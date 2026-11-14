@@ -2462,46 +2462,124 @@
     function wordChrome(root, editing) {
         const chrome = document.createElement("header");
         chrome.className = "wordChrome";
-        chrome.innerHTML = '<div class="wordTitle"><span class="wordBadge">W</span><strong>' +
-            (editing ? "Quarterly project review" : "Oakhaven — " + t("дневник", "journal")) +
-            '</strong><span class="wordSaved">' + t("В этой сессии", "This session") +
-            '</span></div><div class="wordRibbon"><div class="wordRibbonLabel">' +
-            t("Главная", "Home") + '</div><div class="wordCommands"></div></div>';
+        chrome.innerHTML = '<div class="wordTitle"><div class="wordQuick"></div><strong>' +
+            (editing ? t("Документ1", "Document1") : t("Оукхейвен — дневник", "Oakhaven — journal")) +
+            '</strong><div class="wordWindowActions"></div></div><nav class="wordTabs" aria-label="Word"></nav>' +
+            '<div class="wordCommands"></div><div class="wordRuler" aria-hidden="true"><span>' +
+            Array.from({length:19}, (_, i) => '<i>' + i + '</i>').join("") +
+            '</span></div>';
         root.prepend(chrome);
-        const commands = chrome.querySelector(".wordCommands");
-        if (editing) {
-            const editor = root.querySelector("[contenteditable]");
-            const formats = [
-                ["B", "bold", t("Полужирный", "Bold")],
-                ["I", "italic", t("Курсив", "Italic")],
-                ["U", "underline", t("Подчёркнутый", "Underline")]
-            ];
-            for (const [label, command, title] of formats) {
-                const control = button(label, () => {
-                    editor.focus();
-                    document.execCommand(command);
-                }, commands);
-                control.title = title;
-                control.setAttribute("aria-label", title);
-                control.onmousedown = event => event.preventDefault();
-            }
-            const size = document.createElement("select");
-            size.setAttribute("aria-label", t("Размер текста", "Text size"));
-            for (const value of [14, 16, 18, 20, 24]) {
+        const editor = editing ? root.querySelector("[contenteditable]") : root.querySelector(".gameDocument");
+        const quick = chrome.querySelector(".wordQuick");
+        const home = button("⌂", showWelcome, quick);
+        home.title = t("Выбрать интерфейс", "Choose interface");
+        home.setAttribute("aria-label", home.title);
+
+        function command(label, name, value, parent, title) {
+            const control = button(label, () => {
+                editor.focus();
+                document.execCommand(name, false, value);
+            }, parent);
+            control.disabled = !editing;
+            control.title = title || label;
+            control.setAttribute("aria-label", title || label);
+            control.onmousedown = event => event.preventDefault();
+            return control;
+        }
+
+        command("↶", "undo", null, quick, t("Отменить", "Undo"));
+        command("↷", "redo", null, quick, t("Повторить", "Redo"));
+        button(t("Переключить · Esc", "Switch · Esc"), toggleBoss,
+            chrome.querySelector(".wordWindowActions"));
+
+        function group(label) {
+            const section = document.createElement("section");
+            section.className = "wordToolGroup";
+            section.setAttribute("aria-label", label);
+            section.innerHTML = '<div class="wordToolItems"></div><small>' + label + '</small>';
+            chrome.querySelector(".wordCommands").append(section);
+            return section.firstElementChild;
+        }
+
+        function selectControl(label, options, current, change, parent) {
+            const select = document.createElement("select");
+            select.setAttribute("aria-label", label);
+            for (const value of options) {
                 const option = document.createElement("option");
                 option.value = value;
                 option.textContent = value;
-                option.selected = value === 18;
-                size.append(option);
+                option.selected = String(value) === String(current);
+                select.append(option);
             }
-            size.onchange = () => editor.style.fontSize = size.value + "px";
-            commands.append(size);
-        } else {
-            button(t("Сюжет", "Story"), () => $("altScene").scrollIntoView({block:"center"}), commands);
-            button(t("Показатели", "Stats"), () => $("altStats").scrollIntoView({block:"center"}), commands);
-            button(t("Дневник ↓", "Diary ↓"), exportReport, commands);
+            select.disabled = !editing;
+            select.onchange = () => change(select.value);
+            parent.append(select);
         }
-        button(t("Рабочий экран / игра · Esc", "Work / adventure · Esc"), toggleBoss, commands);
+
+        function renderRibbon(tab) {
+            chrome.querySelector(".wordCommands").replaceChildren();
+            for (const item of chrome.querySelectorAll(".wordTabs button")) {
+                item.setAttribute("aria-pressed", String(item.dataset.tab === tab));
+            }
+            if (tab === "home") {
+                const font = group(t("Шрифт", "Font"));
+                selectControl(t("Шрифт", "Font"), ["Calibri", "Arial", "Georgia", "Times New Roman"],
+                    editor.style.fontFamily.replaceAll('"', "") || "Calibri",
+                    value => editor.style.fontFamily = value, font);
+                selectControl(t("Размер текста", "Text size"), [10, 11, 12, 14, 16, 18, 20, 24],
+                    parseInt(editor.style.fontSize) || 16,
+                    value => editor.style.fontSize = value + "px", font);
+                command(t("Ж", "B"), "bold", null, font, t("Полужирный", "Bold"));
+                command(t("К", "I"), "italic", null, font, t("Курсив", "Italic"));
+                command(t("Ч", "U"), "underline", null, font, t("Подчёркнутый", "Underline"));
+                command("ab", "strikeThrough", null, font, t("Зачёркнутый", "Strikethrough"));
+                const paragraph = group(t("Абзац", "Paragraph"));
+                command("☷", "insertUnorderedList", null, paragraph, t("Маркированный список", "Bulleted list"));
+                command("1.", "insertOrderedList", null, paragraph, t("Нумерованный список", "Numbered list"));
+                command("≡", "justifyLeft", null, paragraph, t("По левому краю", "Align left"));
+                command("≡", "justifyCenter", null, paragraph, t("По центру", "Center"));
+                command("≡", "justifyRight", null, paragraph, t("По правому краю", "Align right"));
+                const styles = group(t("Стили", "Styles"));
+                styles.classList.add("wordStyleGallery");
+                for (const [label, tag] of [[t("Обычный","Normal"),"p"],[t("Заголовок 1","Heading 1"),"h1"],[t("Заголовок 2","Heading 2"),"h2"],[t("Подзаголовок","Subtitle"),"h3"]]) {
+                    const tile = command(label, "formatBlock", tag, styles);
+                    tile.className = "wordStyleTile";
+                    const sample = document.createElement("span");
+                    sample.textContent = "AaБбВв";
+                    sample.className = "styleSample " + tag;
+                    tile.prepend(sample);
+                }
+            }
+            if (tab === "insert") {
+                const insert = group(t("Элементы документа", "Document elements"));
+                command(t("Горизонтальная линия", "Horizontal line"), "insertHorizontalRule", null, insert);
+                command(t("Список", "List"), "insertUnorderedList", null, insert);
+                command(t("Дата", "Date"), "insertText", new Date().toLocaleDateString(), insert);
+            }
+            if (tab === "layout") {
+                const layout = group(t("Поля страницы", "Page margins"));
+                for (const [label, padding] of [[t("Обычные","Normal"),"64px"],[t("Узкие","Narrow"),"32px"]]) {
+                    button(label, () => editor.style.padding = padding, layout);
+                }
+            }
+            if (tab === "view") {
+                const view = group(t("Отображение", "Display"));
+                button(t("Линейка", "Ruler"), () => {
+                    chrome.querySelector(".wordRuler").hidden = !chrome.querySelector(".wordRuler").hidden;
+                }, view);
+                button(t("Масштаб +", "Zoom in"), () => editor.style.zoom =
+                    Math.min(1.5, (parseFloat(editor.style.zoom) || 1) + .1), view);
+                button(t("100%", "100%"), () => editor.style.zoom = 1, view);
+                if (!editing) button(t("Показатели", "Stats"), () => $("altStats").scrollIntoView({block:"center"}), view);
+            }
+        }
+
+        for (const [id, label] of [["home",t("Главная","Home")],["insert",t("Вставка","Insert")],
+            ["layout",t("Макет","Layout")],["view",t("Вид","View")]]) {
+            const control = button(label, () => renderRibbon(id), chrome.querySelector(".wordTabs"));
+            control.dataset.tab = id;
+        }
+        renderRibbon("home");
         const footer = document.createElement("footer");
         footer.className = "wordStatus";
         footer.textContent = editing ? t("Страница 1 из 1 · Редактирование", "Page 1 of 1 · Editing") :

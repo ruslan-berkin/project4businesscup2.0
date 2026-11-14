@@ -919,3 +919,59 @@ button:focus-visible,a:focus-visible,input:focus-visible,[contenteditable]:focus
  .offerPortrait{display:flex;align-items:center;justify-content:center;height:100px;padding:10px;background:#edf3e9}
  .offerPortrait img{height:90px;width:60px;object-position:center 15%;object-fit:cover}
 }
+
+/* Word desktop reference: charcoal chrome, dense ribbon and a white page. */
+.wordChrome {background:#2c2c2c;color:#e9e9e9;box-shadow:none;top:0}
+.wordTitle {position:relative;background:#262626;color:#fff;justify-content:space-between;min-height:45px;padding:7px 18px}
+.wordTitle>strong {position:absolute;left:50%;transform:translateX(-50%);max-width:35%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 14px system-ui}
+.wordQuick,.wordWindowActions {display:flex;align-items:center;gap:5px}
+.wordChrome button {background:transparent;color:#dedede;border:1px solid transparent;border-radius:3px;padding:5px 8px;cursor:pointer}
+.wordChrome button:hover {background:#444;border-color:#666}
+.wordChrome button:disabled {opacity:.6;cursor:default}
+.wordQuick button {font-size:22px;line-height:1}
+.wordWindowActions button {font-size:11px}
+.wordTabs {display:flex;gap:16px;padding:0 14px;overflow:auto;border-bottom:1px solid #353535}
+.wordTabs button {font-size:14px;font-weight:650;padding:9px 2px 7px;white-space:nowrap;border-bottom:3px solid transparent;border-radius:0}
+.wordTabs button[aria-pressed="true"] {border-bottom-color:#eee}
+.wordCommands {display:flex;align-items:stretch;flex-wrap:nowrap;min-height:98px;padding:9px 12px;gap:0;overflow-x:auto}
+.wordToolGroup {display:flex;flex-direction:column;justify-content:space-between;flex-shrink:0;border-right:1px solid #555;padding:0 12px}
+.wordToolGroup:last-child {border-right:0}
+.wordToolGroup>small {font-size:10px;color:#a9a9a9;text-align:center;margin-top:5px}
+.wordToolItems {display:flex;flex-wrap:wrap;align-content:center;align-items:center;gap:4px;max-width:250px}
+.wordToolItems button {min-height:28px;min-width:29px;font-size:14px}
+.wordToolItems select {color:#f1f1f1;background:#3b3b3b;border:1px solid #565656;border-radius:4px;padding:5px;max-width:150px;font-size:12px}
+.wordToolItems select:first-child {width:145px}
+.wordStyleGallery {flex-wrap:nowrap;max-width:none}
+.wordStyleGallery .wordStyleTile {display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:95px;height:66px;padding:7px;background:#f7f7f7;color:#161616;border:2px solid #e2e2e2;font-size:10px}
+.wordStyleGallery .wordStyleTile:hover {border-color:#87a9db;background:white}
+.styleSample {font-size:19px;font-family:Calibri,Arial,sans-serif}
+.styleSample.h1 {font-family:Georgia,serif;font-weight:700}
+.styleSample.h2 {color:#366391}
+.styleSample.h3 {color:#666}
+.wordRuler {height:22px;background:#454545;border-top:1px solid #1c1c1c;border-bottom:1px solid #888;overflow:hidden}
+.wordRuler>span {display:flex;width:794px;max-width:calc(100% - 48px);height:100%;margin:auto;padding:0 30px;background:repeating-linear-gradient(90deg,transparent 0 9px,#b5b5b5 9px 10px) left bottom/100% 5px no-repeat}
+.wordRuler i {flex:1;text-align:center;font:10px system-ui;color:#eee}
+.alternative.word {background:#262626;gap:22px;padding-top:0}
+.alternative.word .wordChrome {align-self:stretch}
+.alternative.word .folders {color:#b4b4b4}
+.alternative.word .gameDocument {border:1px solid #b4b4b4;box-shadow:none;border-radius:0;color:#222;background:#fff}
+.alternative.word #altStats {background:#303030;border:1px solid #505050;color:#e1e1e1;border-radius:2px}
+.alternative.word #altStats button {background:#3b3b3b;color:#eee;border-color:#555}
+.workPane.word {background:#262626;position:relative}
+.workPane.word article {border:1px solid #b4b4b4;box-shadow:none;margin:25px auto;min-height:1123px;font:16px/1.6 Calibri,Arial,sans-serif;color:#222}
+.workPane.word article h1 {color:#202020;font-family:Calibri,Arial,sans-serif}
+.workPane.word article h2 {color:#202020}
+.workPane.word::after {content:"";position:absolute;top:189px;bottom:30px;left:0;width:13px;border-right:1px solid #888;background:repeating-linear-gradient(0deg,transparent 0 9px,#aaa 9px 10px) left/6px 100% no-repeat;pointer-events:none}
+.wordStatus {background:#303030;color:#c8c8c8;border-top-color:#555}
+body[data-mask="word"] #workspaceTools,body[data-mask="word"] #compactTools {background:#242424;border-bottom-color:#3a3a3a;color:#ddd}
+body[data-mask="word"] #workspaceTools button,body[data-mask="word"] #compactTools button {color:#ddd;background:#333}
+@media(max-width:800px){
+ .wordTitle {padding:6px 10px}
+ .wordWindowActions button {max-width:110px;font-size:10px}
+ .wordTabs {gap:20px}
+ .wordCommands {min-height:100px}
+ .alternative.word .gameDocument {margin:0 6px}
+ .workPane.word article {width:calc(100% - 40px);padding:40px 28px}
+ .wordRuler>span {max-width:calc(100% - 40px)}
+}
+.wordCommands,.wordTabs,.workPane.word {scrollbar-color:#686868 #2b2b2b;scrollbar-width:thin}
