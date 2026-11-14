@@ -2,6 +2,7 @@
   <img src="tabescape_app/static/images/portal-icon.png" width="72" alt="">
   <h1>TabEscape</h1>
   <p><strong>Короткое приключение в привычном рабочем окне</strong></p>
+  <p><a href="https://github.com/ruslan-berkin/project4zimran/actions/workflows/ci.yml"><img src="https://github.com/ruslan-berkin/project4zimran/actions/workflows/ci.yml/badge.svg" alt="Статус автоматических проверок"></a></p>
   <p>Браузерная текстовая RPG · 8 бесплатных историй · 4 офисных интерфейса · RU / EN</p>
   <p><a href="#установка-и-запуск">Запустить</a> · <a href="#как-проверить-решение">Проверить демо</a> · <a href="PITCH.md">Материал для питча</a> · <a href="docs/REVIEW.md">Проверка репозитория</a></p>
 </div>
