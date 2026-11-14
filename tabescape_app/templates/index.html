@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Книга1.xlsx — Excel</title>
+    <title>TabEscape</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='3' width='22' height='26' rx='3' fill='%2321a366'/%3E%3Cpath d='M6 10h22v7H6z' fill='%23107c41'/%3E%3Crect x='2' y='7' width='14' height='18' rx='2.5' fill='%23185c37'/%3E%3Cpath d='M5.5 11.5l7 9m0-9l-7 9' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/css/style.css">
+
 </head>
 <body>
     <!-- Верхняя панель заголовка Office 365 / Excel Web -->
     <header class="titlebar">
         <div class="tb-left">
-            <button class="icon-btn waffle" title="Средство запуска приложений" aria-label="Приложения" onclick="App.toggleBoss()">
+            <button class="icon-btn waffle" title="Open work view" data-ru-title="Средство запуска приложений" aria-label="Applications" data-ru-aria-label="Приложения" onclick="App.toggleBoss()">
                 <svg viewBox="0 0 16 16" width="16" height="16"><g fill="currentColor"><circle cx="3" cy="3" r="1.25"/><circle cx="8" cy="3" r="1.25"/><circle cx="13" cy="3" r="1.25"/><circle cx="3" cy="8" r="1.25"/><circle cx="8" cy="8" r="1.25"/><circle cx="13" cy="8" r="1.25"/><circle cx="3" cy="13" r="1.25"/><circle cx="8" cy="13" r="1.25"/><circle cx="13" cy="13" r="1.25"/></g></svg>
             </button>
             <span class="excel-logo" title="Excel">
@@ -24,26 +25,26 @@
                     <path d="M5.2 8.5l5.6 7m0-7l-5.6 7" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>
                 </svg>
             </span>
-            <span class="doc-title" id="docTitle" onclick="App.renameWorkbook()" title="Нажмите, чтобы переименовать книгу Excel">Книга1.xlsx</span>
-            <span class="cloud-status" id="saveStatus" title="Сохранено">
+            <span class="doc-title" id="docTitle" onclick="App.renameWorkbook()" title="Rename workbook" data-ru-title="Нажмите, чтобы переименовать книгу Excel" data-ru-copy="Книга1.xlsx">Book1.xlsx</span>
+            <span class="cloud-status" id="saveStatus" title="Saved" data-ru-title="Сохранено">
                 <svg viewBox="0 0 16 16" width="15" height="15">
                     <path d="M4.6 12.5h7.2a2.7 2.7 0 00.4-5.37A3.8 3.8 0 004.9 5.6 3.2 3.2 0 004.6 12.5z" fill="none" stroke="#107c41" stroke-width="1.35"/>
                     <path d="M6.2 9.1l1.4 1.4 2.7-2.7" fill="none" stroke="#107c41" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <span class="status-text" hidden>Сохранено</span>
+                <span class="status-text" hidden data-ru-copy="Сохранено">Saved</span>
             </span>
         </div>
 
         <div class="tb-search">
             <svg viewBox="0 0 16 16" width="14" height="14"><circle cx="6.8" cy="6.8" r="4.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.2 10.2L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            <input type="text" placeholder="Поиск инструментов, справки и другого (ALT + Ы)" aria-label="Поиск" id="searchBox">
+            <input type="text" placeholder="Search tools and help" data-ru-placeholder="Поиск инструментов, справки и другого (ALT + Ы)" aria-label="Search" data-ru-aria-label="Поиск" id="searchBox">
         </div>
 
         <div class="tb-right">
-            <button class="icon-btn" onclick="App.openSettings()" title="Параметры героя и ИИ (TabEscape Pro)" aria-label="Параметры">
+            <button class="icon-btn" onclick="App.openSettings()" title="Hero settings" data-ru-title="Параметры героя и ИИ (TabEscape Pro)" aria-label="Settings" data-ru-aria-label="Параметры">
                 <svg viewBox="0 0 16 16" width="16" height="16"><path d="M8 5.4a2.6 2.6 0 100 5.2 2.6 2.6 0 000-5.2zM8 1.2l.9 1.7 1.9-.4.5 1.9 1.8.9-.9 1.7.9 1.7-1.8.9-.5 1.9-1.9-.4L8 14.8l-.9-1.7-1.9.4-.5-1.9-1.8-.9.9-1.7-.9-1.7 1.8-.9.5-1.9 1.9.4L8 1.2z" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/></svg>
             </button>
-            <span class="avatar" title="Азат Сергалиев (АС)" onclick="App.openSettings()">АС</span>
+            <span class="avatar" title="Azat Sergaliev" data-ru-title="Азат Сергалиев (АС)" onclick="App.openSettings()" data-ru-copy="АС">AS</span>
         </div>
     </header>
 
@@ -52,23 +53,23 @@
         <div class="menubar">
             <div class="ribbon-tabs" id="ribbonTabs"></div>
             <div class="menubar-actions">
-                <button class="mb-btn" onclick="App.gotoSheet('log')" title="Примечания и дневник приключений">
+                <button class="mb-btn" onclick="App.gotoSheet('log')" title="Comments and adventure journal" data-ru-title="Примечания и дневник приключений">
                     <svg viewBox="0 0 16 16" width="13" height="13"><path d="M2.5 3h11a1 1 0 011 1v7a1 1 0 01-1 1H6l-3.5 2.5V12a1 1 0 01-1-1V4a1 1 0 011-1z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></svg>
-                    <span>Примечания</span>
+                    <span data-ru-copy="Примечания">Comments</span>
                 </button>
-                <button class="mb-btn icon-only" onclick="App.gotoSheet('adv')" title="Перейти к приключению">
+                <button class="mb-btn icon-only" onclick="App.gotoSheet('adv')" title="Go to adventure" data-ru-title="Перейти к приключению">
                     <svg viewBox="0 0 16 16" width="13" height="13"><path d="M1.5 10.5l3.2-3.2 2.6 2.6 4.2-5 3 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button class="mb-btn" id="modeBtn" onclick="App.toggleBoss()" title="Переключить режим маскировки (Босс-клавиша Esc)">
+                <button class="mb-btn" id="modeBtn" onclick="App.toggleBoss()" title="Switch work view (Esc)" data-ru-title="Переключить режим маскировки (Босс-клавиша Esc)">
                     <svg viewBox="0 0 16 16" width="13" height="13"><path d="M11.8 2.2l2 2L5.5 12.5 2.5 13.5l1-3 8.3-8.3z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></svg>
                     <span class="chev">▾</span>
                 </button>
-                <button class="mb-btn share-green" onclick="App.exportXlsx()" title="Экспортировать книгу Excel (.xlsx) со всеми цветами и стилями">
+                <button class="mb-btn share-green" onclick="App.exportXlsx()" title="Export formatted Excel workbook (.xlsx)" data-ru-title="Экспортировать книгу Excel (.xlsx) со всеми цветами и стилями">
                     <svg viewBox="0 0 16 16" width="13" height="13"><path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M6.5 4H3.5a1 1 0 00-1 1v7.5a1 1 0 001 1H11a1 1 0 001-1v-3" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span>Поделиться</span>
+                    <span data-ru-copy="Поделиться">Share</span>
                     <span class="chev">▾</span>
                 </button>
-                <button class="icon-btn small ribbon-toggle" id="ribbonToggleBtn" onclick="App.toggleRibbon()" title="Свернуть или развернуть ленту инструментов">
+                <button class="icon-btn small ribbon-toggle" id="ribbonToggleBtn" onclick="App.toggleRibbon()" title="Collapse or expand the ribbon" data-ru-title="Свернуть или развернуть ленту инструментов">
                     <svg viewBox="0 0 16 16" width="12" height="12"><path id="ribbonTogglePath" d="M3.5 10L8 5.5 12.5 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>
@@ -79,18 +80,18 @@
     <!-- Строка формул -->
     <div class="formula-bar">
         <div class="name-box-wrap">
-            <input class="name-box" id="nameBox" value="A1" aria-label="Имя ячейки" title="Имя ячейки (введите адрес, например B5, и нажмите Enter)">
+            <input class="name-box" id="nameBox" value="A1" aria-label="Cell name" data-ru-aria-label="Имя ячейки" title="Enter a cell address, such as B5, and press Enter" data-ru-title="Имя ячейки (введите адрес, например B5, и нажмите Enter)">
             <span class="nb-chev">▾</span>
         </div>
         <div class="fb-actions">
-            <button class="icon-btn small" title="Отмена (Esc)" onclick="App.cancelEdit()">✕</button>
-            <button class="icon-btn small ok" title="Ввод (Enter)" onclick="App.commitFormula()">✓</button>
-            <button class="icon-btn small fx-btn" title="Вставить функцию" onclick="App.insertFn()"><span class="fx">fx</span><span class="nb-chev">▾</span></button>
+            <button class="icon-btn small" title="Cancel (Esc)" data-ru-title="Отмена (Esc)" onclick="App.cancelEdit()">✕</button>
+            <button class="icon-btn small ok" title="Enter" data-ru-title="Ввод (Enter)" onclick="App.commitFormula()">✓</button>
+            <button class="icon-btn small fx-btn" title="Insert function" data-ru-title="Вставить функцию" onclick="App.insertFn()"><span class="fx">fx</span><span class="nb-chev">▾</span></button>
         </div>
         <div class="formula-input-wrap">
             <input type="text" id="formulaInput" class="formula-input" autocomplete="off" spellcheck="false"
                    placeholder="">
-            <span class="fb-expand" title="Развернуть строку формул">⌄</span>
+            <span class="fb-expand" title="Expand formula bar" data-ru-title="Развернуть строку формул">⌄</span>
         </div>
     </div>
 
@@ -106,30 +107,30 @@
     <footer class="bottom">
         <div class="sheet-bar">
             <div class="sheet-nav">
-                <button class="icon-btn small" id="navPrev" onclick="App.scrollTabs(-220)" title="Прокрутить вкладки влево">‹</button>
-                <button class="icon-btn small" id="navNext" onclick="App.scrollTabs(220)" title="Прокрутить вкладки вправо">›</button>
-                <button class="icon-btn small" id="allSheetsBtn" onclick="App.toggleSheetsMenu()" title="Все листы">≡</button>
+                <button class="icon-btn small" id="navPrev" onclick="App.scrollTabs(-220)" title="Scroll sheets left" data-ru-title="Прокрутить вкладки влево">‹</button>
+                <button class="icon-btn small" id="navNext" onclick="App.scrollTabs(220)" title="Scroll sheets right" data-ru-title="Прокрутить вкладки вправо">›</button>
+                <button class="icon-btn small" id="allSheetsBtn" onclick="App.toggleSheetsMenu()" title="All sheets" data-ru-title="Все листы">≡</button>
             </div>
             <div class="sheet-tabs" id="sheetTabs"></div>
-            <button class="icon-btn small add-sheet" title="Добавить новый лист" onclick="App.addSheet()">＋</button>
+            <button class="icon-btn small add-sheet" title="Add sheet" data-ru-title="Добавить новый лист" onclick="App.addSheet()">＋</button>
         </div>
 
         <div class="statusbar">
             <div class="sb-left">
-                <span class="sb-workbook-stats" onclick="App.showWorkbookStats()" title="Статистика рабочей книги">Статистика книг</span>
-                <span id="sbReady" class="sb-ready">Готово</span>
+                <span class="sb-workbook-stats" onclick="App.showWorkbookStats()" title="Workbook statistics" data-ru-title="Статистика рабочей книги" data-ru-copy="Статистика книг">Workbook statistics</span>
+                <span id="sbReady" class="sb-ready" data-ru-copy="Готово">Ready</span>
             </div>
             <div class="sb-mid" id="sbStats"></div>
             <div class="sb-right">
-                <span class="sb-ico" title="Свернуть строку состояния">⌄</span>
-                <span class="sb-ico" title="Сочетания клавиш: Esc — Босс-режим, 1-3 — ход">⌨</span>
-                <span class="sb-ico" title="Справка" onclick="App.openSettings()">?</span>
-                <span class="sb-ico" title="Обычный режим просмотра">▤</span>
-                <button class="icon-btn tiny" onclick="App.zoomBy(-10)" title="Уменьшить масштаб">−</button>
-                <input type="range" id="zoomRange" min="60" max="160" step="10" value="100" aria-label="Масштаб" hidden>
-                <span id="zoomLabel" class="zoom-label" onclick="App.resetZoom()" title="Масштаб (нажмите для 100%)">100 % ▾</span>
-                <button class="icon-btn tiny" onclick="App.zoomBy(10)" title="Увеличить масштаб">＋</button>
-                <button class="icon-btn tiny" onclick="App.toggleFullscreen()" title="Во весь экран">⛶</button>
+                <span class="sb-ico" title="Collapse status bar" data-ru-title="Свернуть строку состояния">⌄</span>
+                <span class="sb-ico" title="Esc switches views. Keys 1–3 choose an action." data-ru-title="Сочетания клавиш: Esc — Босс-режим, 1-3 — ход">⌨</span>
+                <span class="sb-ico" title="Help" data-ru-title="Справка" onclick="App.openSettings()">?</span>
+                <span class="sb-ico" title="Normal view" data-ru-title="Обычный режим просмотра">▤</span>
+                <button class="icon-btn tiny" onclick="App.zoomBy(-10)" title="Zoom out" data-ru-title="Уменьшить масштаб">−</button>
+                <input type="range" id="zoomRange" min="60" max="160" step="10" value="100" aria-label="Zoom" data-ru-aria-label="Масштаб" hidden>
+                <span id="zoomLabel" class="zoom-label" onclick="App.resetZoom()" title="Zoom (select for 100%)" data-ru-title="Масштаб (нажмите для 100%)">100 % ▾</span>
+                <button class="icon-btn tiny" onclick="App.zoomBy(10)" title="Zoom in" data-ru-title="Увеличить масштаб">＋</button>
+                <button class="icon-btn tiny" onclick="App.toggleFullscreen()" title="Full screen" data-ru-title="Во весь экран">⛶</button>
             </div>
         </div>
     </footer>
@@ -147,29 +148,32 @@
     <div class="modal-backdrop" id="settingsModal" hidden>
         <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
             <div class="dlg-head">
-                <h2 id="dlgTitle">Параметры героя и конфигурация ИИ</h2>
-                <button class="icon-btn" onclick="App.closeSettings()" aria-label="Закрыть">✕</button>
+                <h2 id="dlgTitle" data-ru-copy="Параметры героя и конфигурация ИИ">Hero settings</h2>
+                <button class="icon-btn" onclick="App.closeSettings()" aria-label="Close" data-ru-aria-label="Закрыть">✕</button>
             </div>
             <div class="dlg-body">
-                <p class="dlg-desc">
-                    <b>Фэнтези под маской Excel:</b> клавиша <b>Esc</b> мгновенно скрывает вкладки игры и открывает вашу рабочую книгу Excel (пустую с нуля или любой загруженный вами файл <code>.xlsx</code>).
-                </p>
-                <label for="inputRole">Имя и класс вашего героя</label>
-                <input type="text" id="inputRole" maxlength="60" placeholder="Например: Начинающий искатель, Странствующий маг">
-                <label for="inputBoss">Имя Мастера Гильдии или наставника</label>
-                <input type="text" id="inputBoss" maxlength="60" placeholder="Например: Мастер Гильдии Морган">
-                <label for="inputApiKey">Ключ LLM API (необязательно): Groq <code>gsk_…</code> или Gemini <code>AIza…</code></label>
-                <input type="password" id="inputApiKey" placeholder="Оставьте пустым — работает встроенный сюжетный движок" autocomplete="off">
-                <small class="hint">Вы можете создавать листы Excel с нуля (кнопка «Новая книга» или «+») либо загружать любой .xlsx файл с компьютера.</small>
+                <p class="dlg-desc" data-ru-copy="Esc переключает игру и рабочий экран. При повторном нажатии вы вернётесь к той же сцене.">Esc switches between the game and the work view. Press it again to return to the same scene.</p>
+                <label for="inputRole" data-ru-copy="Имя и класс вашего героя">Hero name and class</label>
+                <input type="text" id="inputRole" maxlength="60" placeholder="For example, apprentice adventurer" data-ru-placeholder="Например: Начинающий искатель, Странствующий маг">
+                <label for="inputBoss" data-ru-copy="Имя Мастера Гильдии или наставника">Guildmaster or mentor</label>
+                <input type="text" id="inputBoss" maxlength="60" placeholder="For example, Guildmaster Morgan" data-ru-placeholder="Например: Мастер Гильдии Морган">
+                <details class="optionalAI"><summary data-ru-copy="Необязательный ИИ-движок">Optional AI engine</summary>
+                    <label for="inputApiKey" data-ru-copy="Необязательный ключ Groq или Gemini">Optional Groq or Gemini API key</label>
+                    <input type="password" id="inputApiKey" autocomplete="off" placeholder="Leave empty for the built-in story engine" data-ru-placeholder="Оставьте пустым для встроенного движка">
+                </details>
+                <small class="hint" data-ru-copy="Вы можете создавать листы Excel с нуля (кнопка «Новая книга» или «+») либо загружать любой .xlsx файл с компьютера.">Use New workbook or + to create sheets. Open an existing .xlsx file from your computer.</small>
             </div>
             <div class="dlg-foot">
-                <button class="btn" onclick="App.closeSettings()">Отмена</button>
-                <button class="btn primary" onclick="App.saveSettings()">Применить и начать</button>
+                <button class="btn" onclick="App.closeSettings()" data-ru-copy="Отмена">Cancel</button>
+                <button class="btn primary" onclick="App.saveSettings()" data-ru-copy="Применить и начать">Apply and restart</button>
             </div>
         </div>
     </div>
 
+        <script src="/static/js/assets.js"></script>
+    <script src="/static/js/office-i18n.js"></script>
+    <script src="/static/js/tour.js"></script>
     <script src="/static/js/allowance.js"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="/static/js/app.js"></script>
 </body>
 </html>

@@ -1066,3 +1066,151 @@ body[data-mask="word"] #workspaceTools button,body[data-mask="word"] #compactToo
 .wordStyleTile:nth-child(4) .styleSample {font-size:15px;font-weight:400}
 .wordStyleTile:nth-child(5) .styleSample {font-size:23px;font-weight:400}
 .wordStyleTile:nth-child(6) .styleSample {font-style:normal}
+
+
+
+/* The hub and guide use their own palette. Office documents retain their theme. */
+#welcome {--pine:#182b23;--leaf:#b1ee83;--paper:#f7f7ef;background:var(--paper);color:var(--pine);font:16px/1.5 "Segoe UI",system-ui,sans-serif;min-height:0;height:100%;width:100%;overflow:auto}
+.hub {width:min(1256px,100%);padding:0 clamp(16px,4vw,55px);margin:auto}
+.hubNav,.shelfHeading,.guideStrip,.hubFooter,.wordmark,.hubNav nav {display:flex;align-items:center}
+.hubNav {min-height:80px;gap:36px}
+.wordmark {font:750 26px/1 "Segoe UI",sans-serif;letter-spacing:-1.65px;color:#182d26}
+.wordmark img {width:38px;height:38px;margin-right:7px;image-rendering:pixelated}
+.wordmark span {color:#37764a}
+.hubNav nav {gap:6px;margin-left:auto}
+.hubNav button,.guideStrip button {min-height:42px;padding:8px 14px;font-weight:650;font-size:14px;border-radius:7px}
+.hubNav button:hover,.guideStrip button:hover {background:#e5ebdf}
+.hubNav .navWork {color:#315b3c;background:#e6ecdf}
+.hubNav .langSwitch {font:650 12px/1 ui-monospace,monospace;border:1px solid #b9c4b5;color:#394c3d;padding:8px 12px}
+.hero {position:relative;isolation:isolate;display:flex;align-items:center;min-height:clamp(320px,30vw,404px);overflow:hidden;border:2px solid #243a32;border-radius:16px;color:#fbfaee;background:#101326 url("/static/images/workspace-background-1.webp") center center / cover no-repeat;box-shadow:0 4px 0 #bcc8b5}
+.hero:before {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#07151be6,#0b172545 53%,transparent 72%)}
+.heroCopy {padding:clamp(26px,3.7vw,55px);max-width:680px}
+.campaign,.eyeline,.mapPin,.hubFooter,.speaker,.shelfMeta {font-family:Consolas,"Courier New",monospace}
+.campaign,.eyeline {font-size:11px;font-weight:700;letter-spacing:1.6px}
+.campaign {display:flex;align-items:center;gap:9px;color:#b9ee9d}
+.campaign i,.hubFooter i {display:inline-block;background:#a7e68a;width:7px;height:7px;box-shadow:2px 2px 0 #436840}
+#welcome .hero h1 {font:650 clamp(43px,5.2vw,73px)/1.02 Georgia,"Times New Roman",serif;letter-spacing:-.055em;margin:16px 0 13px}
+.hero h1 em {font-weight:600;color:#b5e88e}
+.heroCopy>p {color:#edf1e7;max-width:370px;font-size:clamp(14px,1.2vw,16px);line-height:1.55}
+.hero .playNow {margin-top:21px;min-height:45px;padding:10px 18px;color:#1d3624;background:#b4e995;box-shadow:0 3px 0 #43764e;border:1px solid #dcf7b8;border-radius:6px;font-size:14px;font-weight:750}
+.hero .playNow:hover {background:#d0f8b4}
+.playNow span {font-size:11px;margin-right:7px}
+.mapPin {position:absolute;right:18px;bottom:15px;display:flex;align-items:center;gap:7px;color:#fffae9;background:#13241ce8;border:1px solid #9ab4918c;border-radius:4px;padding:4px 9px;font-size:11px}
+.mapPin i {color:#f6ce8f;font-style:normal}
+.workspaceShelf {padding:29px 0 20px}
+.shelfHeading {justify-content:space-between;align-items:end;gap:15px}
+.eyeline {color:#527047;margin:0 0 4px}
+.shelfHeading h2 {font:600 clamp(25px,2.7vw,36px)/1.18 Georgia,serif;letter-spacing:-1.2px}
+.shelfMeta {font-size:12px;color:#53665a;margin-bottom:4px}
+.maskCards {grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0 0}
+.maskCard {display:grid;grid-template-columns:1fr auto;align-items:center;position:relative;color:#21352b;background:#fffef6;border:1px solid #c7d0bf;border-radius:10px;padding:16px 16px 14px;box-shadow:0 3px 0 #dbe1d2;transition:transform .18s,box-shadow .18s}
+.maskCard:hover {border-color:#538459;box-shadow:0 4px 0 #a6bf9c;transform:translateY(-3px)}
+.artifact {grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:76px;border-radius:5px;background-color:var(--field);background-image:radial-gradient(var(--dot) .8px,transparent 1px);background-size:8px 8px;margin-bottom:12px}
+.artifact img {width:65px;height:65px;image-rendering:pixelated;filter:drop-shadow(2px 4px 0 #263a3024)}
+.maskCard.excel {--field:#e3eddb;--dot:#bfd2af}.maskCard.word{--field:#eae5f2;--dot:#cfc2db}
+.maskCard.outlook {--field:#f4ead5;--dot:#dfd0b1}.maskCard.autocad {--field:#dfecec;--dot:#bfd3d1}
+.maskCard h3 {font-size:18px;line-height:1.2;letter-spacing:-.55px;margin:0}
+.maskCard .cardInfo p {font:13px/1.4 "Segoe UI",sans-serif;color:#526254;margin:5px 0 0}
+.cardArrow {color:#45664b;font-size:18px;align-self:start}
+.guideStrip {position:relative;overflow:hidden;gap:18px;min-height:85px;padding:10px 18px;background:#eeebf6;border:1px solid #d7d1e3;border-radius:10px}
+.miraBust {position:relative;align-self:stretch;width:58px;flex:0 0 58px;overflow:hidden}
+.miraBust img {position:absolute;top:1px;left:3px;width:53px;image-rendering:pixelated}
+.guideStrip b {font:600 19px/1.3 Georgia,serif;color:#39314d}
+.guideStrip p {font-size:13px;color:#565067;margin-top:2px}
+.guideStrip button {margin-left:auto;border:1px solid #b9b0c8;background:#f8f6fc;font-size:13px;color:#483c5b}
+.hubFooter {justify-content:space-between;gap:14px;padding:18px 0 24px;color:#576654;font-size:11px}
+.hubFooter i {width:6px;height:6px;background:#68a266;box-shadow:none;margin-right:4px}
+.tutorialLaunch {font-weight:700!important}
+#workspaceTools {color:#233a2c;background:#f4f7ef;border-bottom-color:#cbd4c8}
+#workspaceTools button {color:#263e32;background:#e6ece1;min-height:36px}
+#workspaceTools #switchView {color:#f6fff0;background:#326547}
+#workspaceTools .tutorialLaunch,#compactTools .tutorialLaunch {background:#ede7f6;color:#5b3d83}
+:where(button,a,input,select,summary,[tabindex],[contenteditable]):focus-visible {outline:3px solid #8754c4!important;outline-offset:2px}
+#workspaceTools,.alternative,.gameDocument,#alternateWork,#excelShell,.vitals {min-width:0}
+.alternative {min-height:0;overflow:auto}
+.vitals {width:100%}
+.spotlight {position:fixed;z-index:2000;pointer-events:none;box-shadow:0 0 0 9999px #0d171cba,0 0 0 3px #a6eb8a,0 0 20px 6px #9ccd82;border:2px solid #c4f3a3;border-radius:7px;transition:top .22s,left .22s,width .22s,height .22s}
+#guide {display:flex;position:fixed;z-index:2001;top:0;left:0;right:auto;bottom:auto;gap:10px;align-items:end;width:min(378px,calc(100% - 20px));margin:0;padding:0;border:none;box-shadow:none;background:transparent;color:#24332b;font:14px/1.45 "Segoe UI",system-ui,sans-serif;transition:top .22s,left .22s;pointer-events:none}
+#guide .guideSprite {width:65px;height:auto;max-height:148px;object-fit:contain;align-self:end;image-rendering:pixelated;transform-origin:50% 95%;filter:drop-shadow(1px 2px 0 #101b1d);animation:mira-arrive .32s ease-out,mira-idle 2.5s .35s ease-in-out infinite}
+#guide[data-step="2"] .guideSprite,#guide[data-step="4"] .guideSprite {rotate:-4deg}
+@keyframes mira-arrive {from{opacity:0;transform:translateY(8px) scale(.92)}}
+@keyframes mira-idle {0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-4px) rotate(1deg)}}
+.speech {pointer-events:auto;position:relative;flex:1;min-width:0;padding:14px 16px;background:#fffdf2;border:2px solid #394b3b;border-radius:10px;box-shadow:0 4px 0 #2938296b}
+.speech:before {content:"";position:absolute;left:-7px;bottom:24%;width:10px;height:10px;background:#fffdf2;border-left:2px solid #394b3b;border-bottom:2px solid #394b3b;transform:rotate(45deg)}
+.speaker {display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#5a6859;margin-bottom:5px}
+.speaker strong {color:#5b3c82;letter-spacing:1px;text-transform:uppercase}
+#guide h2 {font:650 20px/1.15 Georgia,serif;letter-spacing:-.45px}
+#guide p {margin:5px 0 10px;line-height:1.4}
+.tourButtons {display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+#guide button {min-height:35px;padding:5px 10px;border:1px solid #c3cdbe;background:#f2f4eb;color:#293c2d;border-radius:5px;font-size:13px;font-weight:650}
+#guide [data-go="skip"] {margin-right:auto;border-color:transparent;background:transparent;color:#546454}
+#guide [data-go="next"] {background:#315f40;border-color:#315f40;color:#fff}
+#guide button:disabled {opacity:.45;cursor:default}
+body.tourActive {height:100dvh!important;min-height:0!important;overflow:hidden!important}
+body.tourDock {padding-bottom:var(--dock-height)}
+body.tourDock #guide {width:min(420px,calc(100% - 16px));bottom:8px;top:auto!important;left:50%!important;transform:translateX(-50%);gap:6px}
+body.tourDock #guide .guideSprite {width:clamp(38px,11vw,58px);max-height:100px}
+body.tourDock .speech {padding:9px 12px}
+body.tourDock #guide button {min-height:40px}
+body.tourDock #welcome {min-height:0}
+@media(max-width:900px){
+ .hubNav {min-height:67px}.hero {min-height:302px}.maskCard {padding:10px}.shelfMeta{font-size:11px}
+ #workspaceTools button {min-height:40px}.wordWindowActions .tutorialLaunch {font-size:12px}
+}
+@media(max-width:800px){
+ .alternative,.alternative.outlook,.alternative.autocad {grid-template-columns:minmax(0,1fr);overflow:auto;align-content:start;gap:12px}
+ .alternative.word {display:flex;flex-direction:column;overflow:auto;gap:12px;padding:0 0 12px}
+ .alternative.word>.wordChrome,.alternative.word>.gameDocument,.alternative.word>#altStats,.alternative.word>.wordStatus {flex:none}
+ .alternative.word>.gameDocument,.alternative.word>#altStats {width:calc(100% - 20px);margin:0 auto}
+ .alternative.word .wordChrome,.workPane.word .wordChrome {position:relative;top:auto;min-width:0}
+ .alternative.word .gameDocument {min-height:0;padding:24px 18px}
+ .alternative.word #altStats {grid-row:auto}
+ .alternative .gameDocument,.alternative #altStats {min-width:0}
+ .alternative .folders,.alternative .gameMailList {display:none}
+ .alternative #altChoices button,.alternative #customForm button {min-height:44px}
+ .alternative #altChoices {margin:14px 0}
+ .alternative #altScene p {margin-bottom:10px}
+ .alternative.excel {background:#e7eee5}
+ .alternative.excel .gameDocument {border-top:4px solid #267344}
+ .readerTabs {display:flex;gap:8px;padding:0 2px 8px}
+ .readerTabs button {min-height:42px}
+ #workspaceTools {flex-wrap:nowrap;overflow-x:auto;padding:5px 8px;width:100%}
+ #workspaceTools>* {flex-shrink:0}#workspaceTools #switchView {order:-1}
+ #excelShell {min-width:0;overflow:hidden}#excelShell .grid-scroll {min-height:0}
+ .alternative.autocad .adventureMap {overflow:auto;min-width:0;padding:12px;gap:8px}
+ .workPane.autocad .drawing {min-width:0;overflow:auto;padding:20px;min-height:250px}
+ .workPane.outlook,.workPane.autocad {grid-template-columns:minmax(0,1fr);height:auto;min-height:100%}
+ .workPane.outlook .reading {padding:20px}
+ .alternative .wordQuick {flex-shrink:1;min-width:0}.wordTitle>strong {display:none}
+ .wordWindowActions {margin-left:auto;flex-shrink:0}
+ .hubNav {gap:12px}.shelfHeading {align-items:start}.shelfMeta {display:none}
+}
+@media(max-width:630px){
+ .hubNav {gap:5px;min-height:62px}.wordmark {font-size:22px}.wordmark img {width:30px;height:30px;margin-right:4px}
+ .hubNav button {padding:5px 9px;font-size:12px}.hubNav .langSwitch {padding:5px 7px;font-size:11px}
+ .hubNav nav {gap:0}.hubNav .navWork {display:none}
+ .hero {min-height:310px;background-position:62% center}
+ .heroCopy {padding:23px 18px 37px}.heroCopy>p {max-width:255px;font-size:14px}
+ .hero:before {background:linear-gradient(90deg,#0a1521ee,#0a1521aa 52%,#0a152126)}
+ #welcome .hero h1 {font-size:clamp(40px,9.5vw,54px)}
+ .campaign,.eyeline {font-size:10px}.mapPin {font-size:9px;bottom:8px;right:9px}
+ .workspaceShelf {padding:23px 0 15px}.maskCards {grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+ .maskCard {padding:8px}.artifact {min-height:44px;margin-bottom:7px}.artifact img {width:43px;height:43px}
+ .maskCard h3 {font-size:16px}.maskCard .cardInfo p {font-size:12px;margin-top:2px}
+ .guideStrip {gap:7px;flex-wrap:wrap;padding:10px}.miraBust {width:32px;flex-basis:32px;min-height:42px}
+ .miraBust img {width:32px;left:0}.guideStrip button {font-size:12px;padding:5px 8px}.guideStrip b{font-size:16px}
+ .guideStrip p {font-size:12px}.hubFooter {align-items:start;font-size:10px}.hubFooter span:last-child {max-width:53%;text-align:right}
+ .wordWindowActions button,.wordQuick .wordPanelToggle {min-height:34px}
+}
+@media(max-height:495px) {
+ body.tourDock #guide {width:min(620px,calc(100% - 16px))}
+ body.tourDock .speech {display:grid;grid-template-columns:1fr auto;gap:1px 10px}
+ body.tourDock .speaker {grid-column:1/-1;margin:0}
+ body.tourDock #guide .guideSprite {max-height:75px}
+ body.tourDock #guide p {font-size:12px;margin-bottom:0}
+ body.tourDock .tourButtons {align-self:end;flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){
+ #guide .guideSprite,.grid td.story.fade {animation:none!important;rotate:none!important}
+ .spotlight,#guide,.maskCard {transition:none!important}
+}

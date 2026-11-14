@@ -28,9 +28,12 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(client.get('/').status_code, 200)
             with client.get('/static/js/app.js') as response:
                 self.assertIn(b'initWorkspace', response.data)
-            for resource in ['/static/guides/excel.jpeg', '/api/workbook/default']:
+            for resource in ['/static/guides/excel.jpeg', '/api/workbook/default',
+                             '/static/js/tour.js', '/static/images/mira.webp',
+                             '/static/images/workspace-background-1.webp']:
                 with client.get(resource) as response:
                     self.assertEqual(response.status_code, 200)
+            self.assertIn('You wake', client.post('/api/start', json={'language': 'en'}).get_json()['narrative'])
 
     @patch.dict(os.environ, {}, clear=True)
     def test_procedural_start_and_action(self):
@@ -44,6 +47,45 @@ class RuntimeTests(unittest.TestCase):
         }).get_json()
         self.assertNotEqual(action['stats'], start['stats'])
         self.assertNotEqual(action['narrative'], start['narrative'])
+
+    def test_uploaded_interface_uses_server_and_local_assets(self):
+        client = app.app.test_client()
+        html = client.get('/').get_data(as_text=True)
+        for name in ('assets', 'office-i18n', 'tour', 'allowance', 'app'):
+            self.assertIn('/static/js/' + name + '.js', html)
+            with client.get('/static/js/' + name + '.js') as response:
+                self.assertEqual(response.status_code, 200)
+        with client.get('/static/js/app.js') as response:
+            js = response.get_data(as_text=True)
+        self.assertNotIn('localAdventure', js)
+        self.assertIn('await fetch(url', js)
+        self.assertIn('/api/workbook/default', js)
+        self.assertIn('/api/export_xlsx', js)
+        for name in ('mira.webp', 'workspace-background-1.webp'):
+            with client.get('/static/images/' + name) as response:
+                self.assertEqual(response.status_code, 200)
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_english_uses_same_procedural_rules(self):
+        client = app.app.test_client()
+        start = client.post('/api/start', json={'language': 'en'}).get_json()
+        self.assertIn('You wake', start['narrative'])
+        action = client.post('/api/action', json={
+            'language': 'en', 'action': start['options'][0], 'choice_idx': 0,
+            'scene_id': start['scene_id'], 'stats': start['stats']
+        }).get_json()
+        self.assertEqual(action['stats'], {'ROI': 55, 'KPI': 80, 'Anxiety': 25})
+        self.assertIn('ravine', action['narrative'])
+        attack = client.post('/api/action', json={
+            'language': 'en', 'action': 'Attack the dragon', 'choice_idx': -1,
+            'scene_id': action['scene_id'], 'stats': action['stats']
+        }).get_json()
+        self.assertEqual(attack['stats']['ROI'], 15)
+        item = client.post('/api/action', json={
+            'language': 'en', 'action': 'Use item: Potion', 'choice_idx': -1,
+            'scene_id': attack['scene_id'], 'stats': attack['stats']
+        }).get_json()
+        self.assertEqual(item['stats']['ROI'], 40)
 
     def test_default_and_export(self):
         client = app.app.test_client()

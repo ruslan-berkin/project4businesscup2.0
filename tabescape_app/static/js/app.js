@@ -28,7 +28,10 @@
         get(k, d) { try { const v = sessionStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
         set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* ignore */ } },
     };
-    const nf = (n, o) => n.toLocaleString("ru-RU", o);
+    let language = store.get("te_language", "en");
+    const t = (ru, en) => language === "en" ? en : ru;
+    const ui = value => language === "en" ? (officeEnglish[value] || value) : value;
+    const nf = (n, o) => n.toLocaleString(language === "en" ? "en-US" : "ru-RU", o);
 
     function seeded(seed) {
         let s = seed;
@@ -51,7 +54,7 @@
             fromScratch: true,
             sheets: [
                 {
-                    name: "Лист1",
+                    name: t("Лист1", "Sheet1"),
                     cells: [],
                     sparse: {},
                     merges: [],
@@ -66,14 +69,14 @@
 
     // ------------------------------------------------------------------ состояние
     const START_STATS = { ROI: 100, KPI: 100, Anxiety: 10 };
-    const DEFAULT_WB_NAME = "Книга1.xlsx";
+    const DEFAULT_WB_NAME = t("Книга1.xlsx", "Book1.xlsx");
 
     const S = {
         stats: { ...START_STATS }, options: [], turn: 1, over: false, won: false,
         narrative: "", auditLog: "", sceneId: null, seen: [], inventory: [], log: [],
         history: [{ ...START_STATS }], loading: null, custom: "",
-        role: store.get("te_role", "Начинающий искатель"),
-        boss: store.get("te_boss", "Мастер Гильдии Морган"),
+        role: store.get("te_role", t("Начинающий искатель", "Apprentice adventurer")),
+        boss: store.get("te_boss", t("Мастер Гильдии Морган", "Guildmaster Morgan")),
         apiKey: session.get("te_key", ""),
         imported: null,
         sourceB64: null,
@@ -117,6 +120,13 @@
         "Чешуйка удачи": "Золотистая чешуйка доброй драконицы Аурелии, приносящая удачу.",
     };
 
+    const englishItems = {
+        "Письмо в Гильдию": "Guild letter", "Карта долины": "Valley map", "Тёплый пирожок": "Warm apple pie",
+        "Значок Гильдии": "Guild badge", "Справочник трав": "Herbal field guide", "Старинный компас": "Brass compass",
+        "Кошачий амулет": "Cat’s amulet", "Зелье бодрости": "Energy tonic", "Серебряный ключ": "Silver key",
+        "Линза рассвета": "Dawn lens", "Чешуйка удачи": "Lucky scale"
+    };
+    const itemLabel = name => language === "en" ? (englishItems[name] || name) : name;
     // ------------------------------------------------------------------ формулы
     const FN = {
         SUM: (...a) => a.flat(Infinity).reduce((s, v) => s + (typeof v === "number" ? v : 0), 0),
@@ -305,13 +315,14 @@
         put(2, 1, { raw: "СЦЕНА", cls: "code", locked: true });
         put(2, 2, { cls: "story", locked: true, html: () => S.loading ? esc(S.loading) : esc(S.narrative), fx: () => (S.loading ? "" : S.auditLog) });
         put(3, 1, { raw: "СВОЙ ХОД", cls: "code", locked: true });
-        put(3, 2, { cls: "prompt", html: () => S.custom ? esc(S.custom) : "✎ Свой ход: напишите действие в строке формул (B3) и нажмите Enter", editableAction: true });
+        put(3, 2, { cls: "prompt", html: () => S.custom ? esc(S.custom) : t("✎ Свой ход: напишите действие в строке формул (B3) и нажмите Enter","✎ Your move: select B3, type in the formula bar and press Enter"), editableAction: true });
         for (let i = 0; i < 3; i++) {
-            put(4 + i, 1, { raw: `[ВЫБОР ${i + 1}]`, cls: "code", locked: true });
+            put(4 + i, 1, { raw: `[${t("ВЫБОР","CHOICE")} ${i + 1}]`, cls: "code", locked: true });
             put(4 + i, 2, {
                 cls: "optcell", locked: true,
                 html: () => {
                     if (S.loading) return "";
+                    if (S.over && language === "en") return ["▶ Start another adventure", (S.won ? "Victory!" : "Adventure complete") + " · Score " + score() + " · Best " + S.best, "↓ Download diary (.txt)"][i];
                     if (S.over) return ["▶ Начать новое приключение", S.won ? `🏆 Победа! Очки: ${score()} · Рекорд: ${S.best}` : `💫 Приключение окончено! Очки: ${score()} · Рекорд: ${S.best}`, "⤓ Скачать историю похода (.txt)"][i];
                     return `<span class="optkey">${i + 1}</span>${esc(S.options[i] || "…")}`;
                 },
@@ -338,7 +349,7 @@
                         KPI: ["БОДР", "УТОМЛЁН", "ВАЛИТСЯ С НОГ"],
                         Anxiety: ["СПОКОЙНО", "ЗАМЕЧЕН", "ИЩЕТ СТРАЖА"],
                     }[k][{ ok: 0, warn: 1, bad: 2 }[lvl]];
-                    return `<span class="badge ${lvl}">${txt}</span>`;
+                    return `<span class="badge ${lvl}">${ui(txt)}</span>`;
                 },
             });
         };
@@ -347,10 +358,10 @@
         statCell(4, "Неприятности", "Anxiety", (v) => (v <= 40 ? "ok" : v <= 70 ? "warn" : "bad"), "РОЗЫСК");
         put(5, 4, { raw: "Время дня", locked: true });
         put(5, 5, { locked: true, cls: "r", fx: "=ТЕКСТ(ВРЕМЯ();\"чч:мм\")", html: () => `<b>${clockStr()}</b>` });
-        put(5, 6, { locked: true, html: () => { const left = Math.max(0, 18 * 60 - clockMinutes()); return `<span class="badge ${left > 180 ? "ok" : "warn"}">ДО ВЕЧЕРА — ${Math.floor(left / 60)} Ч ${left % 60} МИН</span>`; }, fx: "=ВРЕМЯ(18;0;0)-ВРЕМЯ()" });
+        put(5, 6, { locked: true, html: () => { const left = Math.max(0, 18 * 60 - clockMinutes()); return `<span class="badge ${left > 180 ? "ok" : "warn"}">${t("ДО ВЕЧЕРА","REMAINING")} · ${Math.floor(left / 60)}${t("ч","h")} ${left % 60}${t("м","m")}</span>`; }, fx: "=ВРЕМЯ(18;0;0)-ВРЕМЯ()" });
         put(6, 4, { raw: "Находки", locked: true });
         put(6, 5, { locked: true, cls: "r", fx: "=СЧЁТ(Инвентарь!B:B)", html: () => `<b>${S.inventory.length}</b>` });
-        put(6, 6, { locked: true, html: () => `<span class="badge ${S.inventory.length ? "ok" : "warn"}">${S.inventory.length ? "В СУМКЕ" : "ПУСТО"}</span>` });
+        put(6, 6, { locked: true, html: () => `<span class="badge ${S.inventory.length ? "ok" : "warn"}">${S.inventory.length ? t("В СУМКЕ","IN BAG") : t("ПУСТО","EMPTY")}</span>` });
 
         const hdr = ["Код", "Статья баланса", "1 кв.", "2 кв.", "3 кв.", "4 кв.", "Итого", "Δ 4/3 кв."];
         hdr.forEach((h, i) => put(8, i + 1, { raw: h, cls: "hdr" + (i > 1 ? " c" : "") }));
@@ -441,10 +452,10 @@
         names.forEach((n, i) => {
             const r = 2 + i;
             put(r, 1, { raw: i + 1, cls: "code" });
-            put(r, 2, { raw: n, cls: "bold" });
-            put(r, 3, { raw: ITEM_DESC[n] || "Полезная находка из Оукхейвена (+25 Здоровья и Бодрости)." });
+            put(r, 2, { raw: itemLabel(n), cls: "bold" });
+            put(r, 3, { raw: language === "en" ? "Use to restore health and energy." : ITEM_DESC[n] || "Полезная находка из Оукхейвена (+25 Здоровья и Бодрости)." });
             put(r, 4, { raw: grouped[n], cls: "c" });
-            put(r, 5, { cls: "c", html: () => `<button class="use-btn" data-use="${esc(n)}">Использовать</button>` });
+            put(r, 5, { cls: "c", html: () => `<button class="use-btn" data-use="${esc(n)}">${t("Использовать","Use")}</button>` });
             if (i % 2) rowCls[r] = "zebra";
         });
         return { id: "inv", name: "Инвентарь", cells, rowCls, cols: [50, 260, 420, 90, 150, 90, 90, 90, 90, 90, 90, 90], ncols: 12, rows: 40, lockedFrom: 999 };
@@ -945,7 +956,7 @@
             cells.push([ri + 1, ci + 1, val, null, null, val]);
             nc = Math.max(nc, ci + 1);
         }));
-        return [{ name: "Лист1", cells, sparse: {}, merges: [], cols: [], rowH: {}, nrows: rows.length, ncols: nc }];
+        return [{ name: t("Лист1", "Sheet1"), cells, sparse: {}, merges: [], cols: [], rowH: {}, nrows: rows.length, ncols: nc }];
     }
 
     // Создание новой пустой книги Excel с нуля
@@ -965,14 +976,14 @@
 
     function renameWorkbook() {
         const curName = (S.imported && S.imported.name) || DEFAULT_WB_NAME;
-        const next = window.prompt("Введите название книги Excel (.xlsx):", curName);
+        const next = window.prompt(t("Введите название книги Excel (.xlsx):", "Workbook name (.xlsx)"), curName);
         if (next && next.trim()) {
             let clean = next.trim();
             if (!clean.toLowerCase().endsWith(".xlsx")) clean += ".xlsx";
             if (!S.imported) S.imported = createBlankWorkbookObj(clean);
             else S.imported.name = clean;
             render();
-            toast("Книга переименована в «" + clean + "»");
+            toast(t("Книга переименована: ", "Workbook renamed: ") + clean);
         }
     }
 
@@ -1002,7 +1013,7 @@
             S.sheet = "imp0";
             render();
             select(1, 1);
-            toast("Книга «" + file.name + "» загружена со всеми стилями и цветами");
+            toast(t("Открыта книга: ", "Workbook opened: ") + file.name);
         } catch (e) {
             console.error(e);
             toast("Не удалось прочитать файл. Поддерживаются .xlsx и .csv");
@@ -1037,7 +1048,7 @@
         src.merges.push([r1, c1, r2, c2]);
         setStyleProp("align", "center");
         render();
-        toast(`Ячейки ${refOf(r1, c1)}:${refOf(r2, c2)} объединены`);
+        toast(t("Объединены ячейки: ", "Merged cells: ") + refOf(r1, c1) + ":" + refOf(r2, c2));
     }
 
     // ------------------------------------------------------------------ Полноценный экспорт .xlsx со всеми стилями и цветами
@@ -1149,7 +1160,6 @@
     }
 
     function render() {
-        if ($("guide")) document.body.append($("guide"));
         if (S.bossMode && workspaceActionPending) return;
         const sh = getSheet(S.sheet);
         curSheet = sh;
@@ -1235,7 +1245,7 @@
                 if (typeof d.val === "number") cls.push("num");
             } else {
                 const v = isF ? cellValue(sh.id, refOf(r, c), 0) : parseInput(raw);
-                inner = esc(formatValue(v, fmt));
+                inner = esc(!hasUserEdit && ["adv","inv","log"].includes(sh.id) ? ui(formatValue(v, fmt)) : formatValue(v, fmt));
                 if (typeof v === "number") {
                     cls.push("num");
                     if (d.signed || fmt === "pct") {
@@ -1293,7 +1303,7 @@
     function renderTabs() {
         const tabs = getTabsList();
         $("sheetTabs").innerHTML = tabs.map(([id, n, isRpg]) =>
-            `<button class="stab ${S.sheet === id ? "active" : ""} ${isRpg ? "rpg-tab" : ""}" data-sheet="${id}">${esc(n)}</button>`
+            `<button class="stab ${S.sheet === id ? "active" : ""} ${isRpg ? "rpg-tab" : ""}" data-sheet="${id}">${esc(isRpg ? ui(n) : n)}</button>`
         ).join("");
     }
 
@@ -1306,8 +1316,8 @@
         const pop = $("sheetsPopup");
         if (!pop.hidden) { pop.hidden = true; return; }
         const tabs = getTabsList();
-        pop.innerHTML = tabs.map(([id, n]) =>
-            `<button class="${S.sheet === id ? "active" : ""}" data-pop-sheet="${id}">${esc(n)}</button>`
+        pop.innerHTML = tabs.map(([id, n, isRpg]) =>
+            `<button class="${S.sheet === id ? "active" : ""}" data-pop-sheet="${id}">${esc(isRpg ? ui(n) : n)}</button>`
         ).join("");
         pop.hidden = false;
     }
@@ -1317,7 +1327,7 @@
             S.imported = createBlankWorkbookObj(DEFAULT_WB_NAME);
         }
         const newIdx = S.imported.sheets.length;
-        const newName = "Лист" + (newIdx + 1);
+        const newName = t("Лист", "Sheet") + (newIdx + 1);
         S.imported.sheets.push({
             name: newName,
             cells: [],
@@ -1329,7 +1339,7 @@
             ncols: 22,
         });
         gotoSheet("imp" + newIdx);
-        toast("Добавлен новый пустой лист «" + newName + "»");
+        toast(t("Добавлен лист: ", "Sheet added: ") + newName);
     }
 
     function renderChart(sh) {
@@ -1348,8 +1358,8 @@
         [0, 25, 50, 75, 100].forEach((v) => {
             grid += `<line x1="${pl}" x2="${W - 4}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid-line)"/><text x="${pl - 5}" y="${y(v) + 3.5}" text-anchor="end" font-size="10" fill="var(--text-dim)">${v}</text>`;
         });
-        box.innerHTML = `<h4>Динамика параметров героя по ходам</h4><svg viewBox="0 0 ${W} ${HT}" preserveAspectRatio="none">${grid}${H.length > 1 ? line("ROI", "#107c41") + line("KPI", "#2f6fdb") + line("Anxiety", "#d13438") : `<text x="${W / 2}" y="${HT / 2}" text-anchor="middle" fill="var(--text-dim)" font-size="12">Сделайте первый ход — график оживёт</text>`}</svg>`
-            + `<div class="legend"><span><i style="background:#107c41"></i>Здоровье</span><span><i style="background:#2f6fdb"></i>Бодрость</span><span><i style="background:#d13438"></i>Неприятности</span></div>`;
+        box.innerHTML = `<h4>${t("Динамика параметров героя по ходам","Hero stats by turn")}</h4><svg viewBox="0 0 ${W} ${HT}" preserveAspectRatio="none">${grid}${H.length > 1 ? line("ROI", "#107c41") + line("KPI", "#2f6fdb") + line("Anxiety", "#d13438") : `<text x="${W / 2}" y="${HT / 2}" text-anchor="middle" fill="var(--text-dim)" font-size="12">${t("Сделайте первый ход — график оживёт","Take your first turn to start the chart.")}</text>`}</svg>`
+            + `<div class="legend"><span><i style="background:#107c41"></i>${ui("Здоровье")}</span><span><i style="background:#2f6fdb"></i>${ui("Бодрость")}</span><span><i style="background:#d13438"></i>${ui("Неприятности")}</span></div>`;
     }
 
     // ------------------------------------------------------------------ выделение
@@ -1427,7 +1437,7 @@
         }
         fi.value = v;
         fi.readOnly = isLocked(r, c);
-        fi.placeholder = d.editableAction ? "Введите своё действие и нажмите Enter…" : "";
+        fi.placeholder = d.editableAction ? t("Введите своё действие и нажмите Enter…", "Type your action and press Enter…") : "";
     }
 
     function updateStatusStats() {
@@ -1542,7 +1552,7 @@
         if (!S.over && clockMinutes() >= 18 * 60) {
             S.over = true;
             S.won = true;
-            S.narrative = `🎉 18:00 — ВЕЧЕРНИЙ ПРАЗДНИК В ОУКХЕЙВЕНЕ! Вы отлично провели день, исследовали долину и заслужили почётное место в Гильдии у мастера ${S.boss}! Итоговый счёт: ${score()}.`;
+            S.narrative = language === "en" ? `18:00 — Festival time! After a day exploring the valley, you’ve earned a place in the guild with ${S.boss}. Final score: ${score()}.` : `🎉 18:00 — ВЕЧЕРНИЙ ПРАЗДНИК В ОУКХЕЙВЕНЕ! Вы отлично провели день, исследовали долину и заслужили почётное место в Гильдии у мастера ${S.boss}! Итоговый счёт: ${score()}.`;
             S.options = [];
         }
         if (S.over) {
@@ -1554,7 +1564,7 @@
             const remaining = DailyAllowance.complete(store, adventureId);
             if (before > 0 && remaining === 0) offerPending = true;
         }
-        if (S.inventory.length > prevItems) toast("🎒 Получен предмет: " + S.inventory[S.inventory.length - 1]);
+        if (S.inventory.length > prevItems) toast(t("Получен предмет: ", "Item found: ") + itemLabel(S.inventory.at(-1)));
         render();
         const td = cellEls[2] && cellEls[2][2];
         if (td) td.classList.add("fade");
@@ -1562,14 +1572,17 @@
     }
 
     async function post(url, body) {
-        const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
+        const response = await fetch(url, {
+            method: "POST", headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({...body, language}),
+        });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        return response.json();
     }
 
     async function restart() {
         if (S.loading) return;
-        adventureId = crypto.randomUUID();
+        adventureId = globalThis.crypto?.randomUUID?.() || String(Date.now()) + "-" + Math.random().toString(36).slice(2);
         offerPending = false;
         offerDismissed = false;
         Object.assign(S, {
@@ -1577,7 +1590,7 @@
             narrative: "", auditLog: "", sceneId: null, seen: [], inventory: [], log: [],
             history: [{ ...START_STATS }], custom: "",
         });
-        S.loading = "Загрузка нового приключения…";
+        S.loading = t("Загрузка нового приключения…","Opening your adventure…");
         S.bossMode = false;
         S.stealthTabs = false;
         S.sheet = "adv";
@@ -1589,7 +1602,7 @@
             applyData(data, null);
         } catch {
             S.loading = null;
-            S.narrative = "⚠ Нет связи с сервером. Нажмите «Новая игра» ещё раз.";
+            S.narrative = t("Нет связи с сервером. Нажмите «Новая игра» ещё раз.","Couldn’t reach the server. Choose Restart to try again.");
             render();
         }
     }
@@ -1597,7 +1610,7 @@
     async function sendAction(text, idx) {
         if (S.loading || S.over || S.bossMode) return;
         const prev = { narrative: S.narrative, options: S.options };
-        S.loading = "Выполняется ход: " + text + " …";
+        S.loading = t("Выполняется ход: ", "Taking your turn: ") + text + " …";
         render();
         syncing();
         try {
@@ -1636,12 +1649,17 @@
         if (i < 0) return;
         S.inventory.splice(i, 1);
         S.sheet = "adv";
-        const applied = await sendAction("Использовать предмет: " + name, -1);
+        const applied = await sendAction(t("Использовать предмет: ", "Use item: ") + itemLabel(name), -1);
         if (!applied) { S.inventory.splice(i, 0, name); if (!S.bossMode) render(); }
     }
 
     function exportReport() {
-        const lines = [
+        const lines = language === "en" ? [
+            "TabEscape — Oakhaven adventure diary", "Hero: " + S.role, "Guildmaster: " + S.boss,
+            "Score: " + score() + " · Turns: " + S.log.length, "",
+            ...S.log.map(e => e.time + " · " + e.action + " (Health " + e.roi + " / Energy " + e.kpi + " / Trouble " + e.anx + ")"),
+            "", S.narrative
+        ] : [
             "TabEscape — Дневник приключений Оукхейвена", `Герой: ${S.role}`, `Мастер Гильдии: ${S.boss}`,
             `Исход: ${S.won ? "успешное завершение дня" : "приключение прервано"}`, `Очки: ${score()} · Ходов: ${S.log.length}`, "",
             ...S.log.map((e) => `${String(e.turn).padStart(2, "0")} [${e.time}] ${e.action}  (Здоровье ${e.roi} / Бодрость ${e.kpi} / Неприятности ${e.anx})`), "", "Финал: " + S.narrative,
@@ -1674,7 +1692,7 @@
             S.sheet = workView && isBossSheet(workView.sheet) ? workView.sheet : bossTarget();
         } else S.sheet = gameView ? gameView.sheet : "adv";
         $("toast").classList.remove("show");
-        if (tourStep === 3 && on) tourVisitedWork = true;
+
         render();
         const target = on ? workView : gameView;
         if (target) {
@@ -1688,6 +1706,7 @@
     }
 
     function toggleBoss() {
+        if (tour?.active && tour.step >= 4) { tour.move(1); return; }
         setBoss(!S.bossMode);
     }
 
@@ -1860,7 +1879,7 @@
                 G("Проверка", [
                     B("Статистика книги", "📊", showWorkbookStats, {}),
                     B("Совет", "?", () => toast(TIPS[Math.floor(Math.random() * TIPS.length)]), {}),
-                    B("Рекорд: " + S.best, "★", () => toast("Лучший результат: " + S.best + " очков"), {}),
+                    B(t("Рекорд: ", "Best: ") + S.best, "★", () => toast(t("Лучший результат: ", "Best score: ") + S.best), {}),
                 ]),
             ];
             case "view": return [
@@ -1912,29 +1931,29 @@
     let ribbonActs = [];
     function renderRibbon() {
         $("ribbonTabs").innerHTML = TABS.map((n, i) =>
-            `<button class="rtab ${TAB_IDS[i] === S.tab ? "active" : ""}" data-tab="${TAB_IDS[i]}">${n}</button>`
+            `<button class="rtab ${TAB_IDS[i] === S.tab ? "active" : ""}" data-tab="${TAB_IDS[i]}">${ui(n)}</button>`
         ).join("");
         ribbonActs = [];
         $("ribbonBody").innerHTML = ribbonDef().filter(g => !S.bossMode || g.title !== "Режим").map((g) => `<div class="rgroup"><div class="rg-items">` + g.items.map((it) => {
             if (it.fontSelect) {
                 const fonts = ["Calibri", "Times New Roman", "Arial", "Arial Cyr", "Segoe UI"];
-                return `<select class="rselect-input" data-font-select="1" title="Шрифт">${fonts.map((f) => `<option value="${f}" ${f === it.fontSelect ? "selected" : ""}>${f}</option>`).join("")}</select>`;
+                return `<select class="rselect-input" data-font-select="1" title="${ui('Шрифт')}">${fonts.map((f) => `<option value="${f}" ${f === it.fontSelect ? "selected" : ""}>${f}</option>`).join("")}</select>`;
             }
             if (it.sizeSelect) {
                 const sizes = ["10", "11", "12", "13", "14", "15", "16", "18", "20", "22"];
-                return `<select class="rselect-input" data-size-select="1" title="Размер шрифта">${sizes.map((s) => `<option value="${s}" ${s === it.sizeSelect ? "selected" : ""}>${s}</option>`).join("")}</select>`;
+                return `<select class="rselect-input" data-size-select="1" title="${ui('Размер шрифта')}">${sizes.map((s) => `<option value="${s}" ${s === it.sizeSelect ? "selected" : ""}>${s}</option>`).join("")}</select>`;
             }
             if (it.swatchFill) {
-                return `<button class="swatch-btn" data-fill-apply="1" title="Залить выбранным цветом"><span>🪣</span><i class="swatch-bar" style="background:${it.swatchFill}"></i></button>`
-                    + `<button class="icon-btn tiny" data-fill-pick="1" title="Выбрать любой цвет заливки">▾</button>`;
+                return `<button class="swatch-btn" data-fill-apply="1" title="${ui('Залить выбранным цветом')}"><span>🪣</span><i class="swatch-bar" style="background:${it.swatchFill}"></i></button>`
+                    + `<button class="icon-btn tiny" data-fill-pick="1" title="${ui('Выбрать любой цвет заливки')}">▾</button>`;
             }
             if (it.swatchFont) {
-                return `<button class="swatch-btn" data-fg-apply="1" title="Применить цвет текста"><b>A</b><i class="swatch-bar" style="background:${it.swatchFont}"></i></button>`
-                    + `<button class="icon-btn tiny" data-fg-pick="1" title="Выбрать цвет текста">▾</button>`;
+                return `<button class="swatch-btn" data-fg-apply="1" title="${ui('Применить цвет текста')}"><b>A</b><i class="swatch-bar" style="background:${it.swatchFont}"></i></button>`
+                    + `<button class="icon-btn tiny" data-fg-pick="1" title="${ui('Выбрать цвет текста')}">▾</button>`;
             }
             ribbonActs.push(it.act);
             const idx = ribbonActs.length - 1;
-            return `<button class="rbtn ${it.on ? "on" : ""} ${it.primary ? "primary" : ""}" data-ract="${idx}" title="${esc(it.tip || it.label || "")}"><span class="ico">${it.raw ? it.ico : esc(it.ico)}</span>${it.label ? `<span>${esc(it.label)}</span>` : ""}</button>`;
+            return `<button class="rbtn ${it.on ? "on" : ""} ${it.primary ? "primary" : ""}" data-ract="${idx}" title="${esc(language === "en" ? (officeEnglish[it.tip] || ui(it.label) || it.tip || "") : it.tip || it.label || "")}"><span class="ico">${it.raw ? it.ico : esc(it.ico)}</span>${it.label ? `<span>${esc(ui(it.label))}</span>` : ""}</button>`;
         }).join("") + `</div></div>`).join("");
     }
 
@@ -1943,7 +1962,7 @@
     function toast(msg) {
         if (S.bossMode) return;
         const t = $("toast");
-        t.textContent = msg;
+        t.textContent = ui(msg);
         t.classList.add("show");
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
@@ -1969,7 +1988,7 @@
     function showWorkbookStats() {
         const shCount = S.imported ? S.imported.sheets.length : 1;
         const cellCount = curSheet ? Object.keys(curSheet.cells).length + Object.keys(S.edits[curSheet.id] || {}).length : 0;
-        toast(`Статистика книги: листов Excel — ${shCount}, активных ячеек на листе — ${cellCount}`);
+        toast(t(`Листов: ${shCount}, активных ячеек: ${cellCount}`, `Sheets: ${shCount}, active cells: ${cellCount}`));
     }
 
     function openSettings() {
@@ -1981,8 +2000,8 @@
     }
     function closeSettings() { $("settingsModal").hidden = true; $("switchView")?.focus(); }
     function saveSettings() {
-        S.role = $("inputRole").value.trim() || "Начинающий искатель";
-        S.boss = $("inputBoss").value.trim() || "Мастер Гильдии Морган";
+        S.role = $("inputRole").value.trim() || t("Начинающий искатель", "Apprentice adventurer");
+        S.boss = $("inputBoss").value.trim() || t("Мастер Гильдии Морган", "Guildmaster Morgan");
         S.apiKey = $("inputApiKey").value.trim();
         store.set("te_role", S.role);
         store.set("te_boss", S.boss);
@@ -2110,7 +2129,7 @@
                 S.custom = fi.value;
                 const td = cellEls[S.anchor.r] && cellEls[S.anchor.r][S.anchor.c];
                 if (td) {
-                    td.innerHTML = esc(S.custom || "✎ Свой ход: напишите действие в строке формул (B3) и нажмите Enter");
+                    td.innerHTML = esc(S.custom || t("✎ Свой ход: напишите действие в строке формул (B3) и нажмите Enter","✎ Your move: select B3, type in the formula bar and press Enter"));
                     td.classList.toggle("editing", Boolean(S.custom));
                 }
             }
@@ -2121,6 +2140,7 @@
         });
 
         document.addEventListener("keydown", (e) => {
+            if (tour?.active) return;
             if ($("subscriptionDialog").open) return;
             if (!$("welcome").hidden) return;
             if (e.key === "Escape") {
@@ -2131,7 +2151,7 @@
                 return;
             }
             if (!$("settingsModal").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
-            if (mask !== "excel") {
+            if (mask !== "excel" || compactSheet()) {
                 if (!S.bossMode && !e.target.closest("input,textarea,select,[contenteditable],button") && ["1","2","3"].includes(e.key)) choose(+e.key-1);
                 return;
             }
@@ -2178,20 +2198,19 @@
 
     // One RPG state, four presentation configurations. Work DOM is mounted once.
     const MASKS = {
-        excel: {name:"Excel", color:"#19734b", icon:"X", guide:"excel", file:"Q4_Прогноз.xlsx", description:["Отчёт, ячейки и формулы","Report, cells and formulas"]},
-        word: {name:"Word", color:"#285b9f", icon:"W", guide:"blue", file:"Project review.docx", description:["Документ и заметки","Document and notes"]},
-        outlook: {name:"Outlook", color:"#087da8", icon:"O", guide:"green", file:"Inbox", description:["Письма и область чтения","Inbox and reading pane"]},
-        autocad: {name:"AutoCAD", color:"#a33437", icon:"A", guide:"green", file:"Floor plan.dwg", description:["Чертёж и слои","Drawing and layers"]}
+        excel: {name:"Excel", color:"#19734b", icon:"X", get file() { return t("Q4_Прогноз.xlsx", "Q4_Forecast.xlsx"); }, description:["Отчёт, ячейки и формулы","Report, cells and formulas"]},
+        word: {name:"Word", color:"#285b9f", icon:"W", file:"Project review.docx", description:["Документ и заметки","Document and notes"]},
+        outlook: {name:"Outlook", color:"#087da8", icon:"O", file:"Inbox", description:["Письма и область чтения","Inbox and reading pane"]},
+        autocad: {name:"AutoCAD", color:"#a33437", icon:"A", file:"Floor plan.dwg", description:["Чертёж и слои","Drawing and layers"]}
     };
     let mask = store.get("te_mask","excel");
     if (!MASKS[mask]) mask = "excel";
-    let language = store.get("te_language","ru");
     let started = false;
-    let tourStep = -1;
-    let tourVisitedWork = false;
+    let tour;
+    let fullSheet = false;
+    const narrowSheet = matchMedia("(max-width: 760px)");
+    const compactSheet = () => narrowSheet.matches && !fullSheet && mask === "excel" && S.sheet === "adv" && !S.bossMode;
     let workspaceActionPending = false;
-    let tourStartTurn = 1;
-    const t = (ru,en) => language === "en" ? en : ru;
     const button = (label, fn, parent) => {
         const b = document.createElement("button");
         b.type="button"; b.textContent=label; b.onclick=fn; parent.append(b); return b;
@@ -2207,25 +2226,70 @@
         document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-label="TabEscape Plus"></dialog>');
         $("subscriptionDialog").addEventListener("cancel", event => {event.preventDefault(); closeOffer();});
         document.body.insertAdjacentHTML("afterbegin", '<main id="welcome"></main><nav id="workspaceTools" hidden></nav><main id="alternateGame" hidden></main><main id="alternateWork" hidden></main><aside id="guide" hidden aria-label="Обучение / Tutorial"></aside>');
+        tour = new WorkspaceTour({
+            guide: $("guide"), t, setWork: setBoss, isWork: () => S.bossMode,
+            isGrid: () => mask === "excel" && !compactSheet(), ended: () => S.over,
+            hasActions: () => S.over || S.options.length > 0,
+            openMask: enterMask, selected: () => mask, selectedName: () => MASKS[mask].name, home: showWelcome,
+            choose, save: () => store.set("te_tutorial", "done"),
+            afterClose: () => {
+                if (offerPending && !offerDismissed && !S.bossMode) offerSubscription();
+            }
+        });
+        narrowSheet.addEventListener("change", () => { if (started) syncWorkspace(); });
         showWelcome();
+        if (store.get("te_tutorial", "") !== "done") tour.start(true);
     }
     function showWelcome() {
         if (S.bossMode) setBoss(false);
-        tourStep=-1;
-        $("welcome").hidden=false;
-        $("welcome").innerHTML='<header><b>TabEscape</b><span>B2C · ENTERTAINMENT</span></header><section><p class="welcome-kicker">YOUR NEXT CHAPTER, BETWEEN TASKS</p><h1>'+t("Фэнтези-приключение<br>на короткий перерыв","A fantasy adventure.<br>A little break.")+'</h1><p>'+t("Выберите рабочий интерфейс. Нажмите Esc, чтобы переключиться между ним и игрой","Choose a work interface. Press Esc to switch between it and your adventure.")+'</p><div class="maskCards"></div><p class="sessionNote">'+t("Без аккаунта и ключа ИИ. Партия продолжается в этой вкладке до перезагрузки.","No account or AI key. Your adventure continues in this tab until you reload.")+'</p></section>';
-        button(language==="en"?"Русский":"English",()=>{language=language==="en"?"ru":"en";store.set("te_language",language);showWelcome();},$("welcome").querySelector("header"));
-        for (const [id,config] of Object.entries(MASKS)) {
-            const b=button("",()=>enterMask(id),$("welcome").querySelector(".maskCards"));
-            b.className="maskCard "+id; b.style.setProperty("--accent",config.color);
-            b.innerHTML='<div class="preview"><div class="previewBar">'+config.icon+' &nbsp; '+config.file+'</div><div class="previewBody"><i></i><i></i><i></i><i></i></div></div><h2>'+config.name+'</h2><p>'+config.description[language==="en"?1:0]+'</p>';
+        document.documentElement.lang = language;
+        localizeOffice(language);
+        $("welcome").hidden = false;
+        const home = $("welcome");
+        home.innerHTML = `
+          <div class="hub">
+            <div class="hubNav">
+              <div class="wordmark"><img src="${portableImages["portal-icon.png"]}" alt="">Tab<span>Escape</span></div>
+              <nav aria-label="TabEscape"><button class="navWork"></button><button data-home-help></button></nav>
+              <button class="langSwitch"></button>
+            </div>
+            <div class="hero">
+              <div class="heroCopy"><div class="campaign"><i></i>${t("ТЕКУЩАЯ КАМПАНИЯ","CURRENT CAMPAIGN")}</div>
+                <h1>${t("Маленький перерыв.","A little break.")}<br><em>${t("Большой квест.","A grand quest.")}</em></h1>
+                <p>${t("Исследуйте Оукхейвен в короткой ролевой игре прямо в привычном рабочем окне.","Explore Oakhaven in a bite-sized fantasy RPG tucked inside your everyday workspace.")}</p>
+                <button class="playNow"><span aria-hidden="true">▶</span> ${started?t("Продолжить игру","Resume adventure"):t("Начать игру","Play adventure")}</button>
+              </div>
+              <div class="mapPin"><i aria-hidden="true">✦</i> ${t("Долина Оукхейвен","Oakhaven Valley")}</div>
+            </div>
+            <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("Одна история · Четыре оформления","One story · Four interfaces")}</span></div><div class="maskCards"></div></div>
+            <div class="guideStrip"><div class="miraBust"><img src="${portableImages["mira.webp"]}" alt=""></div><div><b>${t("Привет, я Мира.","Hi, I’m Mira.")}</b><p>${t("Впервые в долине? Я покажу дорогу.","New to the valley? I’ll show you around.")}</p></div><button data-home-help></button></div>
+            <footer class="hubFooter"><span><i></i> ${t("Игра в браузере","Browser session")}</span><span>${t("Перезагрузка начинает новую партию","Reloading starts a new adventure")}</span></footer>
+          </div>`;
+        const launchGuide = () => tour.start(true);
+        home.querySelector(".playNow").onclick = () => enterMask(mask);
+        const navWork = home.querySelector(".navWork");
+        navWork.textContent = t("Интерфейсы", "Workspaces");
+        navWork.onclick = () => home.querySelector(".maskCard").focus();
+        home.querySelectorAll("[data-home-help]").forEach((btn, i) => {
+            btn.textContent = i ? t("Пройти обучение →", "Take the tutorial →") : t("Обучение", "Tutorial");
+            btn.onclick = launchGuide;
+        });
+        const lang = home.querySelector(".langSwitch");
+        lang.textContent = language === "en" ? "EN / RU" : "RU / EN";
+        lang.setAttribute("aria-label", t("Switch to English","Switch to Russian"));
+        lang.onclick = () => {
+            language = language === "en" ? "ru" : "en";
+            store.set("te_language", language);
+            showWelcome();
+        };
+        for (const [id, config] of Object.entries(MASKS)) {
+            const card = button("", () => tour.active ? tour.enter(id) : enterMask(id), home.querySelector(".maskCards"));
+            card.className = "maskCard " + id;
+            card.innerHTML = `<div class="artifact"><img src="${portableImages[id+"-icon.png"]}" alt=""></div>
+              <div class="cardInfo"><h3>${config.name}</h3><p>${config.description[language === "en" ? 1 : 0]}</p></div><span class="cardArrow" aria-hidden="true">↗</span>`;
         }
-        const quota = document.createElement("p");
-        quota.className = "quotaNote";
-        quota.textContent = t("Демо · истории без ограничений", "Demo · unlimited stories");
-        $("welcome").querySelector("section").append(quota);
         syncWorkspace();
-        $("welcome").scrollTop=0;
+        if (!tour?.active) $("welcome").scrollTop=0;
     }
     async function enterMask(id) {
         if (id === "word") panelHidden = true;
@@ -2234,33 +2298,35 @@
             started=true;
             try {
                 const response = await fetch("/api/workbook/default");
-                if (!response.ok) throw new Error("No default workbook");
+                if (!response.ok) throw new Error("Default workbook unavailable");
                 const buffer = await response.arrayBuffer();
                 const sheets = await parseXlsx(buffer);
                 if (sheets.length) {
-                    S.imported = {name:"Q4_Прогноз.xlsx",fromScratch:false,sheets};
+                    S.imported = {name:MASKS.excel.file,fromScratch:false,sheets};
                     S.sourceB64 = arrayBufferToBase64(buffer);
                 }
             } catch { /* The built-in Q4 forecast remains available. */ }
             await restart();
         }
         if (!S.bossMode) render();
-        if (store.get("te_tutorial","")!=="done") startTour();
+        if (!tour.active && store.get("te_tutorial","")!=="done") startTour();
         else syncWorkspace();
     }
     function startTour() {
+        const trigger = document.activeElement;
         if (S.bossMode) setBoss(false);
-        S.sheet="adv"; tourStep=0; tourStartTurn=S.turn; tourVisitedWork=false; render();
+        S.sheet = "adv";
+        render();
+        tour.start();
+        tour.returnFocus = trigger;
     }
-    function finishTour() {tourStep=-1; store.set("te_tutorial","done");syncWorkspace();}
     function syncWorkspace() {
         if (!$("welcome")) return;
-        document.body.append($("guide"));
         const home=!$("welcome").hidden;
         document.body.dataset.mask=mask;
         document.body.classList.toggle("work-mode",S.bossMode);
-        $("excelShell").hidden=home || mask!=="excel";
-        $("alternateGame").hidden=home || mask==="excel" || S.bossMode;
+        $("excelShell").hidden=home || mask!=="excel" || compactSheet();
+        $("alternateGame").hidden=home || (mask==="excel" && !compactSheet()) || S.bossMode;
         $("alternateWork").hidden=home || mask==="excel" || !S.bossMode;
         $("workspaceTools").hidden=home;
         $("workspaceTools").replaceChildren();
@@ -2273,7 +2339,10 @@
         }
         if (!S.bossMode) {
             button(t("Маски","Interfaces"),showWelcome,$("workspaceTools"));
-            button(t("Как играть","How to play"),startTour,$("workspaceTools"));
+            button(t("Обучение","Tutorial"),startTour,$("workspaceTools")).className = "tutorialLaunch";
+            if (mask === "excel" && narrowSheet.matches && S.sheet === "adv") {
+                button(fullSheet ? t("Компактный вид","Reader view") : t("Таблица","Full sheet"), () => { fullSheet = !fullSheet; syncWorkspace(); }, $("workspaceTools"));
+            }
             button(t("Параметры героя","Hero settings"),openSettings,$("workspaceTools"));
             button(t("Новая игра","Restart"),()=>{if(!S.loading)restart();},$("workspaceTools"));
             button(t("Дневник ↓","Diary ↓"),exportReport,$("workspaceTools"));
@@ -2287,19 +2356,19 @@
         }, $("workspaceTools"));
         hide.id = "hideToolbar";
         updatePanelVisibility();
-        if (!home && mask==="excel" && !S.bossMode && language==="en" && S.sheet==="adv") {
+        if (!home && mask==="excel" && !compactSheet() && !S.bossMode && language==="en" && S.sheet==="adv") {
             for (const [r,label] of [[2,"Health"],[3,"Energy"],[4,"Trouble"],[5,"Time"],[6,"Inventory"]]) {
-                const cell=document.querySelector('td[data-r="'+r+'"][data-c="4"]');
+                const cell=cellEls[r]?.[4];
                 if(cell) cell.textContent=label;
             }
         }
-        if (!home && mask!=="excel") {
+        if (!home && (mask!=="excel" || compactSheet())) {
             if (!S.bossMode) renderAlternateGame();
             else mountWork();
         }
         document.title=home?"TabEscape":cfg.file+" — "+cfg.name;
         document.querySelector('link[rel="icon"]').href="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="5" fill="'+cfg.color+'"/><text x="16" y="23" text-anchor="middle" fill="white" font-size="23">'+cfg.icon+'</text></svg>');
-        renderTour();
+        tour?.refresh();
         if (DailyAllowance.remaining(store) > 0) offerPending = false;
         if (offerPending && !offerDismissed && !S.bossMode && !home) offerSubscription();
     }
@@ -2309,7 +2378,11 @@
         root.innerHTML='<aside class="folders"><b>'+MASKS[mask].file+'</b><p>'+t("Оукхейвен","Oakhaven")+'</p><p>'+t("Архив приключения","Adventure archive")+'</p></aside><section class="gameDocument"><div id="altScene"><small>'+t("Текущая сцена","Current scene")+'</small><h1>Oakhaven</h1><p>'+esc(S.loading||S.narrative)+'</p></div><div id="altChoices"></div><form id="customForm"><label for="customAction">'+t("Свой ход","Your action")+'</label><input id="customAction" maxlength="500"><button>'+t("Отправить","Send")+'</button></form></section><aside id="altStats"></aside>';
         const stats=$("altStats");
         stats.innerHTML='<h2>'+clockStr()+'</h2><p>'+t("Здоровье","Health")+' '+S.stats.ROI+'%</p><p>'+t("Бодрость","Energy")+' '+S.stats.KPI+'%</p><p>'+t("Неприятности","Trouble")+' '+S.stats.Anxiety+'%</p><p>'+t("Рекорд","Best")+' '+S.best+'</p><h3>'+t("Инвентарь","Inventory")+'</h3>';
-        S.inventory.forEach(name=>button(name,()=>useItem(name),stats));
+        const vitals = document.createElement("div");
+        vitals.className = "vitals";
+        for (const entry of [...stats.children].slice(0, 4)) vitals.append(entry);
+        stats.prepend(vitals);
+        S.inventory.forEach(name=>button(itemLabel(name),()=>useItem(name),stats));
         const details=document.createElement("details");
         details.innerHTML='<summary>'+t("Журнал","Journal")+' ('+S.log.length+')</summary>'+S.log.map(e=>'<p>'+e.time+' · '+esc(e.action)+'</p>').join("");
         stats.append(details);
@@ -2339,6 +2412,14 @@
             bar.title=String(entry.ROI)+"%";chart.append(bar);
         }
         stats.append(chart);
+        if (mask === "excel") {
+            const nav = document.createElement("nav");
+            nav.className = "readerTabs";
+            for (const [id, label] of [["log",t("Журнал","Journal")],["inv",t("Инвентарь","Inventory")]]) {
+                button(label, () => gotoSheet(id), nav);
+            }
+            root.append(nav);
+        }
         if (mask === "word") wordChrome(root, false);
     }
     const mail = [
@@ -2366,32 +2447,6 @@
             pane.querySelector("#furniture").onchange=e=>pane.querySelector(".furniture").hidden=!e.target.checked;
         }
     }
-    function renderTour() {
-        document.querySelectorAll(".tourFocus").forEach(el=>el.classList.remove("tourFocus"));
-        const guide=$("guide");guide.hidden=tourStep<0 || S.bossMode || !$("welcome").hidden;
-        if(guide.hidden) return;
-        const excel=mask==="excel";
-        const selectors=excel?['td[data-r="2"][data-c="2"]','td[data-r="2"][data-c="4"],td[data-r="2"][data-c="5"],td[data-r="2"][data-c="6"],td[data-r="3"][data-c="4"],td[data-r="3"][data-c="5"],td[data-r="3"][data-c="6"],td[data-r="4"][data-c="4"],td[data-r="4"][data-c="5"],td[data-r="4"][data-c="6"]','tr[data-opt]','#switchView']:["#altScene","#altStats","#altChoices","#switchView"];
-        const targetSelector = tourStep === 3 && mask === "word" ? ".wordSwitch" : tourStep === 3 && panelHidden ? "#compactTools" : selectors[tourStep];
-        const targets=document.querySelectorAll(targetSelector);
-        targets.forEach(el=>el.classList.add("tourFocus"));
-        if (window.matchMedia("(max-width:800px)").matches && !excel && targets.length) {
-            targets[targets.length-1].insertAdjacentElement("afterend",guide);
-        }
-        const texts=[
-            t("Здесь появляется текущая сцена. Твоя цель — добраться до 18:00. Каждый ход занимает 30 минут.","This is the current scene. Reach 18:00. Each action takes 30 minutes."),
-            t("Здоровье и бодрость начинаются со 100%, неприятности — с 10%. При нуле здоровья или бодрости либо при 100% неприятностей приключение заканчивается.","Health and energy start at 100%, trouble at 10%. Zero health or energy, or 100% trouble, ends the adventure.")+" "+t("Сейчас","Now")+": "+S.stats.ROI+" / "+S.stats.KPI+" / "+S.stats.Anxiety+"%.",
-            t("Нажми на один из трёх вариантов или используй 1, 2, 3. ","Choose an option or press 1, 2, 3. ")+(excel?t("В Excel можно выделить вариант и нажать Enter. Для своего действия выбери B3, введи текст в строке формул и нажми Enter.","In Excel select an option and press Enter. For a custom action select B3, type in the formula bar and press Enter."):t("Для своего действия используй поле «Свой ход» и кнопку «Отправить».","For a custom action use Your action and Send."))+t(" Попробуй настоящий ход."," Try a real turn."),
-            t("Нажми Esc, чтобы открыть рабочий экран. Нажми ещё раз, чтобы продолжить с того же места.","Press Esc to open the work screen. Press it again to continue from the same scene.")
-        ];
-        guide.innerHTML='<img src="/static/guides/'+MASKS[mask].guide+'.jpeg" alt=""><div><small>'+t("Проводница","Your guide")+' · '+(tourStep+1)+' / 4</small><p>'+texts[tourStep]+'</p><div class="tourButtons"></div></div>';
-        const actions=guide.querySelector(".tourButtons");
-        const back=button(t("Назад","Back"),()=>{tourStep--;renderTour();},actions);back.disabled=tourStep===0;
-        button(t("Пропустить","Skip"),finishTour,actions);
-        const next=button(tourStep===3?t("К приключению","Start adventuring"):t("Далее","Next"),()=>{if(tourStep===3)finishTour();else{tourStep++;renderTour();}},actions);
-        next.disabled=(tourStep===2 && S.turn===tourStartTurn)||(tourStep===3 && !tourVisitedWork);
-    }
-
     let panelHidden = store.get("te_panel_hidden", "false") === "true";
     let adventureId = null;
     let offerPending = false;
@@ -2409,18 +2464,18 @@
             updatePanelVisibility();
             $("hideToolbar")?.focus();
         }, $("compactTools"));
-        button(t("Переключить · Esc", "Switch · Esc"), toggleBoss, $("compactTools"));
+        if (!S.bossMode) button(t("Обучение", "Tutorial"), startTour, $("compactTools")).className = "tutorialLaunch";
+        button(t("Переключить · Esc", "Switch · Esc"), toggleBoss, $("compactTools")).className = "compactSwitch";
     }
 
     function offerSubscription() {
         offerPending = true;
         offerDismissed = false;
-        if (S.bossMode) return;
+        if (S.bossMode || tour?.active) return;
         const dialog = $("subscriptionDialog");
         if (dialog.open) return;
         offerFocus = document.activeElement;
-        dialog.innerHTML = '<div class="offerLayout"><div class="offerPortrait"><img src="/static/guides/' +
-            MASKS[mask].guide + '.jpeg" alt=""></div><section><span class="offerEyebrow">TABESCAPE PLUS</span><h2>' +
+        dialog.innerHTML = '<div class="offerLayout"><div class="offerPortrait"><img src="' + portableImages["mira.webp"] + '" alt=""></div><section><span class="offerEyebrow">TABESCAPE PLUS</span><h2>' +
             t("На сегодня — целое приключение", "You’ve had quite an adventure") + '</h2><p>' +
             t("Ты завершил три истории! В демо можно продолжать играть бесплатно и без ограничений.",
               "You’ve finished three stories! Keep playing this demo for free, with no limits.") +
@@ -2509,6 +2564,7 @@
         const switchButton = button(t("Переключить · Esc", "Switch · Esc"), toggleBoss,
             chrome.querySelector(".wordWindowActions"));
         switchButton.className="wordSwitch";
+        if (!editing) button(t("Обучение","Tutorial"), startTour, chrome.querySelector(".wordWindowActions")).className = "tutorialLaunch";
 
         function group(label) {
             const section = document.createElement("section");
@@ -2590,7 +2646,7 @@
                     const tile = command(label, tag === "em" ? "italic" : tag === "strong" ? "bold" : "formatBlock", tag, styles);
                     tile.className = "wordStyleTile";
                     const sample = document.createElement("span");
-                    sample.textContent = "AaБбВв";
+                    sample.textContent = t("AaБбВв","AaBbCc");
                     sample.className = "styleSample " + tag;
                     tile.prepend(sample);
                 }

@@ -1,0 +1,171 @@
+{
+  "start": [
+    "You wake on a bed of hay as a wagon rattles toward Oakhaven. Today is the town fair and the Adventurers’ Guild is taking on recruits. In your pocket are two coins and a letter for {boss}.",
+    [
+      "Jump from the moving wagon to take a shortcut through the bushes.",
+      "Ask the driver where a newcomer should go first.",
+      "Ride to the gates and step out onto the town square."
+    ],
+    [
+      "The bushes hide a steep ravine. You tumble through the brambles and land hard.",
+      "The driver points you toward the fountain. From there, both the guild and the tavern are an easy walk.",
+      "The wagon eases to a stop at the carved gates. You step into the morning bustle."
+    ]
+  ],
+  "crossroads": [
+    "Water splashes into a stone fountain in the middle of Oakhaven. The Golden Acorn tavern stands to your left, the guildhall is straight ahead, and bright market stalls crowd the street to your right.",
+    [
+      "Turn left for the Golden Acorn and the latest news.",
+      "Head straight to the guild’s job board.",
+      "Wander through the fair on your right."
+    ],
+    [
+      "You push open the oak door and step into the cool tavern.",
+      "You climb the wide steps into the bright guildhall.",
+      "You slip between stalls selling oddities and fresh pastries."
+    ]
+  ],
+  "tavern": [
+    "The tavern smells of bread and baked apples. Marta polishes mugs at the counter. A ranger studies a map by the fire while a bruiser argues with some mercenaries.",
+    [
+      "Ask the ranger what’s worth seeing nearby.",
+      "Ask Marta if she needs an errand run.",
+      "Kick the bruiser’s chair and challenge his entire table."
+    ],
+    [
+      "The ranger tells you about a talking cat at the wizard’s tower and gives you his map.",
+      "Marta sends you to the fair with a parcel of spices and a warm apple pie.",
+      "Three bouncers toss you through the window and onto a stack of barrels."
+    ]
+  ],
+  "guild": [
+    "Recruits crowd around the maps while {boss} sorts the morning reports. The clerk at the counter looks up, ready to find you an assignment.",
+    [
+      "Ask the clerk for a first assignment.",
+      "Check the wall map for the river crossing.",
+      "Grab a practice staff and strike it against the floor."
+    ],
+    [
+      "The clerk sends you to Cornelius’s tower. The wizard could use a steady pair of hands.",
+      "You memorize the route and follow a leafy path out of town.",
+      "A practice lightning bolt bursts in your hands. Half the hall rushes to put out your cloak."
+    ]
+  ],
+  "market": [
+    "At the fair, a herbalist lays out fragrant bundles and a clockmaker repairs pocket compasses. A sign points toward the Green Grove.",
+    [
+      "Ask the herbalist about plants in the valley.",
+      "Ask the clockmaker for directions to the old windmill.",
+      "Gulp down the alchemist’s bubbling blue potion."
+    ],
+    [
+      "The herbalist hands you a pocket guide and recommends the Green Grove.",
+      "The clockmaker points across the river and gives you a repaired brass compass.",
+      "That was concentrated horseshoe glue. Your stomach twists and the square spins."
+    ]
+  ],
+  "wizard_tower": [
+    "A plump ginger cat in a tiny wizard’s hat lounges on the tower steps. Cornelius whistles a tune through the open window.",
+    [
+      "Greet the cat and ask permission to enter.",
+      "Ask Cornelius for directions to the ferry.",
+      "Pull the cat’s tail and charge the tower door."
+    ],
+    [
+      "The cat straightens its hat. “Welcome,” it says, rolling an amulet to your feet.",
+      "Cornelius points to a riverside path and tosses you a flask of apple tonic.",
+      "A ward flashes. You sail across the yard into a thorny gooseberry bush."
+    ]
+  ],
+  "woods": [
+    "A birchwood path forks beside a musician with a lute. A wooden sign points one way to the ferry and the other to Warm Crag.",
+    [
+      "Ask the musician which path to take.",
+      "Follow the lower path toward the ferry.",
+      "Climb a dead tree above the drop to reach a wild hive."
+    ],
+    [
+      "The musician strums a bright chord and recommends the view from Warm Crag.",
+      "The leaves rustle overhead. Soon you hear running water.",
+      "The branch cracks. You drop straight into a swarm of furious hornets."
+    ]
+  ],
+  "river_ferry": [
+    "Sunlight glints on the wide river. A ferryman readies his boat at the dock. A stone bridge leads toward the white pillars of the old observatory.",
+    [
+      "Take the ferry toward the windmill.",
+      "Cross the stone bridge to the observatory.",
+      "Leap from the pier toward the spinning waterwheel."
+    ],
+    [
+      "The ferryman welcomes you aboard and rows you across the quiet inlet.",
+      "You cross the bridge and reach a garden of pale columns.",
+      "The current pulls you under the wheel. The ferryman fishes you out just in time."
+    ]
+  ],
+  "windmill": [
+    "Clover and fresh flour scent the air around the windmill. The miller laughs from a bench. Raccoons have stolen his keys and carried them into the garden.",
+    [
+      "Trade the raccoons a crust of bread for the keys.",
+      "Ask the miller for the trail to Warm Crag.",
+      "Grab one of the windmill’s spinning sails."
+    ],
+    [
+      "The raccoons take the bread. For returning his keys, the miller gives you a silver charm.",
+      "The miller points across a meadow toward the foothills.",
+      "The sail lifts you high into the air and flings you into prickly thistles."
+    ]
+  ],
+  "ruins": [
+    "Flowers grow around the white pillars of the Elven Observatory. A scholar sketches a sundial on a bench where two garden paths meet.",
+    [
+      "Ask the scholar how the old sundial works.",
+      "Follow the garden path toward the travelers’ camp.",
+      "Kick the heavy stone column at the edge of the terrace."
+    ],
+    [
+      "She shows you how to turn the pointer. A sun lens drops from a hidden compartment.",
+      "The path slopes down to a clearing where campfire smoke rises.",
+      "A ledge breaks loose and a chunk of stone lands on your head."
+    ]
+  ],
+  "dragon_hill": [
+    "Aurelia, a golden dragon in reading glasses, leafs through fairy tales atop Warm Crag. Mountain tea steams beside her, close to the sign for the valley.",
+    [
+      "Greet Aurelia and ask about her book.",
+      "Enjoy the view, then descend toward camp.",
+      "Snatch the dragon’s book and shout in her ear."
+    ],
+    [
+      "Aurelia pours you tea with honey and gives you a golden scale to remember her by.",
+      "You breathe in the mountain air and follow the trail down.",
+      "Aurelia sneezes a cloud of flame. You roll down the hill with smoking eyebrows."
+    ]
+  ],
+  "camp": [
+    "Travelers and merchants sit around a fire beside the stream. Stew bubbles in a pot. A broad road leads back to Oakhaven.",
+    [
+      "Sit by the fire, share stories, and rest.",
+      "Ask a merchant for the road back to the square.",
+      "Jump into the campfire to impress the travelers."
+    ],
+    [
+      "A hot meal and good company restore your strength.",
+      "You walk with the caravan and return to the town fountain.",
+      "Your boots catch fire. A bucket of cold water saves them, but the burns sting."
+    ]
+  ],
+  "alley": [
+    "In a sunny alley behind the bakery, a guard feeds crumbs to pigeons. The main square is just around the corner.",
+    [
+      "Ask the guard for the quickest route to the guildhall.",
+      "Walk back to the fountain in the main square.",
+      "Try to take the guard’s helmet and halberd."
+    ],
+    [
+      "The guard shows you an archway leading straight to the guild doors.",
+      "A moment later, you are back in the heart of Oakhaven.",
+      "The guard sweeps your feet from under you and sends you sprawling on the cobbles."
+    ]
+  ]
+}
