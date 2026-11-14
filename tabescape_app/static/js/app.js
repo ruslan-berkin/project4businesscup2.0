@@ -2213,8 +2213,8 @@
         outlook: {name:"Outlook", color:"#087da8", icon:"O", file:"Inbox", description:["Письма и область чтения","Inbox and reading pane"]},
         autocad: {name:"AutoCAD", color:"#a33437", icon:"A", file:"Floor plan.dwg", description:["Чертёж и слои","Drawing and layers"]}
     };
-    let mask = store.get("te_mask","excel");
-    if (!MASKS[mask]) mask = "excel";
+    // Each visit starts with Excel; switching masks keeps the current session.
+    let mask = "excel";
     let started = false;
     let tour;
     let fullSheet = false;
@@ -2476,7 +2476,7 @@
     async function enterMask(id, options = {}) {
         if (!options.confirmed) return openGameLobby(id);
         if (id === "word") panelHidden = true;
-        mask=id; store.set("te_mask",mask); $("welcome").hidden=true;
+        mask=id; $("welcome").hidden=true;
         const needsStart = !started || options.newGame;
         if (!started) {
             started=true;
