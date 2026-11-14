@@ -1550,8 +1550,9 @@
             if (S.turn > 1 && sc > S.best) { S.best = sc; store.set("te_best", String(sc)); }
         }
         if (S.over && !wasOver && adventureId) {
+            const before = DailyAllowance.remaining(store);
             const remaining = DailyAllowance.complete(store, adventureId);
-            if (remaining === 0) offerPending = true;
+            if (before > 0 && remaining === 0) offerPending = true;
         }
         if (S.inventory.length > prevItems) toast("🎒 Получен предмет: " + S.inventory[S.inventory.length - 1]);
         render();
@@ -1568,10 +1569,6 @@
 
     async function restart() {
         if (S.loading) return;
-        if (DailyAllowance.remaining(store) === 0) {
-            offerSubscription();
-            return;
-        }
         adventureId = crypto.randomUUID();
         offerPending = false;
         offerDismissed = false;
@@ -2225,18 +2222,12 @@
         }
         const quota = document.createElement("p");
         quota.className = "quotaNote";
-        quota.textContent = t("Бесплатных историй сегодня — ", "Free stories left today — ") +
-            DailyAllowance.remaining(store) + " / 3";
+        quota.textContent = t("Демо · истории без ограничений", "Demo · unlimited stories");
         $("welcome").querySelector("section").append(quota);
         syncWorkspace();
         $("welcome").scrollTop=0;
     }
     async function enterMask(id) {
-        if (!started && DailyAllowance.remaining(store) === 0) {
-            mask = id;
-            offerSubscription();
-            return;
-        }
         mask=id; store.set("te_mask",mask); $("welcome").hidden=true;
         if (!started) {
             started=true;
@@ -2430,8 +2421,8 @@
         dialog.innerHTML = '<div class="offerLayout"><div class="offerPortrait"><img src="/static/guides/' +
             MASKS[mask].guide + '.jpeg" alt=""></div><section><span class="offerEyebrow">TABESCAPE PLUS</span><h2>' +
             t("На сегодня — целое приключение", "You’ve had quite an adventure") + '</h2><p>' +
-            t("Ты завершил три истории. Завтра тебя ждут ещё три бесплатных приключения.",
-              "You’ve finished three stories. Three more free adventures will be available tomorrow.") +
+            t("Ты завершил три истории! В демо можно продолжать играть бесплатно и без ограничений.",
+              "You’ve finished three stories! Keep playing this demo for free, with no limits.") +
             '</p><div class="plusFeatures"><h3>' + t("Больше миров с Plus", "More worlds with Plus") +
             '</h3><ul><li>' + t("Новые сюжеты с ИИ", "New AI-generated stories") + '</li><li>' +
             t("Выбор жанров и атмосферы", "Choose genres and atmosphere") + '</li><li>' +
@@ -2440,11 +2431,15 @@
               "Subscription coming soon. Pricing and checkout will be available at launch.") +
             '</p></div><div class="offerActions"></div><p class="offerNote" role="status"></p></section></div>';
         const actions = dialog.querySelector(".offerActions");
+        button(t("Продолжить бесплатно", "Continue for free"), () => {
+            closeOffer();
+            if (S.over) restart();
+        }, actions).className = "primary";
         button(t("Купить подписку · скоро", "Get Plus · coming soon"), () => {
             dialog.querySelector(".offerNote").textContent = t(
                 "Plus ещё в разработке. Генерация историй и оплата станут доступны после запуска подписки.",
                 "Plus is in development. Story generation and checkout will become available when subscriptions launch.");
-        }, actions).className = "primary";
+        }, actions);
         button(t("Прийти завтра", "Come back tomorrow"), () => {
             closeOffer();
             showWelcome();
