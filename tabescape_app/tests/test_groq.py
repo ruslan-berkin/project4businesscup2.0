@@ -40,6 +40,9 @@ class GroqContractTests(unittest.TestCase):
     def test_endless_continuity_transport_and_inventory(self):
         self.call.return_value = self.answer(ending=True, item='Kit')
         state = self.start()
+        opening_context = json.loads(self.call.call_args.kwargs['json']['messages'][1]['content'])
+        self.assertEqual(opening_context['phase'], 'opening')
+        self.assertIsNone(opening_context['action'])
         self.assertEqual(state['engine'], 'groq')
         self.assertEqual(state['stats']['ROI'], 100)
         for _ in range(5):
@@ -54,6 +57,7 @@ class GroqContractTests(unittest.TestCase):
         context = json.loads(request['messages'][1]['content'])
         self.assertEqual(context['memory'], 'Lena has the ledger.')
         self.assertEqual(context['action'], 'Follow Lena')
+        self.assertEqual(context['phase'], 'continuation')
         self.assertEqual(context['current_scene'], 'Lena opens the tower.')
         self.assertEqual(len(context['history']), 4)
         self.assertIn('Kit', context['inventory'])
