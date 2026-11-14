@@ -1526,6 +1526,7 @@
     }
 
     function applyData(data, action) {
+        const wasOver = S.over;
         const prevItems = S.inventory.length;
         S.narrative = data.narrative;
         S.stats = data.stats || { ...START_STATS };
@@ -1548,10 +1549,15 @@
             const sc = S.won ? score() : Math.round(score() / 2);
             if (S.turn > 1 && sc > S.best) { S.best = sc; store.set("te_best", String(sc)); }
         }
+        if (S.over && !wasOver && adventureId) {
+            const remaining = DailyAllowance.complete(store, adventureId);
+            if (remaining === 0) offerPending = true;
+        }
         if (S.inventory.length > prevItems) toast("🎒 Получен предмет: " + S.inventory[S.inventory.length - 1]);
         render();
         const td = cellEls[2] && cellEls[2][2];
         if (td) td.classList.add("fade");
+        if (offerPending && !offerDismissed && !S.bossMode) offerSubscription();
     }
 
     async function post(url, body) {
@@ -1562,6 +1568,13 @@
 
     async function restart() {
         if (S.loading) return;
+        if (DailyAllowance.remaining(store) === 0) {
+            offerSubscription();
+            return;
+        }
+        adventureId = crypto.randomUUID();
+        offerPending = false;
+        offerDismissed = false;
         Object.assign(S, {
             stats: { ...START_STATS }, options: [], turn: 1, over: false, won: false,
             narrative: "", auditLog: "", sceneId: null, seen: [], inventory: [], log: [],
@@ -2111,6 +2124,7 @@
         });
 
         document.addEventListener("keydown", (e) => {
+            if ($("subscriptionDialog").open) return;
             if (!$("welcome").hidden) return;
             if (e.key === "Escape") {
                 e.preventDefault();
@@ -2193,6 +2207,8 @@
             if (child.tagName !== "SCRIPT" && child !== modal) original.append(child);
         }
         document.body.prepend(original);
+        document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-label="TabEscape Plus"></dialog>');
+        $("subscriptionDialog").addEventListener("cancel", event => {event.preventDefault(); closeOffer();});
         document.body.insertAdjacentHTML("afterbegin", '<main id="welcome"></main><nav id="workspaceTools" hidden></nav><main id="alternateGame" hidden></main><main id="alternateWork" hidden></main><aside id="guide" hidden aria-label="Обучение / Tutorial"></aside>');
         showWelcome();
     }
@@ -2207,10 +2223,20 @@
             b.className="maskCard "+id; b.style.setProperty("--accent",config.color);
             b.innerHTML='<div class="preview"><div class="previewBar">'+config.icon+' &nbsp; '+config.file+'</div><div class="previewBody"><i></i><i></i><i></i><i></i></div></div><h2>'+config.name+'</h2><p>'+config.description[language==="en"?1:0]+'</p>';
         }
+        const quota = document.createElement("p");
+        quota.className = "quotaNote";
+        quota.textContent = t("Бесплатных историй сегодня — ", "Free stories left today — ") +
+            DailyAllowance.remaining(store) + " / 3";
+        $("welcome").querySelector("section").append(quota);
         syncWorkspace();
         $("welcome").scrollTop=0;
     }
     async function enterMask(id) {
+        if (!started && DailyAllowance.remaining(store) === 0) {
+            mask = id;
+            offerSubscription();
+            return;
+        }
         mask=id; store.set("te_mask",mask); $("welcome").hidden=true;
         if (!started) {
             started=true;
@@ -2261,6 +2287,14 @@
             button(t("Дневник ↓","Diary ↓"),exportReport,$("workspaceTools"));
         }
         button(S.bossMode?t("Переключить · Esc","Switch · Esc"):t("Рабочий экран · Esc","Work screen · Esc"),toggleBoss,$("workspaceTools")).id="switchView";
+        const hide = button(t("Скрыть панель", "Hide toolbar"), () => {
+            panelHidden = true;
+            store.set("te_panel_hidden", "true");
+            updatePanelVisibility();
+            $("compactTools").querySelector("button").focus();
+        }, $("workspaceTools"));
+        hide.id = "hideToolbar";
+        updatePanelVisibility();
         if (!home && mask==="excel" && !S.bossMode && language==="en" && S.sheet==="adv") {
             for (const [r,label] of [[2,"Health"],[3,"Energy"],[4,"Trouble"],[5,"Time"],[6,"Inventory"]]) {
                 const cell=document.querySelector('td[data-r="'+r+'"][data-c="4"]');
@@ -2274,6 +2308,8 @@
         document.title=home?"TabEscape":cfg.file+" — "+cfg.name;
         document.querySelector('link[rel="icon"]').href="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="5" fill="'+cfg.color+'"/><text x="16" y="23" text-anchor="middle" fill="white" font-size="23">'+cfg.icon+'</text></svg>');
         renderTour();
+        if (DailyAllowance.remaining(store) > 0) offerPending = false;
+        if (offerPending && !offerDismissed && !S.bossMode && !home) offerSubscription();
     }
     function renderAlternateGame() {
         const root=$("alternateGame");
@@ -2311,6 +2347,7 @@
             bar.title=String(entry.ROI)+"%";chart.append(bar);
         }
         stats.append(chart);
+        if (mask === "word") wordChrome(root, false);
     }
     const mail = [
         ["Alex Morgan","Q4 planning review","Hi team, please review the forecast before Thursday. Focus on operating expenses and the updated regional totals. Thanks, Alex."],
@@ -2324,6 +2361,7 @@
         if(pane) return;
         pane=document.createElement("section");pane.dataset.work=mask;pane.className="workPane "+mask;root.append(pane);
         if(mask==="word") pane.innerHTML='<article contenteditable="true" aria-label="Project document" role="textbox" aria-multiline="true"><p>OPERATIONS / NOVEMBER 2026</p><h1>Quarterly project review</h1><h2>Executive summary</h2><p>The team completed the first delivery milestone. This document records progress, open questions and next steps for the quarterly review.</p><h2>Priorities</h2><p>Review the forecast, confirm ownership of outstanding tasks and prepare the revised timeline.</p><h2>Next steps</h2><p>Gather feedback by Thursday. Share the updated document with the project team on Friday.</p></article>';
+        if (mask === "word") wordChrome(pane, true);
         if(mask==="outlook") {
             pane.innerHTML='<aside><h2>Folders</h2><p>Inbox (3)</p><p>Sent</p><p>Drafts</p></aside><div class="mailList"></div><article class="reading" tabindex="0"></article>';
             const read=i=>{pane.querySelector(".reading").innerHTML='<small>'+esc(mail[i][0])+' · 10:15 AM</small><h1>'+esc(mail[i][1])+'</h1><p>'+esc(mail[i][2])+'</p>';};
@@ -2342,7 +2380,8 @@
         if(guide.hidden) return;
         const excel=mask==="excel";
         const selectors=excel?['td[data-r="2"][data-c="2"]','td[data-r="2"][data-c="4"],td[data-r="2"][data-c="5"],td[data-r="2"][data-c="6"],td[data-r="3"][data-c="4"],td[data-r="3"][data-c="5"],td[data-r="3"][data-c="6"],td[data-r="4"][data-c="4"],td[data-r="4"][data-c="5"],td[data-r="4"][data-c="6"]','tr[data-opt]','#switchView']:["#altScene","#altStats","#altChoices","#switchView"];
-        const targets=document.querySelectorAll(selectors[tourStep]);
+        const targetSelector = tourStep === 3 && panelHidden ? "#compactTools" : selectors[tourStep];
+        const targets=document.querySelectorAll(targetSelector);
         targets.forEach(el=>el.classList.add("tourFocus"));
         if (window.matchMedia("(max-width:800px)").matches && !excel && targets.length) {
             targets[targets.length-1].insertAdjacentElement("afterend",guide);
@@ -2359,6 +2398,115 @@
         button(t("Пропустить","Skip"),finishTour,actions);
         const next=button(tourStep===3?t("К приключению","Start adventuring"):t("Далее","Next"),()=>{if(tourStep===3)finishTour();else{tourStep++;renderTour();}},actions);
         next.disabled=(tourStep===2 && S.turn===tourStartTurn)||(tourStep===3 && !tourVisitedWork);
+    }
+
+    let panelHidden = store.get("te_panel_hidden", "false") === "true";
+    let adventureId = null;
+    let offerPending = false;
+    let offerDismissed = false;
+    let offerFocus = null;
+
+    function updatePanelVisibility() {
+        const home = !$("welcome").hidden;
+        $("workspaceTools").hidden = home || panelHidden;
+        $("compactTools").hidden = home || !panelHidden;
+        $("compactTools").replaceChildren();
+        button(t("Показать панель", "Show toolbar"), () => {
+            panelHidden = false;
+            store.set("te_panel_hidden", "false");
+            updatePanelVisibility();
+            $("hideToolbar")?.focus();
+        }, $("compactTools"));
+        button(t("Переключить · Esc", "Switch · Esc"), toggleBoss, $("compactTools"));
+    }
+
+    function offerSubscription() {
+        offerPending = true;
+        offerDismissed = false;
+        if (S.bossMode) return;
+        const dialog = $("subscriptionDialog");
+        if (dialog.open) return;
+        offerFocus = document.activeElement;
+        dialog.innerHTML = '<div class="offerLayout"><div class="offerPortrait"><img src="/static/guides/' +
+            MASKS[mask].guide + '.jpeg" alt=""></div><section><span class="offerEyebrow">TABESCAPE PLUS</span><h2>' +
+            t("На сегодня — целое приключение", "You’ve had quite an adventure") + '</h2><p>' +
+            t("Ты завершил три истории. Завтра тебя ждут ещё три бесплатных приключения.",
+              "You’ve finished three stories. Three more free adventures will be available tomorrow.") +
+            '</p><div class="plusFeatures"><h3>' + t("Больше миров с Plus", "More worlds with Plus") +
+            '</h3><ul><li>' + t("Новые сюжеты с ИИ", "New AI-generated stories") + '</li><li>' +
+            t("Выбор жанров и атмосферы", "Choose genres and atmosphere") + '</li><li>' +
+            t("Бесконечный режим", "Endless mode") + '</li></ul><p>' +
+            t("Подписка готовится к запуску. Цена и оплата появятся позже.",
+              "Subscription coming soon. Pricing and checkout will be available at launch.") +
+            '</p></div><div class="offerActions"></div><p class="offerNote" role="status"></p></section></div>';
+        const actions = dialog.querySelector(".offerActions");
+        button(t("Купить подписку · скоро", "Get Plus · coming soon"), () => {
+            dialog.querySelector(".offerNote").textContent = t(
+                "Plus ещё в разработке. Генерация историй и оплата станут доступны после запуска подписки.",
+                "Plus is in development. Story generation and checkout will become available when subscriptions launch.");
+        }, actions).className = "primary";
+        button(t("Прийти завтра", "Come back tomorrow"), () => {
+            closeOffer();
+            showWelcome();
+        }, actions);
+        button(started ? t("Посмотреть финал", "Review ending") : t("Закрыть", "Close"), closeOffer, actions);
+        dialog.showModal();
+    }
+
+    function closeOffer() {
+        $("subscriptionDialog").close();
+        offerDismissed = true;
+        if (offerFocus?.isConnected) offerFocus.focus();
+    }
+
+    function wordChrome(root, editing) {
+        const chrome = document.createElement("header");
+        chrome.className = "wordChrome";
+        chrome.innerHTML = '<div class="wordTitle"><span class="wordBadge">W</span><strong>' +
+            (editing ? "Quarterly project review" : "Oakhaven — " + t("дневник", "journal")) +
+            '</strong><span class="wordSaved">' + t("В этой сессии", "This session") +
+            '</span></div><div class="wordRibbon"><div class="wordRibbonLabel">' +
+            t("Главная", "Home") + '</div><div class="wordCommands"></div></div>';
+        root.prepend(chrome);
+        const commands = chrome.querySelector(".wordCommands");
+        if (editing) {
+            const editor = root.querySelector("[contenteditable]");
+            const formats = [
+                ["B", "bold", t("Полужирный", "Bold")],
+                ["I", "italic", t("Курсив", "Italic")],
+                ["U", "underline", t("Подчёркнутый", "Underline")]
+            ];
+            for (const [label, command, title] of formats) {
+                const control = button(label, () => {
+                    editor.focus();
+                    document.execCommand(command);
+                }, commands);
+                control.title = title;
+                control.setAttribute("aria-label", title);
+                control.onmousedown = event => event.preventDefault();
+            }
+            const size = document.createElement("select");
+            size.setAttribute("aria-label", t("Размер текста", "Text size"));
+            for (const value of [14, 16, 18, 20, 24]) {
+                const option = document.createElement("option");
+                option.value = value;
+                option.textContent = value;
+                option.selected = value === 18;
+                size.append(option);
+            }
+            size.onchange = () => editor.style.fontSize = size.value + "px";
+            commands.append(size);
+        } else {
+            button(t("Сюжет", "Story"), () => $("altScene").scrollIntoView({block:"center"}), commands);
+            button(t("Показатели", "Stats"), () => $("altStats").scrollIntoView({block:"center"}), commands);
+            button(t("Дневник ↓", "Diary ↓"), exportReport, commands);
+        }
+        button(t("Рабочий экран / игра · Esc", "Work / adventure · Esc"), toggleBoss, commands);
+        const footer = document.createElement("footer");
+        footer.className = "wordStatus";
+        footer.textContent = editing ? t("Страница 1 из 1 · Редактирование", "Page 1 of 1 · Editing") :
+            t("Оукхейвен · ", "Oakhaven · ") + clockStr();
+        root.append(footer);
     }
 
     // ------------------------------------------------------------------ публичный API
