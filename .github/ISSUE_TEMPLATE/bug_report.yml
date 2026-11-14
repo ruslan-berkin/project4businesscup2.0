@@ -1,0 +1,29 @@
+name: Bug report / Ошибка
+description: Report a reproducible issue in TabEscape / Сообщить об ошибке.
+title: '[Bug] '
+body:
+  - type: markdown
+    attributes:
+      value: Please do not attach API keys, .env files or private work documents. Можно писать по-русски.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / Шаги
+      placeholder: Open the site → choose Word → select a story → …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior / Ожидание и результат
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, device and mode / Браузер, устройство и режим
+      placeholder: Safari on macOS, Excel, Free stories
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshot or error / Скриншот или ошибка

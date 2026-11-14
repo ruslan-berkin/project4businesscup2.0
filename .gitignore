@@ -1,4 +1,19 @@
+# Local environments and credentials
 .venv/
-__pycache__/
+venv/
 .env
+.env.*
+!.env.example
+
+# Python / editor / OS output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
 .DS_Store
+.idea/
+.vscode/
+
+# Local reports and temporary exports
+*.log

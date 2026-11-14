@@ -192,7 +192,10 @@
                 .replace(/VS\("[^"]+","[A-Z0-9]+"\)/g, "")
                 .replace(/[RV]\("[A-Z0-9]+"(?:,"[A-Z0-9]+")?\)/g, "")
                 .replace(/\u0001\d+\u0001/g, "");
-            if (/[A-Za-zА-Яа-яЁё_]/.test(rest)) throw new Error("#ИМЯ?");
+            // After replacing approved references/functions/strings, only arithmetic
+            // and comparison punctuation may remain. Reject JS property access,
+            // arrays and template literals before evaluating the expression.
+            if (/[^0-9\s+*/%(),.<>=!\-]/.test(rest)) throw new Error("#ИМЯ?");
             s = s.replace(/\u0001(\d+)\u0001/g, (m, i) => JSON.stringify(strs[+i]));
 
             const V = (ref) => {

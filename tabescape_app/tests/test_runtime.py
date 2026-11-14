@@ -1,6 +1,7 @@
 import base64
 import importlib.util
 import io
+import json
 import os
 from pathlib import Path
 import shutil
@@ -88,6 +89,36 @@ class RuntimeTests(unittest.TestCase):
             'scene_id': attack['scene_id'], 'stats': attack['stats']
         }).get_json()
         self.assertEqual(item['stats']['ROI'], 40)
+
+    def test_embedded_template_fallback_resolves_all_assets(self):
+        with patch('app.render_template', side_effect=RuntimeError('template unavailable')):
+            response = app.app.test_client().get('/')
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertNotIn('{{', html)
+        for name in ('assets', 'office-i18n', 'tour', 'allowance', 'app'):
+            self.assertIn('/static/js/' + name + '.js', html)
+
+    def test_malformed_api_requests_are_client_errors(self):
+        client = app.app.test_client()
+        for route in ('start', 'action', 'export_xlsx'):
+            for body in ([1], 'string', 42, None):
+                with self.subTest(route=route, body=body):
+                    response = client.post('/api/' + route, data=json.dumps(body), content_type='application/json')
+                    self.assertEqual(response.status_code, 400)
+        for body in ({'mode': []}, {'campaign_id': {}}, {'mode': None}, {'mode': 'free', 'genre': None}):
+            self.assertEqual(client.post('/api/start', json=body).status_code, 400)
+        self.assertEqual(client.post('/api/action', json={'stats': [1]}).status_code, 400)
+        self.assertEqual(client.post('/api/export_xlsx', json={'source_b64':'not a workbook'}).status_code, 400)
+        with patch.dict(app.app.config, {'MAX_CONTENT_LENGTH': 64}):
+            response = client.post('/api/start', json={'role': 'x' * 100})
+            self.assertEqual(response.status_code, 413)
+            self.assertIn('error', response.get_json())
+
+    def test_health_endpoint(self):
+        response = app.app.test_client().get('/healthz')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {'status': 'ok'})
 
     def test_default_and_export(self):
         client = app.app.test_client()

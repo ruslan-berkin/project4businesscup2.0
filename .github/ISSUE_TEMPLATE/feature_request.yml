@@ -1,0 +1,21 @@
+name: Feature request / Идея
+description: Suggest a player-focused improvement / Предложить улучшение.
+title: '[Idea] '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Player problem / Проблема игрока
+      description: What are you trying to do, and what gets in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed behavior / Предлагаемое поведение
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: How would we verify it? / Как проверить результат?
