@@ -1,4 +1,4 @@
-"""Branches, survival and the server-side OpenAI contract (no real API requests)."""
+"""Branches, survival and the server-side AI contracts (no real API requests)."""
 import json
 import os
 import unittest
@@ -7,7 +7,7 @@ import requests
 import app
 
 
-@patch.dict(os.environ, {'OPENAI_ENABLED': 'false', 'OPENAI_API_KEY': ''})
+@patch.dict(os.environ, {'AI_PROVIDER': 'openai', 'AI_ENABLED': 'false', 'OPENAI_ENABLED': 'false', 'OPENAI_API_KEY': ''})
 class CampaignTests(unittest.TestCase):
     def setUp(self):
         self.client = app.app.test_client()
@@ -100,7 +100,7 @@ class CampaignTests(unittest.TestCase):
 
     @patch('app.requests.post')
     def test_free_never_calls_openai(self, call):
-        with patch.dict(os.environ, {'OPENAI_ENABLED':'true', 'OPENAI_API_KEY':'test-only'}):
+        with patch.dict(os.environ, {'AI_PROVIDER':'openai', 'AI_ENABLED':'true', 'OPENAI_ENABLED':'true', 'OPENAI_API_KEY':'test-only'}):
             self.turn(self.start())
         call.assert_not_called()
 
@@ -108,7 +108,7 @@ class CampaignTests(unittest.TestCase):
 class OpenAIContractTests(unittest.TestCase):
     def setUp(self):
         self.client = app.app.test_client()
-        self.env = patch.dict(os.environ, {'OPENAI_ENABLED':'true', 'OPENAI_API_KEY':'test-only', 'OPENAI_MODEL':'gpt-5-mini'})
+        self.env = patch.dict(os.environ, {'AI_PROVIDER':'openai', 'AI_ENABLED':'true', 'OPENAI_ENABLED':'true', 'OPENAI_API_KEY':'test-only', 'OPENAI_MODEL':'gpt-5-mini'})
         self.env.start()
         self.addCleanup(self.env.stop)
 

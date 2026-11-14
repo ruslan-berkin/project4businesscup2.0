@@ -15,6 +15,7 @@ import app
 
 
 class RuntimeTests(unittest.TestCase):
+    @patch.dict(os.environ, {}, clear=True)
     def test_embedded_assets_match_and_restore(self):
         root = Path(app.BASE_DIR)
         for path, data in app._EMBEDDED_FILES.items():

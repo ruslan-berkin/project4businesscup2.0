@@ -10,7 +10,11 @@ services:
     envVars:
       - key: TABESCAPE_SECRET_KEY
         generateValue: true
-      - key: OPENAI_ENABLED
+      - key: AI_PROVIDER
+        value: groq
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b
+      - key: AI_ENABLED
         value: "false"
       - key: OPENAI_MODEL
         value: gpt-5-mini

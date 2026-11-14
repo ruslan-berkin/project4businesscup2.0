@@ -103,7 +103,7 @@
     };
     const storyModeLabel = () => S.playMode === "free" ? t("Бесплатная история", "Free story") :
         (S.playMode === "endless" ? t("Бесконечный режим", "Endless mode") : "Premium") +
-        (S.engine === "openai" ? t(" · ИИ", " · AI") : t(" · демо без ИИ", " · demo, no AI"));
+        (["openai", "groq"].includes(S.engine) ? (S.engine === "groq" ? " · Groq" : " · OpenAI") : t(" · демо без ИИ", " · demo, no AI"));
     const storyGoal = () => S.playMode === "endless" ?
         t("Путешествуйте, пока герой жив. Каждый ход — 30 минут; 18:00 не завершает игру.", "Keep exploring while your hero lives. Each turn takes 30 minutes; 18:00 does not end the game.") :
         t("Следуйте за уликами и выберите, чем закончится история. Каждый ход — 30 минут. Esc закрывает обучение.", "Follow the clues and shape the ending. Each turn takes 30 minutes. Esc skips the tour.");
@@ -2331,9 +2331,9 @@
             $("lobbyStoryPreview").innerHTML = `<span class="storyTag">${esc(genre.title[language])} · ${mode === "free" ? t("4 хода до финала", "4 moves to an ending") : mode === "endless" ? t("До гибели героя", "Until your hero dies") : storyCatalog.premium_ai ? t("8–12 ходов · ИИ", "8–12 moves · AI") : t("4 хода · демо", "4 moves · demo")}</span><h2>${esc(campaign.title[language])}</h2><p>${esc(campaign.description[language])}</p>`;
         }
         $("lobbyModeNote").textContent = mode === "free" ? t("Все восемь историй открыты. Без ключа ИИ и без оплаты.", "All eight stories are open. No AI key or payment needed.") :
-            storyCatalog?.premium_ai ? t("Генерация подключена. Модель помнит события и развивает сюжет после каждого хода. Демо доступно без подписки.", "AI is connected. The model follows past events and develops the story each turn. This demo needs no subscription.") :
-            mode === "endless" ? t("Демо без ИИ: локальные главы повторяются, игра идёт до гибели героя. Новые генерируемые главы появятся после подключения OpenAI. Оплата не нужна.", "No-AI demo: local chapters repeat until your hero dies. OpenAI will create new chapters when connected. No payment needed.") :
-            t("Демо без ИИ: покажем готовую историю выбранного жанра. Новые сюжеты будут генерироваться после подключения OpenAI. Подписка пока не требуется.", "No-AI demo: try a prepared story in your genre. New plots will be generated when OpenAI is connected. No subscription required yet.");
+            storyCatalog?.premium_ai ? t("ИИ настроен на сервере. Модель помнит события и развивает сюжет после каждого хода. Демо доступно без подписки.", "AI is configured on the server. The model follows past events and develops the story each turn. This demo needs no subscription.") :
+            mode === "endless" ? t("Демо без ИИ: локальные главы повторяются, игра идёт до гибели героя. Новые генерируемые главы появятся после подключения Groq или OpenAI. Оплата не нужна.", "No-AI demo: local chapters repeat until your hero dies. Groq or OpenAI will create new chapters when connected. No payment needed.") :
+            t("Демо без ИИ: покажем готовую историю выбранного жанра. Новые сюжеты будут генерироваться после подключения Groq или OpenAI. Подписка пока не требуется.", "No-AI demo: try a prepared story in your genre. New plots will be generated when Groq or OpenAI is connected. No subscription required yet.");
     }
 
     function closeGameLobby(launched) {
@@ -2444,7 +2444,7 @@
                 S.genre = campaign.genre;
                 S.campaignId = campaign.id;
                 S.campaignTitle = campaign.title[language];
-                S.engine = S.playMode === "free" ? "scripted" : storyCatalog.premium_ai ? "openai" : "demo";
+                S.engine = S.playMode === "free" ? "scripted" : storyCatalog.premium_ai ? storyCatalog.ai_provider : "demo";
             }
             const pendingTour = tour.active && withGuide;
             if (tour.active && !withGuide) tour.close();
@@ -2689,8 +2689,8 @@
         }, actions).className = "primary";
         button(t("Купить подписку · скоро", "Get Plus · coming soon"), () => {
             dialog.querySelector(".offerNote").textContent = t(
-                "Оплата ещё не подключена. Жанры и режимы уже доступны в окне новой игры; генерацию OpenAI включает команда на сервере.",
-                "Checkout is not connected yet. Genres and modes are available in the new-game menu; the team enables OpenAI on the server.");
+                "Оплата ещё не подключена. Жанры и режимы уже доступны в окне новой игры; генерацию Groq / OpenAI включает команда на сервере.",
+                "Checkout is not connected yet. Genres and modes are available in the new-game menu; the team enables Groq / OpenAI on the server.");
         }, actions);
         button(t("Прийти завтра", "Come back tomorrow"), () => {
             closeOffer();
