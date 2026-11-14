@@ -2228,6 +2228,7 @@
         $("welcome").scrollTop=0;
     }
     async function enterMask(id) {
+        if (id === "word") panelHidden = true;
         mask=id; store.set("te_mask",mask); $("welcome").hidden=true;
         if (!started) {
             started=true;
@@ -2282,7 +2283,7 @@
             panelHidden = true;
             store.set("te_panel_hidden", "true");
             updatePanelVisibility();
-            $("compactTools").querySelector("button").focus();
+            (mask === "word" ? document.querySelector(".wordPanelToggle") : $("compactTools").querySelector("button"))?.focus();
         }, $("workspaceTools"));
         hide.id = "hideToolbar";
         updatePanelVisibility();
@@ -2371,7 +2372,7 @@
         if(guide.hidden) return;
         const excel=mask==="excel";
         const selectors=excel?['td[data-r="2"][data-c="2"]','td[data-r="2"][data-c="4"],td[data-r="2"][data-c="5"],td[data-r="2"][data-c="6"],td[data-r="3"][data-c="4"],td[data-r="3"][data-c="5"],td[data-r="3"][data-c="6"],td[data-r="4"][data-c="4"],td[data-r="4"][data-c="5"],td[data-r="4"][data-c="6"]','tr[data-opt]','#switchView']:["#altScene","#altStats","#altChoices","#switchView"];
-        const targetSelector = tourStep === 3 && panelHidden ? "#compactTools" : selectors[tourStep];
+        const targetSelector = tourStep === 3 && mask === "word" ? ".wordSwitch" : tourStep === 3 && panelHidden ? "#compactTools" : selectors[tourStep];
         const targets=document.querySelectorAll(targetSelector);
         targets.forEach(el=>el.classList.add("tourFocus"));
         if (window.matchMedia("(max-width:800px)").matches && !excel && targets.length) {
@@ -2400,7 +2401,7 @@
     function updatePanelVisibility() {
         const home = !$("welcome").hidden;
         $("workspaceTools").hidden = home || panelHidden;
-        $("compactTools").hidden = home || !panelHidden;
+        $("compactTools").hidden = home || !panelHidden || mask === "word";
         $("compactTools").replaceChildren();
         button(t("Показать панель", "Show toolbar"), () => {
             panelHidden = false;
@@ -2458,22 +2459,34 @@
         const chrome = document.createElement("header");
         chrome.className = "wordChrome";
         chrome.innerHTML = '<div class="wordTitle"><div class="wordQuick"></div><strong>' +
-            (editing ? t("Документ1", "Document1") : t("Оукхейвен — дневник", "Oakhaven — journal")) +
+            t("Документ1", "Document1") +
             '</strong><div class="wordWindowActions"></div></div><nav class="wordTabs" aria-label="Word"></nav>' +
             '<div class="wordCommands"></div><div class="wordRuler" aria-hidden="true"><span>' +
-            Array.from({length:19}, (_, i) => '<i>' + i + '</i>').join("") +
+            Array.from({length:23}, (_, i) => '<i>' + (i < 3 ? 3-i : i-3 || "") + '</i>').join("") +
             '</span></div>';
         root.prepend(chrome);
         const editor = editing ? root.querySelector("[contenteditable]") : root.querySelector(".gameDocument");
         const quick = chrome.querySelector(".wordQuick");
-        const home = button("⌂", showWelcome, quick);
+        function iconControl(label, path, action, parent) {
+            const b = button("", action, parent);
+            b.title = label; b.setAttribute("aria-label", label);
+            b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';
+            return b;
+        }
+        const home = iconControl(t("Выбрать интерфейс", "Choose interface"), '<path d="M3 10 12 2l9 8v11h-6v-8H9v8H3Z"/>', showWelcome, quick);
         home.title = t("Выбрать интерфейс", "Choose interface");
         home.setAttribute("aria-label", home.title);
 
         function command(label, name, value, parent, title) {
             const control = button(label, () => {
                 editor.focus();
-                document.execCommand(name, false, value);
+                if (name === "increaseFontSize" || name === "decreaseFontSize") {
+                    const size = Math.round((parseFloat(editor.style.fontSize) || 16) * .75);
+                    const next = Math.max(8, Math.min(72, size + (name === "increaseFontSize" ? 2 : -2)));
+                    editor.style.fontSize = (next * 4 / 3) + "px";
+                    const control = chrome.querySelector('select[aria-label="'+t("Размер текста", "Text size")+'"]');
+                    if (control) control.value=String(next);
+                } else document.execCommand(name, false, value);
             }, parent);
             control.disabled = !editing;
             control.title = title || label;
@@ -2484,8 +2497,18 @@
 
         command("↶", "undo", null, quick, t("Отменить", "Undo"));
         command("↷", "redo", null, quick, t("Повторить", "Redo"));
-        button(t("Переключить · Esc", "Switch · Esc"), toggleBoss,
+        iconControl(t("Печать", "Print"), '<path d="M6 8V2h12v6M6 17H3V8h18v9h-3M6 13h12v9H6Z"/>', () => window.print(), quick);
+        iconControl(t("Скачать документ", "Download document"), '<path d="M3 2h15l3 3v17H3ZM7 2v7h10V2M7 22v-9h10v9"/>', () => {
+            const blob = new Blob(['<!doctype html><meta charset="utf-8"><title>Document1</title>'+editor.innerHTML], {type:"text/html;charset=utf-8"});
+            const url = URL.createObjectURL(blob), a = document.createElement("a");
+            a.href=url; a.download="Document1.html"; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+        }, quick);
+        const panel = button("•••", () => {panelHidden=!panelHidden;updatePanelVisibility();}, quick);
+        panel.className="wordPanelToggle";
+        panel.title=t("Показать / скрыть панель", "Show / hide toolbar"); panel.setAttribute("aria-label",panel.title);
+        const switchButton = button(t("Переключить · Esc", "Switch · Esc"), toggleBoss,
             chrome.querySelector(".wordWindowActions"));
+        switchButton.className="wordSwitch";
 
         function group(label) {
             const section = document.createElement("section");
@@ -2517,33 +2540,68 @@
                 item.setAttribute("aria-pressed", String(item.dataset.tab === tab));
             }
             if (tab === "home") {
+                const clipboard = group(t("Буфер обмена", "Clipboard"));
+                clipboard.classList.add("wordClipboard");
+                const paste = button("", async () => {
+                    editor.focus();
+                    try {const text=await navigator.clipboard.readText(); document.execCommand("insertText", false, text);}
+                    catch {root.querySelector(".wordStatus").textContent=t("Для вставки нажмите ⌘V (Mac) или Ctrl+V", "Press ⌘V (Mac) or Ctrl+V to paste");}
+                }, clipboard);
+                paste.innerHTML='<svg viewBox="0 0 30 38" fill="none" stroke="#ddd" stroke-width="1.5" aria-hidden="true"><path stroke="#dda941" stroke-width="3" d="M21 5H3v30h10"/><path d="M9 3h10v6H9ZM13 14h15v23H13Z"/></svg><span>'+t("Вставить", "Paste")+'</span>';
+                paste.title=t("Вставить · ⌘V", "Paste · ⌘V"); paste.setAttribute("aria-label",paste.title); paste.disabled=!editing;
+                const cutCopy=document.createElement("div");clipboard.append(cutCopy);
+                command("✂", "cut", null, cutCopy, t("Вырезать", "Cut"));
+                command("▱", "copy", null, cutCopy, t("Копировать", "Copy"));
+                command("▰", "removeFormat", null, cutCopy, t("Очистить форматирование", "Clear formatting"));
                 const font = group(t("Шрифт", "Font"));
+                font.classList.add("wordFontTools");
+                const fontTop=document.createElement("div"), fontBottom=document.createElement("div");
+                font.append(fontTop,fontBottom);
                 selectControl(t("Шрифт", "Font"), ["Calibri", "Arial", "Georgia", "Times New Roman"],
                     editor.style.fontFamily.replaceAll('"', "") || "Calibri",
-                    value => editor.style.fontFamily = value, font);
-                selectControl(t("Размер текста", "Text size"), [10, 11, 12, 14, 16, 18, 20, 24],
-                    parseInt(editor.style.fontSize) || 16,
-                    value => editor.style.fontSize = value + "px", font);
-                command(t("Ж", "B"), "bold", null, font, t("Полужирный", "Bold"));
-                command(t("К", "I"), "italic", null, font, t("Курсив", "Italic"));
-                command(t("Ч", "U"), "underline", null, font, t("Подчёркнутый", "Underline"));
-                command("ab", "strikeThrough", null, font, t("Зачёркнутый", "Strikethrough"));
+                    value => editor.style.fontFamily = value, fontTop);
+                selectControl(t("Размер текста", "Text size"), [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72],
+                    Math.round((parseFloat(editor.style.fontSize) || 16) * .75),
+                    value => editor.style.fontSize = (Number(value) * 4 / 3) + "px", fontTop);
+                command("A↑", "increaseFontSize", null, fontTop, t("Увеличить шрифт", "Grow font"));
+                command("A↓", "decreaseFontSize", null, fontTop, t("Уменьшить шрифт", "Shrink font"));
+                command("Aa⌄", "removeFormat", null, fontTop, t("Сбросить формат", "Clear format"));
+                command(t("Ж", "B"), "bold", null, fontBottom, t("Полужирный", "Bold"));
+                command(t("К", "I"), "italic", null, fontBottom, t("Курсив", "Italic"));
+                command(t("Ч", "U"), "underline", null, fontBottom, t("Подчёркнутый", "Underline"));
+                command("ab", "strikeThrough", null, fontBottom, t("Зачёркнутый", "Strikethrough"));
+                command("x₂", "subscript", null, fontBottom, t("Подстрочный", "Subscript"));
+                command("x²", "superscript", null, fontBottom, t("Надстрочный", "Superscript"));
+                command("A", "foreColor", "#2257a5", fontBottom, t("Цвет текста", "Font color")).className="wordTextColor";
+                command("▰", "hiliteColor", "#fff300", fontBottom, t("Выделить цветом", "Highlight")).className="wordHighlight";
                 const paragraph = group(t("Абзац", "Paragraph"));
+                paragraph.classList.add("wordParagraphTools");
                 command("☷", "insertUnorderedList", null, paragraph, t("Маркированный список", "Bulleted list"));
                 command("1.", "insertOrderedList", null, paragraph, t("Нумерованный список", "Numbered list"));
                 command("≡", "justifyLeft", null, paragraph, t("По левому краю", "Align left"));
                 command("≡", "justifyCenter", null, paragraph, t("По центру", "Center"));
                 command("≡", "justifyRight", null, paragraph, t("По правому краю", "Align right"));
+                command("☰", "justifyFull", null, paragraph, t("По ширине", "Justify"));
+                command("⇤", "outdent", null, paragraph, t("Уменьшить отступ", "Decrease indent"));
+                command("⇥", "indent", null, paragraph, t("Увеличить отступ", "Increase indent"));
                 const styles = group(t("Стили", "Styles"));
                 styles.classList.add("wordStyleGallery");
-                for (const [label, tag] of [[t("Обычный","Normal"),"p"],[t("Заголовок 1","Heading 1"),"h1"],[t("Заголовок 2","Heading 2"),"h2"],[t("Подзаголовок","Subtitle"),"h3"]]) {
-                    const tile = command(label, "formatBlock", tag, styles);
+                for (const [label, tag] of [[t("Обычный","Normal"),"p"],[t("Без интервала","No spacing"),"p"],[t("Заголовок 1","Heading 1"),"h1"],[t("Заголовок 2","Heading 2"),"h2"],[t("Заголовок","Title"),"h1"],[t("Подзаголовок","Subtitle"),"h3"],[t("Слабое выделение","Subtle emphasis"),"em"],[t("Выделение","Emphasis"),"em"],[t("Сильное выделение","Intense emphasis"),"strong"],[t("Строгий","Strong"),"strong"]]) {
+                    const tile = command(label, tag === "em" ? "italic" : tag === "strong" ? "bold" : "formatBlock", tag, styles);
                     tile.className = "wordStyleTile";
                     const sample = document.createElement("span");
                     sample.textContent = "AaБбВв";
                     sample.className = "styleSample " + tag;
                     tile.prepend(sample);
                 }
+            }
+            if (["draw","design","references","mailings","review"].includes(tab)) {
+                const extra = group(t("Инструменты документа", "Document tools"));
+                if (tab === "draw") command(t("Выделить текст", "Highlight text"), "hiliteColor", "#fff300", extra);
+                if (tab === "design") command(t("Заголовок", "Title"), "formatBlock", "h1", extra);
+                if (tab === "references") command(t("Ссылка на раздел", "Section reference"), "insertText", t("См. раздел «Следующие шаги»", "See Next steps"), extra);
+                if (tab === "mailings") command(t("Обращение", "Greeting"), "insertText", t("Уважаемые коллеги,", "Dear colleagues,"), extra);
+                if (tab === "review") command(t("Примечание", "Comment"), "insertText", t("[Примечание: ]", "[Comment: ]"), extra);
             }
             if (tab === "insert") {
                 const insert = group(t("Элементы документа", "Document elements"));
@@ -2570,11 +2628,17 @@
         }
 
         for (const [id, label] of [["home",t("Главная","Home")],["insert",t("Вставка","Insert")],
-            ["layout",t("Макет","Layout")],["view",t("Вид","View")]]) {
+            ["draw",t("Рисование","Draw")],["design",t("Конструктор","Design")],["layout",t("Макет","Layout")],["references",t("Ссылки","References")],["mailings",t("Рассылки","Mailings")],["review",t("Рецензирование","Review")],["view",t("Вид","View")]]) {
             const control = button(label, () => renderRibbon(id), chrome.querySelector(".wordTabs"));
             control.dataset.tab = id;
         }
+        const help = button(t("♧  Расскажите", "♧  Tell me"), () => {
+            if (S.bossMode) editor.focus(); else startTour();
+        }, chrome.querySelector(".wordTabs"));
+        help.className="wordTellMe";
         renderRibbon("home");
+        const vertical=document.createElement("div");vertical.className="wordVerticalRuler";vertical.setAttribute("aria-hidden","true");
+        vertical.innerHTML=Array.from({length:29},(_,i)=>'<span>'+i+'</span>').join("");root.append(vertical);
         const footer = document.createElement("footer");
         footer.className = "wordStatus";
         footer.textContent = editing ? t("Страница 1 из 1 · Редактирование", "Page 1 of 1 · Editing") :

@@ -975,3 +975,94 @@ body[data-mask="word"] #workspaceTools button,body[data-mask="word"] #compactToo
  .wordRuler>span {max-width:calc(100% - 40px)}
 }
 .wordCommands,.wordTabs,.workPane.word {scrollbar-color:#686868 #2b2b2b;scrollbar-width:thin}
+
+/* Full-width Word shell, proportioned to the supplied desktop screenshot. */
+.alternative.word {
+ --word-page:794px;position:relative;grid-template-columns:minmax(140px,1fr) minmax(0,var(--word-page)) minmax(190px,1fr);
+ gap:22px 24px;padding:0 0 24px;justify-content:stretch;width:100%;max-width:none;
+}
+.alternative.word .wordChrome {margin:0;width:100%;grid-column:1/-1}
+.alternative.word .folders {display:block;justify-self:end;width:160px;padding:8px 0}
+.alternative.word .gameDocument {grid-column:2;padding:72px 76px;min-height:1123px;width:100%;margin:0;font-family:Calibri,Arial,sans-serif}
+.alternative.word #altStats {grid-column:3;max-width:210px;margin-right:18px;padding:18px;font:12px/1.6 Calibri,Arial,sans-serif}
+.alternative.word #altScene h1 {font:600 26px/1.25 Calibri,Arial,sans-serif}
+.alternative.word #altScene p {font:16px/1.6 Calibri,Arial,sans-serif;margin:18px 0 24px}
+.alternative.word #altChoices button {font-size:13px;padding:10px 12px;border-radius:3px}
+.wordChrome {font-family:Calibri,Arial,sans-serif;z-index:5}
+.wordTitle {height:38px;min-height:38px;padding:4px 14px}
+.wordTitle>strong {font:600 14px/1.2 Calibri,Arial,sans-serif}
+.wordQuick {gap:4px}.wordQuick button {width:24px;height:28px;padding:3px;font:22px/1 Calibri,Arial,sans-serif}
+.wordQuick svg {width:19px;height:21px;display:block}
+.wordQuick .wordPanelToggle {width:28px;font-size:16px;letter-spacing:1px}
+.wordWindowActions button {height:26px;padding:3px 8px;color:#ccc}
+.wordTabs {height:32px;gap:22px;padding:0 9px;align-items:stretch;border:0}
+.wordTabs button {font:600 13px/1 Calibri,Arial,sans-serif;padding:6px 0;border:0;border-bottom:3px solid transparent}
+.wordTabs .wordTellMe {font-weight:400;flex-shrink:0}
+.wordCommands {height:76px;min-height:76px;padding:4px 7px 6px;gap:0;overflow-y:hidden;align-items:stretch}
+.wordToolGroup {padding:0 9px;justify-content:center;border-right:1px solid #505050}
+.wordToolGroup>small {display:none}
+.wordToolItems {gap:3px;max-width:none;flex-wrap:nowrap;align-content:center}
+.wordToolItems button {min-width:23px;min-height:25px;height:25px;padding:2px 4px;font:15px/1 Calibri,Arial,sans-serif}
+.wordToolItems select {height:25px;padding:2px 5px;border-radius:3px;font:12px Calibri,Arial,sans-serif;max-width:104px}
+.wordToolItems select:first-child {width:104px}
+.wordToolItems select:nth-child(2) {width:53px}
+.wordFontTools {display:flex;flex-direction:column;align-items:flex-start;gap:7px;width:265px}
+.wordFontTools>div {display:flex;align-items:center;gap:3px}
+.wordFontTools>div:first-child button {font-size:13px}
+.wordFontTools>div:nth-child(2) button:nth-child(1) {font-weight:700}
+.wordFontTools>div:nth-child(2) button:nth-child(2) {font-style:italic}
+.wordFontTools>div:nth-child(2) button:nth-child(3) {text-decoration:underline}
+.wordFontTools>div:nth-child(2) button:nth-child(4) {text-decoration:line-through}
+.wordFontTools .wordTextColor {color:#74b8ef;border-bottom:3px solid #de4940;border-radius:0}
+.wordFontTools .wordHighlight {border-bottom:3px solid #fcf229;border-radius:0}
+.wordParagraphTools {display:grid;grid-template-columns:repeat(4,29px);grid-template-rows:25px 25px;gap:7px 4px;width:133px}
+.wordParagraphTools button:nth-child(-n+2) {color:#84bfdf}
+.wordClipboard {gap:5px;align-items:center}
+.wordClipboard>button {height:62px;display:flex;align-items:center;flex-direction:column;gap:2px;padding:0;font-size:11px}
+.wordClipboard svg {width:27px;height:40px}
+.wordClipboard>div {display:flex;flex-direction:column}
+.wordClipboard>div button {height:20px;min-height:20px;font-size:17px;padding:0;color:#b8c1c8}
+.wordStyleGallery {gap:6px;padding:4px;background:#383838;border:1px solid #414141;border-radius:3px}
+.wordStyleGallery .wordStyleTile {height:54px;min-width:76px;max-width:84px;padding:5px 4px;gap:8px;border:1px solid #ddd;border-radius:1px;font:9px Calibri,Arial,sans-serif;overflow:hidden;white-space:nowrap}
+.wordStyleGallery .wordStyleTile:first-child {outline:2px solid #999;outline-offset:2px}
+.wordStyleGallery .styleSample {font-size:15px}
+.wordStyleTile:nth-child(4) .styleSample {font-size:23px;font-weight:400}
+.wordStyleTile:nth-child(n+6) .styleSample {font-style:italic}
+.wordChrome button:disabled {opacity:1;color:#bdbdbd}
+.wordChrome .wordStyleTile:disabled {color:#161616}
+.wordRuler {height:17px;position:relative}
+.wordRuler>span {position:relative;width:794px;max-width:calc(100% - 40px);padding:0;justify-content:space-between;background-color:#353535;background-size:100% 5px}
+.wordRuler>span:before,.wordRuler>span:after {content:"";position:absolute;top:0;bottom:0;width:76px;background:#9993}
+.wordRuler>span:before {left:0;border-right:1px solid #bfbfbf}
+.wordRuler>span:after {right:0;border-left:1px solid #bfbfbf}
+.wordRuler i {font:9px/11px Calibri,Arial,sans-serif}
+.wordVerticalRuler {position:absolute;top:163px;bottom:24px;left:0;width:13px;border-right:1px solid #888;color:#ddd;background:#454545 repeating-linear-gradient(0deg,transparent 0 7px,#aaa 7px 8px) left/5px 100% no-repeat;overflow:hidden;pointer-events:none}
+.wordVerticalRuler span {height:38px;display:block;text-align:center;font:9px Calibri,Arial,sans-serif;writing-mode:vertical-rl;padding-top:8px}
+.workPane.word::after {display:none}
+.workPane.word article {width:794px;max-width:calc(100% - 40px);margin:22px auto;padding:76px;min-height:1123px;font:16px/1.6 Calibri,Arial,sans-serif;flex-shrink:0}
+.wordStatus {padding:4px 15px;font:10px Calibri,Arial,sans-serif;min-height:22px}
+.alternative.word>.wordStatus {grid-row:3;grid-column:1/-1}
+@media(max-width:1200px){
+ .alternative.word {grid-template-columns:minmax(20px,1fr) minmax(0,794px) minmax(20px,1fr)}
+ .alternative.word .folders {display:none}
+ .alternative.word #altStats {grid-column:2;grid-row:3;width:100%;max-width:none;margin:0;display:flex;align-items:start;gap:12px;flex-wrap:wrap}
+ .alternative.word #altStats h2 {font-size:20px;margin:0}.alternative.word #altStats h3{margin:0}
+ .alternative.word #altStats details{margin:0;flex:1}.alternative.word #altStats .historyBars{width:100%;margin-top:5px;height:40px}
+ .alternative.word>.wordStatus {grid-row:4}
+}
+@media(max-width:800px){
+ .alternative.word {display:grid;grid-template-columns:20px minmax(0,1fr) 20px;gap:14px 0;padding:0}
+ .alternative.word .wordChrome {margin:0}.alternative.word .gameDocument {padding:32px 26px;min-height:850px;margin:0}
+ .wordTitle {padding:4px 9px}.wordTitle>strong{font-size:12px;max-width:30%}
+ .wordWindowActions button{font-size:10px;padding:3px}
+ .wordTabs {gap:20px}.wordCommands{min-height:76px}
+ .wordQuick button {width:22px}.wordQuick button[aria-label="Печать"],.wordQuick button[aria-label="Print"]{display:none}
+ .workPane.word article {padding:40px 28px}.wordRuler>span:before,.wordRuler>span:after{width:28px}
+}
+@media print{body[data-mask="word"] .wordChrome,body[data-mask="word"] #workspaceTools,body[data-mask="word"] #compactTools,.wordVerticalRuler{display:none!important}.workPane.word article{margin:0;border:0}}
+.wordCommands .wordToolGroup:has(.wordStyleGallery) {flex:1;min-width:100px;flex-shrink:1;overflow:hidden}
+.wordStyleGallery {overflow-x:auto;scrollbar-width:none;max-width:100%}
+.wordStyleGallery .wordStyleTile {flex-shrink:0}
+.wordStyleTile:nth-child(4) .styleSample {font-size:15px;font-weight:400}
+.wordStyleTile:nth-child(5) .styleSample {font-size:23px;font-weight:400}
+.wordStyleTile:nth-child(6) .styleSample {font-style:normal}
