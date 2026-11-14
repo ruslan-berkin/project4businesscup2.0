@@ -91,10 +91,10 @@ class WorkspaceTour {
         this.afterClose();
     }
     allowed(el) {
-        return document.getElementById("excelLobby")?.open || this.isWork() || this.guide.contains(el) || this.targets?.some(target => target.contains(el));
+        return document.getElementById("gameLobby")?.open || this.isWork() || this.guide.contains(el) || this.targets?.some(target => target.contains(el));
     }
     keydown(event) {
-        if (!this.active || document.getElementById("excelLobby")?.open) return;
+        if (!this.active || document.getElementById("gameLobby")?.open) return;
         if (this.isWork() && event.key !== "Escape") return;
         if (event.key === "Tab") {
             const clickable = (this.targets || []).flatMap(el => el.matches("button:enabled") ? [el] : [...el.querySelectorAll("button:enabled")]);
@@ -121,9 +121,9 @@ class WorkspaceTour {
         const end = this.ended();
         const steps = [
             [".maskCards", t("Ваше рабочее окно","Pick your workspace"), t("Я Мира. Выберите оформление или нажмите «Далее», чтобы открыть выбранное окно. Esc закрывает обучение.","I’m Mira. Pick a workspace, or use Next to open " + this.selectedName() + ". Esc skips the tour.")],
-            [grid ? "td.story" : "#altScene", t("Ваша история","Read the scene"), t("Так начинается ваша история в Оукхейвене. Цель — добраться до праздника к 18:00. Esc закрывает обучение.","Your day in Oakhaven unfolds here. Make it to the evening festival at 18:00. Esc skips the tour.")],
+            [grid ? "td.story" : "#altScene", t("Ваша история","Read the scene"), this.goalText()],
             [grid ? "td.optcell" : "#altChoices", end ? t("Финал","Adventure complete") : t("Ваш выбор","Choose your next move"), end ? t("Здесь можно начать новую игру.","This is where you can start another adventure.") : t("Попробуйте вариант или нажмите 1–3. Настоящий ход занимает 30 игровых минут. Можно просто продолжить обучение.","Try an option or press 1–3. A real turn takes 30 game minutes. You can also select Next to keep looking around.")],
-            [grid ? 'td[data-r="2"][data-c="4"],td[data-r="4"][data-c="5"]' : "#altStats .vitals", t("Показатели героя","Check your vitals"), t("Следите за здоровьем и бодростью. Если они упадут до нуля или неприятности достигнут 100%, приключение закончится.","Keep health and energy above zero, and trouble below 100%, to stay in the adventure.")],
+            [grid ? 'td[data-r="2"][data-c="4"],td[data-r="4"][data-c="5"]' : "#altStats .vitals", t("Показатели героя","Check your vitals"), this.endless() ? t("Игра закончится, когда здоровье упадёт до нуля. Нулевая бодрость или 100% неприятностей отнимают здоровье каждый ход.", "Only zero health ends this mode. Zero energy or 100% trouble costs health every turn.") : t("Следите за здоровьем и бодростью. Если они упадут до нуля или неприятности достигнут 100%, приключение закончится.","Keep health and energy above zero, and trouble below 100%, to stay in the adventure.")],
             [activeSwitch, t("Рабочий экран","Try the work screen"), t("Нажмите выделенную кнопку, Esc или «Далее», чтобы открыть рабочий экран. Сцена сохранится.","Use the highlighted switch, press Esc, or select Next to open the work screen. Your scene stays right here.")],
             [activeSwitch, t("Вернитесь в игру","Return to your adventure"), t("Вы на рабочем экране. Нажмите Esc, выделенную кнопку или «Завершить», чтобы продолжить с той же сцены.","You’re in the work view. Press Esc, use the switch, or select Finish to return to the same scene.")]
         ];
@@ -131,7 +131,7 @@ class WorkspaceTour {
     }
     refresh() {
         if (!this.active) return;
-        if (this.isWork() || document.getElementById("excelLobby")?.open) {
+        if (this.isWork() || document.getElementById("gameLobby")?.open) {
             this.guide.hidden = this.shade.hidden = true;
             document.body.classList.remove("tourActive", "tourDock");
             document.body.style.removeProperty("--dock-height");

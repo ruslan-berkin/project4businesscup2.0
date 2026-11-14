@@ -5,5 +5,12 @@ services:
     plan: free
     rootDir: tabescape_app
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn app:app --timeout 60 --bind 0.0.0.0:$PORT
     healthCheckPath: /
+    envVars:
+      - key: TABESCAPE_SECRET_KEY
+        generateValue: true
+      - key: OPENAI_ENABLED
+        value: "false"
+      - key: OPENAI_MODEL
+        value: gpt-5-mini

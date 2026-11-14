@@ -1,4 +1,4 @@
-/* TabEscape — Увлекательное фэнтези-приключение, замаскированное под оригинальный Excel Web (Office 365).
+/* TabEscape — short stories across four office workspaces.
  * Создание книг и листов Excel с нуля, загрузка любых своих .xlsx файлов и экспорт со всеми стилями и цветами. */
 (() => {
     "use strict";
@@ -23,10 +23,6 @@
     const store = {
         get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
         set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
-    };
-    const session = {
-        get(k, d) { try { const v = sessionStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
-        set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* ignore */ } },
     };
     let language = store.get("te_language", "en");
     const t = (ru, en) => language === "en" ? en : ru;
@@ -72,12 +68,12 @@
     const DEFAULT_WB_NAME = t("Книга1.xlsx", "Book1.xlsx");
 
     const S = {
+        campaignId: "oakhaven", playMode: "free", genre: "fantasy", campaignTitle: "", engine: "scripted", storyToken: null,
         stats: { ...START_STATS }, options: [], turn: 1, over: false, won: false,
         narrative: "", auditLog: "", sceneId: null, seen: [], inventory: [], log: [],
         history: [{ ...START_STATS }], loading: null, custom: "",
         role: store.get("te_role", t("Начинающий искатель", "Apprentice adventurer")),
         boss: store.get("te_boss", t("Мастер Гильдии Морган", "Guildmaster Morgan")),
-        apiKey: session.get("te_key", ""),
         imported: null,
         sourceB64: null,
         impIdx: 0,
@@ -101,9 +97,16 @@
 
     const clockMinutes = () => 9 * 60 + 30 * (S.turn - 1);
     const clockStr = () => {
-        const m = Math.min(clockMinutes(), 18 * 60);
-        return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+        const m = clockMinutes();
+        const day = Math.floor(m / 1440);
+        return (day ? t("День ", "Day ") + (day + 1) + " · " : "") + String(Math.floor(m / 60) % 24).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
     };
+    const storyModeLabel = () => S.playMode === "free" ? t("Бесплатная история", "Free story") :
+        (S.playMode === "endless" ? t("Бесконечный режим", "Endless mode") : "Premium") +
+        (S.engine === "openai" ? t(" · ИИ", " · AI") : t(" · демо без ИИ", " · demo, no AI"));
+    const storyGoal = () => S.playMode === "endless" ?
+        t("Путешествуйте, пока герой жив. Каждый ход — 30 минут; 18:00 не завершает игру.", "Keep exploring while your hero lives. Each turn takes 30 minutes; 18:00 does not end the game.") :
+        t("Следуйте за уликами и выберите, чем закончится история. Каждый ход — 30 минут. Esc закрывает обучение.", "Follow the clues and shape the ending. Each turn takes 30 minutes. Esc skips the tour.");
     const score = () => Math.max(0, S.stats.ROI + S.stats.KPI + (100 - S.stats.Anxiety) + S.inventory.length * 10);
 
     const ITEM_DESC = {
@@ -302,7 +305,7 @@
         const put = (r, c, o) => { cells[key(r, c)] = o; };
         const rnd = seeded(26);
         put(1, 1, { raw: "ID", cls: "hdr" });
-        put(1, 2, { raw: "ДНЕВНИК ПРИКЛЮЧЕНИЙ ОУКХЕЙВЕНА (МАСКИРОВКА: ОТЧЁТ Q4)", cls: "hdr" });
+        put(1, 2, { raw: (S.campaignTitle || "TabEscape") + " · " + storyModeLabel(), cls: "hdr" });
         put(1, 3, { raw: "Бюджет", cls: "hdr c" });
         put(1, 4, { raw: "Параметр героя", cls: "hdr" });
         put(1, 5, { raw: "Значение", cls: "hdr c" });
@@ -358,7 +361,7 @@
         statCell(4, "Неприятности", "Anxiety", (v) => (v <= 40 ? "ok" : v <= 70 ? "warn" : "bad"), "РОЗЫСК");
         put(5, 4, { raw: "Время дня", locked: true });
         put(5, 5, { locked: true, cls: "r", fx: "=ТЕКСТ(ВРЕМЯ();\"чч:мм\")", html: () => `<b>${clockStr()}</b>` });
-        put(5, 6, { locked: true, html: () => { const left = Math.max(0, 18 * 60 - clockMinutes()); return `<span class="badge ${left > 180 ? "ok" : "warn"}">${t("ДО ВЕЧЕРА","REMAINING")} · ${Math.floor(left / 60)}${t("ч","h")} ${left % 60}${t("м","m")}</span>`; }, fx: "=ВРЕМЯ(18;0;0)-ВРЕМЯ()" });
+        put(5, 6, { locked: true, html: () => `<span class="badge ok">${esc(S.over ? t("ФИНАЛ", "ENDING") : S.playMode === "endless" ? t("БЕЗ ЛИМИТА ХОДОВ", "NO TURN LIMIT") : t("ХОД ", "TURN ") + S.log.length)}</span>` });
         put(6, 4, { raw: "Находки", locked: true });
         put(6, 5, { locked: true, cls: "r", fx: "=СЧЁТ(Инвентарь!B:B)", html: () => `<b>${S.inventory.length}</b>` });
         put(6, 6, { locked: true, html: () => `<span class="badge ${S.inventory.length ? "ok" : "warn"}">${S.inventory.length ? t("В СУМКЕ","IN BAG") : t("ПУСТО","EMPTY")}</span>` });
@@ -453,7 +456,7 @@
             const r = 2 + i;
             put(r, 1, { raw: i + 1, cls: "code" });
             put(r, 2, { raw: itemLabel(n), cls: "bold" });
-            put(r, 3, { raw: language === "en" ? "Use to restore health and energy." : ITEM_DESC[n] || "Полезная находка из Оукхейвена (+25 Здоровья и Бодрости)." });
+            put(r, 3, { raw: language === "en" ? "Use to restore health and energy." : ITEM_DESC[n] || "Полезная находка (+25 Здоровья и Бодрости)." });
             put(r, 4, { raw: grouped[n], cls: "c" });
             put(r, 5, { cls: "c", html: () => `<button class="use-btn" data-use="${esc(n)}">${t("Использовать","Use")}</button>` });
             if (i % 2) rowCls[r] = "zebra";
@@ -1546,7 +1549,14 @@
         S.narrative = data.narrative;
         S.stats = data.stats || { ...START_STATS };
         S.options = data.options || [];
-        S.over = Boolean(data.game_over) || S.stats.ROI <= 0 || S.stats.KPI <= 0 || S.stats.Anxiety >= 100;
+        S.over = Boolean(data.game_over);
+        S.won = Boolean(data.won);
+        S.storyToken = data.story_token || null;
+        S.playMode = data.mode || S.playMode;
+        S.campaignId = data.campaign_id || S.campaignId;
+        S.campaignTitle = data.campaign_title || S.campaignTitle;
+        S.engine = data.engine || S.engine;
+        if (Number.isInteger(data.story_turn)) S.turn = data.story_turn + 1;
         S.auditLog = data.audit_log || "";
         S.sceneId = data.scene_id || null;
         if (S.sceneId) S.seen.push(S.sceneId);
@@ -1554,12 +1564,6 @@
         S.loading = null;
         S.custom = "";
         if (action) logTurn(action);
-        if (!S.over && clockMinutes() >= 18 * 60) {
-            S.over = true;
-            S.won = true;
-            S.narrative = language === "en" ? `18:00 — Festival time! After a day exploring the valley, you’ve earned a place in the guild with ${S.boss}. Final score: ${score()}.` : `🎉 18:00 — ВЕЧЕРНИЙ ПРАЗДНИК В ОУКХЕЙВЕНЕ! Вы отлично провели день, исследовали долину и заслужили почётное место в Гильдии у мастера ${S.boss}! Итоговый счёт: ${score()}.`;
-            S.options = [];
-        }
         if (S.over) {
             const sc = S.won ? score() : Math.round(score() / 2);
             if (S.turn > 1 && sc > S.best) { S.best = sc; store.set("te_best", String(sc)); }
@@ -1581,8 +1585,9 @@
             method: "POST", headers: {"Content-Type": "application/json"},
             body: JSON.stringify({...body, language}),
         });
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        return response.json();
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "HTTP " + response.status);
+        return data;
     }
 
     async function restart() {
@@ -1593,7 +1598,7 @@
         Object.assign(S, {
             stats: { ...START_STATS }, options: [], turn: 1, over: false, won: false,
             narrative: "", auditLog: "", sceneId: null, seen: [], inventory: [], log: [],
-            history: [{ ...START_STATS }], custom: "",
+            history: [{ ...START_STATS }], custom: "", storyToken: null,
         });
         S.loading = t("Загрузка нового приключения…","Opening your adventure…");
         S.bossMode = false;
@@ -1603,24 +1608,24 @@
         select(2, 2);
         syncing();
         try {
-            const data = await post("/api/start", { role: S.role, boss: S.boss, api_key: S.apiKey });
+            const data = await post("/api/start", { role: S.role, boss: S.boss, campaign_id: S.campaignId, mode: S.playMode, genre: S.genre });
             applyData(data, null);
-        } catch {
+        } catch (error) {
             S.loading = null;
-            S.narrative = t("Нет связи с сервером. Нажмите «Новая игра» ещё раз.","Couldn’t reach the server. Choose Restart to try again.");
+            S.narrative = error.message + " " + t("Нажмите «Новая игра», чтобы повторить.", "Choose Restart to retry.");
             render();
         }
     }
 
     async function sendAction(text, idx) {
-        if (S.loading || S.over || S.bossMode) return;
+        if (S.loading || S.over || S.bossMode || !S.storyToken) return;
         const prev = { narrative: S.narrative, options: S.options };
         S.loading = t("Выполняется ход: ", "Taking your turn: ") + text + " …";
         render();
         syncing();
         try {
             const data = await post("/api/action", {
-                action: text, stats: S.stats, role: S.role, boss: S.boss, api_key: S.apiKey,
+                action: text, story_token: S.storyToken,
                 choice_idx: idx, scene_id: S.sceneId, seen: S.seen.slice(-12), clock: clockStr(), inventory: S.inventory,
             });
             S.turn += 1;
@@ -1628,12 +1633,12 @@
             applyData(data, text);
             workspaceActionPending = false;
             return true;
-        } catch {
+        } catch (error) {
             S.loading = null;
             S.narrative = prev.narrative;
             S.options = prev.options;
             if (!S.bossMode) render();
-            toast("⚠ Ошибка связи с сервером. Повторите ход.");
+            toast(error.message + " " + t("Повторите ход.", "Please retry your turn."));
             return false;
         }
     }
@@ -1660,13 +1665,13 @@
 
     function exportReport() {
         const lines = language === "en" ? [
-            "TabEscape — Oakhaven adventure diary", "Hero: " + S.role, "Guildmaster: " + S.boss,
+            "TabEscape — " + S.campaignTitle, "Hero: " + S.role, "Guildmaster: " + S.boss,
             "Score: " + score() + " · Turns: " + S.log.length, "",
             ...S.log.map(e => e.time + " · " + e.action + " (Health " + e.roi + " / Energy " + e.kpi + " / Trouble " + e.anx + ")"),
             "", S.narrative
         ] : [
-            "TabEscape — Дневник приключений Оукхейвена", `Герой: ${S.role}`, `Мастер Гильдии: ${S.boss}`,
-            `Исход: ${S.won ? "успешное завершение дня" : "приключение прервано"}`, `Очки: ${score()} · Ходов: ${S.log.length}`, "",
+            "TabEscape — " + S.campaignTitle, `Герой: ${S.role}`, `Мастер Гильдии: ${S.boss}`,
+            `Исход: ${S.won ? "успешный финал" : S.over ? "приключение окончено" : "продолжается"}`, `Очки: ${score()} · Ходов: ${S.log.length}`, "",
             ...S.log.map((e) => `${String(e.turn).padStart(2, "0")} [${e.time}] ${e.action}  (Здоровье ${e.roi} / Бодрость ${e.kpi} / Неприятности ${e.anx})`), "", "Финал: " + S.narrative,
         ];
         const a = document.createElement("a");
@@ -1999,7 +2004,6 @@
     function openSettings() {
         $("inputRole").value = S.role;
         $("inputBoss").value = S.boss;
-        $("inputApiKey").value = S.apiKey;
         $("settingsModal").hidden = false;
         $("inputRole").focus();
     }
@@ -2007,10 +2011,8 @@
     function saveSettings() {
         S.role = $("inputRole").value.trim() || t("Начинающий искатель", "Apprentice adventurer");
         S.boss = $("inputBoss").value.trim() || t("Мастер Гильдии Морган", "Guildmaster Morgan");
-        S.apiKey = $("inputApiKey").value.trim();
         store.set("te_role", S.role);
         store.set("te_boss", S.boss);
-        session.set("te_key", S.apiKey);
         closeSettings();
         restart();
     }
@@ -2112,7 +2114,7 @@
         window.addEventListener("drop", (e) => {
             e.preventDefault();
             if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                if ($("excelLobby").open) prepareLobbyWorkbook(e.dataTransfer.files[0]);
+                if ($("gameLobby").open) { if ($("lobbyFile")) prepareLobbyWorkbook(e.dataTransfer.files[0]); }
                 else importFile(e.dataTransfer.files[0]);
             }
         });
@@ -2148,7 +2150,7 @@
         });
 
         document.addEventListener("keydown", (e) => {
-            if ($("excelLobby").open || tour?.active) return;
+            if ($("gameLobby").open || tour?.active) return;
             if ($("subscriptionDialog").open) return;
             if (!$("welcome").hidden) return;
             if (e.key === "Escape") {
@@ -2232,12 +2234,13 @@
         }
         document.body.prepend(original);
         document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-label="TabEscape Plus"></dialog>');
-        document.body.insertAdjacentHTML("afterbegin", '<dialog id="excelLobby" aria-labelledby="excelLobbyTitle"></dialog>');
-        $("excelLobby").addEventListener("cancel", event => {event.preventDefault(); closeExcelLobby(false);});
+        document.body.insertAdjacentHTML("afterbegin", '<dialog id="gameLobby" aria-labelledby="gameLobbyTitle"></dialog>');
+        $("gameLobby").addEventListener("cancel", event => {event.preventDefault(); closeGameLobby(false);});
         $("subscriptionDialog").addEventListener("cancel", event => {event.preventDefault(); closeOffer();});
         document.body.insertAdjacentHTML("afterbegin", '<main id="welcome"></main><nav id="workspaceTools" hidden></nav><main id="alternateGame" hidden></main><main id="alternateWork" hidden></main><aside id="guide" hidden aria-label="Обучение / Tutorial"></aside>');
         tour = new WorkspaceTour({
             guide: $("guide"), t, setWork: setBoss, isWork: () => S.bossMode,
+            goalText: storyGoal, endless: () => S.playMode === "endless",
             isGrid: () => mask === "excel" && !compactSheet(), ended: () => S.over,
             hasActions: () => S.over || S.options.length > 0,
             openMask: enterMask, selected: () => mask, selectedName: () => MASKS[mask].name, home: showWelcome,
@@ -2264,15 +2267,15 @@
               <button class="langSwitch"></button>
             </div>
             <div class="hero">
-              <div class="heroCopy"><div class="campaign"><i></i>${t("ТЕКУЩАЯ КАМПАНИЯ","CURRENT CAMPAIGN")}</div>
+              <div class="heroCopy"><div class="campaign"><i></i>${t("8 БЕСПЛАТНЫХ ИСТОРИЙ","8 FREE STORIES")}</div>
                 <h1>${t("Маленький перерыв.","A little break.")}<br><em>${t("Большой квест.","A grand quest.")}</em></h1>
-                <p>${t("Исследуйте Оукхейвен в короткой ролевой игре прямо в привычном рабочем окне.","Explore Oakhaven in a bite-sized fantasy RPG tucked inside your everyday workspace.")}</p>
+                <p>${t("Тайны, трудные решения и немного надежды. Выберите историю для короткого перерыва — в привычном рабочем окне.","Mysteries, difficult choices and a little hope. Pick a story for a short break in your everyday workspace.")}</p>
                 <button class="playNow"><span aria-hidden="true">▶</span> ${started?t("Продолжить игру","Resume adventure"):t("Начать игру","Play adventure")}</button>
               </div>
-              <div class="mapPin"><i aria-hidden="true">✦</i> ${t("Долина Оукхейвен","Oakhaven Valley")}</div>
+              <div class="mapPin"><i aria-hidden="true">✦</i> ${t("Между надеждой и тайной","Between hope and mystery")}</div>
             </div>
-            <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("Одна история · Четыре оформления","One story · Four interfaces")}</span></div><div class="maskCards"></div></div>
-            <div class="guideStrip"><div class="miraBust"><img src="${portableImages["mira.webp"]}" alt=""></div><div><b>${t("Привет, я Мира.","Hi, I’m Mira.")}</b><p>${t("Впервые в долине? Я покажу дорогу.","New to the valley? I’ll show you around.")}</p></div><button data-home-help></button></div>
+            <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("8 историй · 4 оформления","8 stories · 4 interfaces")}</span></div><div class="maskCards"></div></div>
+            <div class="guideStrip"><div class="miraBust"><img src="${portableImages["mira.webp"]}" alt=""></div><div><b>${t("Привет, я Мира.","Hi, I’m Mira.")}</b><p>${t("Впервые здесь? Давайте выберем вашу историю.","New here? Let’s find your first story.")}</p></div><button data-home-help></button></div>
             <footer class="hubFooter"><span><i></i> ${t("Игра в браузере","Browser session")}</span><span>${t("Перезагрузка начинает новую партию","Reloading starts a new adventure")}</span></footer>
           </div>`;
         const launchGuide = () => tour.start(true);
@@ -2307,18 +2310,31 @@
     let lobbyBusy = false;
     let lobbyGeneration = 0;
 
-    function syncExcelLobby() {
-        const dialog = $("excelLobby");
+    function syncGameLobby() {
+        const dialog = $("gameLobby");
         if (!dialog?.open) return;
         const fresh = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
-        $("lobbyStart").disabled = lobbyBusy || Boolean(S.loading);
+        $("lobbyStart").disabled = lobbyBusy || Boolean(S.loading) || !selectedLobbyCampaign();
         $("lobbyStart").textContent = S.loading ? t("Дождитесь завершения хода…", "Finishing your turn…") :
             fresh ? t("Начать игру", "Start adventure") : t("Продолжить игру", "Continue adventure");
         $("lobbyReplaceNote").hidden = !fresh || !started;
+        $("lobbySetup").disabled = !fresh;
+        const mode = dialog.querySelector('input[name="lobbyMode"]:checked').value;
+        $("lobbyStoryLabel").hidden = mode !== "free";
+        $("lobbyGenreLabel").hidden = mode === "free";
+        const campaign = selectedLobbyCampaign();
+        if (campaign) {
+            const genre = storyCatalog.genres.find(g => g.id === campaign.genre);
+            $("lobbyStoryPreview").innerHTML = `<span class="storyTag">${esc(genre.title[language])} · ${mode === "free" ? t("4 хода до финала", "4 moves to an ending") : mode === "endless" ? t("До гибели героя", "Until your hero dies") : storyCatalog.premium_ai ? t("8–12 ходов · ИИ", "8–12 moves · AI") : t("4 хода · демо", "4 moves · demo")}</span><h2>${esc(campaign.title[language])}</h2><p>${esc(campaign.description[language])}</p>`;
+        }
+        $("lobbyModeNote").textContent = mode === "free" ? t("Все восемь историй открыты. Без ключа ИИ и без оплаты.", "All eight stories are open. No AI key or payment needed.") :
+            storyCatalog?.premium_ai ? t("Генерация подключена. Модель помнит события и развивает сюжет после каждого хода. Демо доступно без подписки.", "AI is connected. The model follows past events and develops the story each turn. This demo needs no subscription.") :
+            mode === "endless" ? t("Демо без ИИ: локальные главы повторяются, игра идёт до гибели героя. Новые генерируемые главы появятся после подключения OpenAI. Оплата не нужна.", "No-AI demo: local chapters repeat until your hero dies. OpenAI will create new chapters when connected. No payment needed.") :
+            t("Демо без ИИ: покажем готовую историю выбранного жанра. Новые сюжеты будут генерироваться после подключения OpenAI. Подписка пока не требуется.", "No-AI demo: try a prepared story in your genre. New plots will be generated when OpenAI is connected. No subscription required yet.");
     }
 
-    function closeExcelLobby(launched) {
-        const dialog = $("excelLobby");
+    function closeGameLobby(launched) {
+        const dialog = $("gameLobby");
         if (!dialog.open) return;
         dialog.close();
         lobbyGeneration++;
@@ -2336,7 +2352,7 @@
         const generation = lobbyGeneration;
         lobbyBusy = true;
         $("lobbyFileStatus").textContent = t("Читаем книгу…", "Reading workbook…");
-        syncExcelLobby();
+        syncGameLobby();
         try {
             const parsed = await readWorkbook(file);
             if (generation !== lobbyGeneration) return;
@@ -2347,66 +2363,118 @@
             $("lobbyFileStatus").textContent = t("Не удалось прочитать файл. Предыдущая книга или готовый отчёт остаются доступны.",
                 "Could not read this file. Your previous workbook or the prepared report is still available.");
         } finally {
-            if (generation === lobbyGeneration) {lobbyBusy = false; syncExcelLobby();}
+            if (generation === lobbyGeneration) {lobbyBusy = false; syncGameLobby();}
         }
     }
 
-    function openExcelLobby() {
-        if ($("excelLobby").open) return Promise.resolve(false);
+    let storyCatalog = null;
+    let catalogRequest = null;
+    function loadCatalog() {
+        if (!catalogRequest) catalogRequest = fetch('/api/catalog').then(response => {
+            if (!response.ok) throw new Error('Catalog unavailable');
+            return response.json();
+        }).then(data => { storyCatalog = data; return data; }).catch(error => {catalogRequest = null; throw error;});
+        return catalogRequest;
+    }
+
+    function openGameLobby(id) {
+        if ($("gameLobby").open) return Promise.resolve(false);
         lobbyFocus = document.activeElement;
         lobbyDraft = null;
         lobbyBusy = false;
-        lobbyGeneration++;
-        const dialog = $("excelLobby");
+        const generation = ++lobbyGeneration;
+        const dialog = $("gameLobby");
         const tutorial = tour.active || store.get("te_tutorial", "") !== "done";
+        const workDescription = {
+            word: t("Редактируемый документ уже подготовлен. Ваши правки останутся при возвращении в игру.", "An editable document is ready. Your edits remain when you return to the game."),
+            outlook: t("Готовые входящие: выбирайте письма и читайте их в соседней панели.", "Your inbox is ready: select a message and read it in the adjacent pane."),
+            autocad: t("Чертёж уже открыт: меняйте масштаб и видимость слоя мебели.", "Your drawing is ready: change the zoom or toggle the furniture layer.")
+        };
+        dialog.dataset.mask = id;
         dialog.innerHTML = `
-            <header class="lobbyHeader"><div class="lobbyBrand"><img src="${portableImages["excel-icon.png"]}" alt=""><span>TabEscape <small>EXCEL</small></span></div><button class="lobbyClose" aria-label="${t("Закрыть", "Close")}">×</button></header>
+            <header class="lobbyHeader"><div class="lobbyBrand"><img src="${portableImages[id+"-icon.png"]}" alt=""><span>TabEscape <small>${MASKS[id].name}</small></span></div><button class="lobbyClose" aria-label="${t("Закрыть", "Close")}">×</button></header>
             <div class="lobbyBody"><p class="lobbyEyebrow">${t("ПЕРЕД ПРИКЛЮЧЕНИЕМ", "BEFORE YOUR ADVENTURE")}</p>
-            <h1 id="excelLobbyTitle">${t("Ваш следующий ход", "Your next move")}</h1>
-            <p class="lobbyIntro">${t("Подготовьте игру и рабочее окно. Начнём, когда вы будете готовы.", "Set up your adventure and work view. Start when you’re ready.")}</p>
+            <h1 id="gameLobbyTitle">${t("Какую историю проживём?", "Which story will you live?")}</h1>
+            <p class="lobbyIntro">${t("Выберите историю и режим. Игра начнётся только по вашей команде.", "Choose a story and a mode. Your adventure starts when you say so.")}</p>
             <fieldset class="lobbyActions"><legend>${t("Партия", "Adventure")}</legend>
-                <label><input type="radio" name="lobbyAction" value="new" ${!started ? "checked" : ""}><span><b>${t("Новая игра", "New game")}</b><small>${t("Оукхейвен · начало в 09:00", "Oakhaven · start at 09:00")}</small></span></label>
-                <label><input type="radio" name="lobbyAction" value="continue" ${started ? "checked" : "disabled"}><span><b>${t("Продолжить", "Continue")}</b><small>${started ? clockStr()+" · "+t("Ходов: ", "Turns: ")+S.log.length : t("Пока нет начатой партии", "No adventure started yet")}</small></span></label>
+                <label><input type="radio" name="lobbyAction" value="new" ${!started || S.over ? "checked" : ""}><span><b>${t("Новая игра", "New game")}</b><small>${t("Начать другую историю или ветку", "Try a new story or another path")}</small></span></label>
+                <label><input type="radio" name="lobbyAction" value="continue" ${started ? (S.over ? "" : "checked") : "disabled"}><span><b>${t("Продолжить", "Continue")}</b><small>${started ? esc(S.campaignTitle)+" · "+clockStr() : t("Пока нет начатой партии", "No adventure started yet")}</small></span></label>
             </fieldset>
-            <fieldset class="lobbyModes"><legend>${t("Режим игры", "Play mode")}</legend>
-                <label><input type="radio" name="lobbyMode" value="adventure" ${!tutorial ? "checked" : ""}><span><b>${t("Приключение", "Adventure")}</b><small>${t("История и выбор действий в вашем темпе", "Story and choices at your own pace")}</small></span></label>
-                <label><input type="radio" name="lobbyMode" value="tutorial" ${tutorial ? "checked" : ""}><span><b>${t("С проводницей", "With your guide")}</b><small>${t("Мира покажет управление и даст сделать ход", "Mira explains the controls as you play")}</small></span></label>
+            <fieldset id="lobbySetup"><legend>${t("Режим игры", "Play mode")}</legend>
+              <div class="lobbyModeCards">
+                <label><input type="radio" name="lobbyMode" value="free" ${S.playMode === "free" ? "checked" : ""}><span><b>${t("Бесплатно", "Free stories")}</b><small>${t("8 историй · разные финалы", "8 stories · branching endings")}</small></span></label>
+                <label><input type="radio" name="lobbyMode" value="premium" ${S.playMode === "premium" ? "checked" : ""}><span><b>Premium</b><small>${t("ИИ-сюжет в выбранном жанре", "An AI story in your genre")}</small></span></label>
+                <label><input type="radio" name="lobbyMode" value="endless" ${S.playMode === "endless" ? "checked" : ""}><span><b>${t("Бесконечный", "Endless")}</b><small>${t("Новые главы, пока герой жив", "New chapters while you survive")}</small></span></label>
+              </div>
+              <div class="lobbyStoryControls">
+                <label class="lobbySelect" id="lobbyStoryLabel" for="lobbyStory">${t("История", "Story")}<select id="lobbyStory"></select></label>
+                <label class="lobbySelect" id="lobbyGenreLabel" for="lobbyGenre" hidden>${t("Жанр", "Genre")}<select id="lobbyGenre"></select></label>
+                <div id="lobbyStoryPreview" aria-live="polite">${t("Загружаем библиотеку…", "Loading the library…")}</div>
+              </div>
             </fieldset>
-            <section class="lobbyWorkbook"><div><h2>${t("Рабочая книга для Esc", "Your work view for Esc")}</h2><p>${t("Загрузите свою книгу или используйте готовый отчёт. Загрузка необязательна.", "Open your workbook or use the prepared report. Uploading is optional.")}</p></div>
-                <button id="lobbyUpload" type="button">${t("Загрузить книгу", "Upload workbook")}</button>
+            <p id="lobbyModeNote" class="lobbyModeNote"></p>
+            <label class="lobbyGuide"><input type="checkbox" id="lobbyTutorial" ${tutorial ? "checked" : ""}><span>${t("Показать обучение с Мирой", "Show Mira’s tutorial")}</span></label>
+            <section class="lobbyWorkbook"><div><h2>${t("Рабочий экран по Esc", "Work view on Esc")}</h2><p>${id === "excel" ? t("Загрузите свою книгу или используйте готовый отчёт. Загрузка необязательна.", "Open your workbook or use the prepared report. Uploading is optional.") : workDescription[id]}</p></div>
+                ${id === "excel" ? `<button id="lobbyUpload" type="button">${t("Загрузить книгу", "Upload workbook")}</button>
                 <input id="lobbyFile" type="file" accept=".xlsx,.csv,.tsv,.txt" hidden>
-                <p id="lobbyFileStatus" role="status">${esc(S.imported?.name || t("Готовый отчёт Q4_Прогноз.xlsx", "Prepared Q4_Forecast.xlsx report"))}</p>
-                <small>.xlsx · .csv · .tsv · .txt</small>
+                <p id="lobbyFileStatus" role="status">${esc(S.imported?.name || t("Готовый отчёт Q4_Прогноз.xlsx", "Prepared Q4_Forecast.xlsx report"))}</p><small>.xlsx · .csv · .tsv · .txt</small>` : `<span class="workReady">✓ ${t("Готов", "Ready")}</span>`}
             </section>
             <p class="lobbySessionNote">${t("«Продолжить» работает в этой вкладке. После перезагрузки начинается новая сессия.", "Continue works in this tab. Reloading starts a new session.")}</p>
-            <p id="lobbyReplaceNote" class="lobbyReplaceNote" hidden>${t("Новая игра заменит текущую партию. Рабочая книга сохранится.", "A new game replaces your current adventure. Your workbook stays available.")}</p>
-            </div><footer class="lobbyFooter"><button id="lobbyBack">${t("Назад к интерфейсам", "Back to workspaces")}</button><button id="lobbyStart" class="primary"></button></footer>`;
-        dialog.querySelector(".lobbyClose").onclick = () => closeExcelLobby(false);
-        $("lobbyBack").onclick = () => closeExcelLobby(false);
-        $("lobbyUpload").onclick = () => $("lobbyFile").click();
-        $("lobbyFile").onchange = event => {prepareLobbyWorkbook(event.target.files[0]); event.target.value="";};
-        dialog.querySelectorAll('input[type="radio"]').forEach(input => input.onchange = syncExcelLobby);
+            <p id="lobbyReplaceNote" class="lobbyReplaceNote" hidden>${t("Новая игра заменит текущую партию. Рабочие документы сохранятся.", "A new game replaces your current adventure. Your work documents stay available.")}</p>
+            </div><footer class="lobbyFooter"><button id="lobbyBack">${t("Назад к интерфейсам", "Back to workspaces")}</button><button id="lobbyStart" class="primary" disabled></button></footer>`;
+        dialog.querySelector(".lobbyClose").onclick = () => closeGameLobby(false);
+        $("lobbyBack").onclick = () => closeGameLobby(false);
+        if (id === "excel") {
+            $("lobbyUpload").onclick = () => $("lobbyFile").click();
+            $("lobbyFile").onchange = event => {prepareLobbyWorkbook(event.target.files[0]); event.target.value="";};
+        }
+        dialog.querySelectorAll('input[type="radio"],select').forEach(input => input.onchange = syncGameLobby);
         $("lobbyStart").onclick = async () => {
-            if (lobbyBusy || S.loading) return;
+            if (lobbyBusy || S.loading || !storyCatalog) return;
             const newGame = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
-            const withGuide = dialog.querySelector('input[name="lobbyMode"]:checked').value === "tutorial";
+            const withGuide = $("lobbyTutorial").checked;
+            if (newGame) {
+                S.playMode = dialog.querySelector('input[name="lobbyMode"]:checked').value;
+                S.genre = $("lobbyGenre").value;
+                S.campaignId = $("lobbyStory").value;
+                const campaign = selectedLobbyCampaign();
+                S.genre = campaign.genre;
+                S.campaignId = campaign.id;
+                S.campaignTitle = campaign.title[language];
+                S.engine = S.playMode === "free" ? "scripted" : storyCatalog.premium_ai ? "openai" : "demo";
+            }
             const pendingTour = tour.active && withGuide;
             if (tour.active && !withGuide) tour.close();
             if (lobbyDraft) installWorkbook(lobbyDraft);
-            const finish = closeExcelLobby(true);
-            try { await enterMask("excel", {confirmed:true, newGame, tutorial:withGuide && !pendingTour}); }
+            const finish = closeGameLobby(true);
+            try { await enterMask(id, {confirmed:true, newGame, tutorial:withGuide && !pendingTour}); }
             finally { finish?.(true); }
         };
         const pending = new Promise(resolve => {lobbyResolve = resolve;});
         dialog.showModal();
         tour.refresh();
-        syncExcelLobby();
-        $("lobbyStart").focus();
+        syncGameLobby();
+        loadCatalog().then(catalog => {
+            if (generation !== lobbyGeneration || !dialog.open) return;
+            $("lobbyStory").innerHTML = catalog.campaigns.map(c => `<option value="${c.id}">${esc(c.title[language])}</option>`).join("");
+            $("lobbyGenre").innerHTML = catalog.genres.map(g => `<option value="${g.id}">${esc(g.title[language])}</option>`).join("");
+            $("lobbyStory").value = S.campaignId;
+            $("lobbyGenre").value = S.genre;
+            syncGameLobby();
+        }).catch(() => {
+            if (generation === lobbyGeneration) $("lobbyStoryPreview").textContent = t("Библиотека недоступна. Закройте это окно и попробуйте снова.", "The library is unavailable. Close this window and try again.");
+        });
+        dialog.querySelector('input[name="lobbyAction"]:checked').focus();
         return pending;
     }
 
+    function selectedLobbyCampaign() {
+        const mode = $("gameLobby").querySelector('input[name="lobbyMode"]:checked').value;
+        return storyCatalog?.campaigns.find(c => mode === "free" ? c.id === $("lobbyStory").value : c.genre === $("lobbyGenre").value);
+    }
+
     async function enterMask(id, options = {}) {
-        if (id === "excel" && !options.confirmed) return openExcelLobby();
+        if (!options.confirmed) return openGameLobby(id);
         if (id === "word") panelHidden = true;
         mask=id; store.set("te_mask",mask); $("welcome").hidden=true;
         const needsStart = !started || options.newGame;
@@ -2439,7 +2507,7 @@
     }
     function syncWorkspace() {
         if (!$("welcome")) return;
-        syncExcelLobby();
+        syncGameLobby();
         const home=!$("welcome").hidden;
         document.body.dataset.mask=mask;
         document.body.classList.toggle("work-mode",S.bossMode);
@@ -2493,7 +2561,7 @@
     function renderAlternateGame() {
         const root=$("alternateGame");
         root.className="alternative "+mask;
-        root.innerHTML='<aside class="folders"><b>'+MASKS[mask].file+'</b><p>'+t("Оукхейвен","Oakhaven")+'</p><p>'+t("Архив приключения","Adventure archive")+'</p></aside><section class="gameDocument"><div id="altScene"><small>'+t("Текущая сцена","Current scene")+'</small><h1>Oakhaven</h1><p>'+esc(S.loading||S.narrative)+'</p></div><div id="altChoices"></div><form id="customForm"><label for="customAction">'+t("Свой ход","Your action")+'</label><input id="customAction" maxlength="500"><button>'+t("Отправить","Send")+'</button></form></section><aside id="altStats"></aside>';
+        root.innerHTML='<aside class="folders"><b>'+MASKS[mask].file+'</b><p>'+esc(S.campaignTitle)+'</p><p>'+t("Архив приключения","Adventure archive")+'</p></aside><section class="gameDocument"><div id="altScene"><small>'+esc(storyModeLabel())+'</small><h1>'+esc(S.campaignTitle)+'</h1><p>'+esc(S.loading||S.narrative)+'</p></div><div id="altChoices"></div><form id="customForm"><label for="customAction">'+t("Свой ход","Your action")+'</label><input id="customAction" maxlength="500"><button>'+t("Отправить","Send")+'</button></form></section><aside id="altStats"></aside>';
         const stats=$("altStats");
         stats.innerHTML='<h2>'+clockStr()+'</h2><p>'+t("Здоровье","Health")+' '+S.stats.ROI+'%</p><p>'+t("Бодрость","Energy")+' '+S.stats.KPI+'%</p><p>'+t("Неприятности","Trouble")+' '+S.stats.Anxiety+'%</p><p>'+t("Рекорд","Best")+' '+S.best+'</p><h3>'+t("Инвентарь","Inventory")+'</h3>';
         const vitals = document.createElement("div");
@@ -2504,7 +2572,14 @@
         const details=document.createElement("details");
         details.innerHTML='<summary>'+t("Журнал","Journal")+' ('+S.log.length+')</summary>'+S.log.map(e=>'<p>'+e.time+' · '+esc(e.action)+'</p>').join("");
         stats.append(details);
-        if (S.over) button(t("Сыграть снова","Play again"),restart,$("altChoices"));
+        if (S.over) {
+            const result = document.createElement("p");
+            result.className = "storyResult";
+            result.textContent = (S.won ? t("История раскрыта", "Story resolved") : t("Приключение окончено", "Adventure complete")) + " · " + t("Очки: ", "Score: ") + (S.won ? score() : Math.round(score()/2));
+            $("altChoices").append(result);
+            button(t("Выбрать другую историю", "Choose another story"), () => openGameLobby(mask), $("altChoices"));
+            button(t("Повторить эту историю", "Replay this story"),restart,$("altChoices"));
+        }
         else S.options.forEach((option,i)=>{const b=button((i+1)+". "+option,()=>{S.sheet="adv";choose(i);},$("altChoices"));b.disabled=!!S.loading;});
         $("customForm").onsubmit=e=>{e.preventDefault();const value=$("customAction").value.trim();if(value)sendAction(value,-1);};
         $("customForm").hidden=S.over;
@@ -2513,14 +2588,14 @@
         $("customAction").disabled=!!S.loading;
         if(mask==="outlook") {
             const folder=root.querySelector(".folders");
-            folder.innerHTML="<b>Inbox</b><p>Guild (1)</p><p>Sent</p><p>Archive</p>";
+            folder.innerHTML="<b>"+t("Входящие", "Inbox")+"</b><p>"+t("Дела (1)", "Cases (1)")+"</p><p>"+t("Отправленные", "Sent")+"</p><p>"+t("Архив", "Archive")+"</p>";
             const list=document.createElement("aside");list.className="gameMailList";
-            list.innerHTML="<b>Guild correspondence</b><p>Morgan · "+clockStr()+"</p><p>Oakhaven — current assignment</p>";
+            list.innerHTML="<b>"+t("Дела и поручения", "Cases and assignments")+"</b><p>"+esc(S.boss)+" · "+clockStr()+"</p><p>"+esc(S.campaignTitle)+"</p>";
             root.insertBefore(list,root.querySelector(".gameDocument"));
         }
         if(mask==="autocad") {
             const drawing=document.createElement("div");drawing.className="adventureMap";
-            drawing.innerHTML="<div>OAKHAVEN</div><div>GUILD</div><div>RIVER</div>";
+            drawing.innerHTML="<div>"+t("СЦЕНА", "SCENE")+"</div><div>"+t("УЛИКИ", "CLUES")+"</div><div>"+t("МАРШРУТ", "ROUTE")+"</div>";
             root.querySelector(".gameDocument").prepend(drawing);
         }
         const chart=document.createElement("div");chart.className="historyBars";
@@ -2611,8 +2686,8 @@
         }, actions).className = "primary";
         button(t("Купить подписку · скоро", "Get Plus · coming soon"), () => {
             dialog.querySelector(".offerNote").textContent = t(
-                "Plus ещё в разработке. Генерация историй и оплата станут доступны после запуска подписки.",
-                "Plus is in development. Story generation and checkout will become available when subscriptions launch.");
+                "Оплата ещё не подключена. Жанры и режимы уже доступны в окне новой игры; генерацию OpenAI включает команда на сервере.",
+                "Checkout is not connected yet. Genres and modes are available in the new-game menu; the team enables OpenAI on the server.");
         }, actions);
         button(t("Прийти завтра", "Come back tomorrow"), () => {
             closeOffer();
@@ -2816,7 +2891,7 @@
         const footer = document.createElement("footer");
         footer.className = "wordStatus";
         footer.textContent = editing ? t("Страница 1 из 1 · Редактирование", "Page 1 of 1 · Editing") :
-            t("Оукхейвен · ", "Oakhaven · ") + clockStr();
+            S.campaignTitle + " · " + clockStr();
         root.append(footer);
     }
 

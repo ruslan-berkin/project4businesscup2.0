@@ -30,10 +30,12 @@ class RuntimeTests(unittest.TestCase):
                 self.assertIn(b'initWorkspace', response.data)
             for resource in ['/static/guides/excel.jpeg', '/api/workbook/default',
                              '/static/js/tour.js', '/static/images/mira.webp',
-                             '/static/images/workspace-background-1.webp']:
+                             '/static/images/workspace-background-1.webp', '/api/catalog']:
                 with client.get(resource) as response:
                     self.assertEqual(response.status_code, 200)
             self.assertIn('You wake', client.post('/api/start', json={'language': 'en'}).get_json()['narrative'])
+            self.assertEqual(len(client.get('/api/catalog').get_json()['campaigns']), 8)
+            self.assertEqual(client.post('/api/start', json={'campaign_id': 'row17'}).status_code, 200)
 
     @patch.dict(os.environ, {}, clear=True)
     def test_procedural_start_and_action(self):
