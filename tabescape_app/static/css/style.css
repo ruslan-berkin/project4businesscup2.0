@@ -1214,3 +1214,45 @@ body.tourDock #welcome {min-height:0}
  #guide .guideSprite,.grid td.story.fade {animation:none!important;rotate:none!important}
  .spotlight,#guide,.maskCard {transition:none!important}
 }
+
+/* Excel pre-game screen: choosing an interface never starts a party. */
+#excelLobby {width:min(680px,calc(100% - 28px));max-height:calc(100dvh - 28px);padding:0;margin:auto;border:1px solid #b8c5af;border-radius:18px;background:#fafbf5;color:#223a2a;box-shadow:0 28px 90px #10241b55;font:14px/1.5 Inter,system-ui,sans-serif;overflow:auto}
+#excelLobby::backdrop {background:#13241cc4;backdrop-filter:blur(5px)}
+#excelLobby button {font:inherit;cursor:pointer;border:1px solid #c3cdbb;border-radius:8px;padding:10px 16px;background:#fff;color:#29472e}
+#excelLobby button:hover {background:#edf4e5;border-color:#6f8b5b}
+#excelLobby button:disabled {opacity:.5;cursor:wait}
+#excelLobby :focus-visible {outline:3px solid #4a793d;outline-offset:3px}
+.lobbyHeader {display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid #dce3d5;background:#f0f4e9}
+.lobbyBrand {display:flex;align-items:center;gap:12px;font-size:16px;font-weight:700}
+.lobbyBrand img {width:38px;height:38px;object-fit:contain;image-rendering:pixelated}
+.lobbyBrand small {display:block;font:10px/1.4 monospace;letter-spacing:2px;color:#57774b}
+#excelLobby .lobbyClose {font-size:26px;line-height:1;background:transparent;border:0;padding:8px 10px}
+.lobbyBody {padding:24px 28px 18px}
+.lobbyEyebrow {margin:0 0 8px;font:10px monospace;letter-spacing:2px;color:#5c7952}
+#excelLobby h1 {margin:0 0 8px;font:400 32px/1.15 Georgia,serif;letter-spacing:-.6px}
+.lobbyIntro {color:#64705e;margin:0 0 22px;max-width:48ch}
+#excelLobby fieldset {border:0;padding:0;margin:0 0 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px;min-width:0}
+#excelLobby legend {font-weight:650;margin-bottom:9px;padding:0;font-size:13px}
+#excelLobby fieldset label {display:flex;align-items:flex-start;gap:9px;padding:14px;border:1px solid #d0d9c6;border-radius:9px;background:white;cursor:pointer}
+#excelLobby fieldset label:has(input:checked) {border-color:#48733e;background:#eaf4df;box-shadow:inset 0 0 0 1px #48733e}
+#excelLobby fieldset label:has(input:disabled) {opacity:.55;cursor:default;background:#f0f1ec}
+#excelLobby input[type=radio] {accent-color:#396c35;margin:4px 0 0;flex-shrink:0}
+#excelLobby label b {display:block;font-size:14px;font-weight:650}
+#excelLobby label small {display:block;font-size:11px;color:#697661;margin-top:3px;line-height:1.5}
+.lobbyWorkbook {display:grid;grid-template-columns:1fr auto;gap:10px 18px;padding:16px;border:1px dashed #acbea0;background:#f2f5ec;border-radius:10px;align-items:center}
+#excelLobby .lobbyWorkbook h2 {font-size:13px;margin:0 0 4px}
+.lobbyWorkbook p {margin:0;font-size:12px;color:#65765d}
+.lobbyWorkbook #lobbyFileStatus {grid-column:1/-1;color:#36582d;overflow-wrap:anywhere;font-size:12px}
+.lobbyWorkbook>small {grid-column:1/-1;color:#7c8775;font-size:10px}
+.lobbySessionNote {font-size:11px;color:#76816d;margin:16px 0 0}
+.lobbyReplaceNote {font-size:12px;color:#8a611b;margin:10px 0 0}
+.lobbyFooter {display:flex;justify-content:space-between;gap:12px;position:sticky;bottom:0;padding:16px 28px;border-top:1px solid #dce3d5;background:#fafbf5;z-index:1}
+#excelLobby .primary {background:#345e34;color:white;border-color:#345e34;font-weight:650;min-width:180px}
+#excelLobby .primary:hover {background:#274e29}
+@media(max-width:520px){
+ #excelLobby {width:calc(100% - 16px);max-height:calc(100dvh - 16px);border-radius:12px}
+ .lobbyHeader{padding:12px 18px}.lobbyBody{padding:20px 18px 16px}
+ #excelLobby h1{font-size:28px}#excelLobby fieldset{gap:8px}#excelLobby fieldset label{padding:11px 8px;gap:7px}
+ .lobbyWorkbook{grid-template-columns:1fr}.lobbyWorkbook button{justify-self:start}
+ .lobbyFooter{padding:12px 18px;flex-direction:column-reverse}.lobbyFooter button{width:100%}
+}

@@ -61,7 +61,10 @@ class WorkspaceTour {
         if (this.entering) return;
         this.entering = true;
         this.step = 1;
-        try { await this.openMask(id); }
+        try {
+            const entered = await this.openMask(id);
+            if (entered === false) this.step = this.fromHome ? 0 : 1;
+        }
         finally {
             this.entering = false;
             if (this.active) {
@@ -88,10 +91,10 @@ class WorkspaceTour {
         this.afterClose();
     }
     allowed(el) {
-        return this.isWork() || this.guide.contains(el) || this.targets?.some(target => target.contains(el));
+        return document.getElementById("excelLobby")?.open || this.isWork() || this.guide.contains(el) || this.targets?.some(target => target.contains(el));
     }
     keydown(event) {
-        if (!this.active) return;
+        if (!this.active || document.getElementById("excelLobby")?.open) return;
         if (this.isWork() && event.key !== "Escape") return;
         if (event.key === "Tab") {
             const clickable = (this.targets || []).flatMap(el => el.matches("button:enabled") ? [el] : [...el.querySelectorAll("button:enabled")]);
@@ -128,7 +131,7 @@ class WorkspaceTour {
     }
     refresh() {
         if (!this.active) return;
-        if (this.isWork()) {
+        if (this.isWork() || document.getElementById("excelLobby")?.open) {
             this.guide.hidden = this.shade.hidden = true;
             document.body.classList.remove("tourActive", "tourDock");
             document.body.style.removeProperty("--dock-height");

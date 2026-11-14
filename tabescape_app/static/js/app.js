@@ -987,28 +987,33 @@
         }
     }
 
+    async function readWorkbook(file) {
+        if (!/\.(xlsx|csv|tsv|txt)$/i.test(file.name)) throw new Error("Unsupported format");
+        let sheets, sourceB64 = null;
+        const fromScratch = /\.(csv|tsv|txt)$/i.test(file.name);
+        if (fromScratch) sheets = parseCsv(await file.text());
+        else {
+            const buffer = await file.arrayBuffer();
+            sheets = await parseXlsx(buffer);
+            sourceB64 = arrayBufferToBase64(buffer);
+        }
+        if (!sheets.length) throw new Error("Empty workbook");
+        return {book: {name: file.name, fromScratch, sheets}, sourceB64};
+    }
+
+    function installWorkbook({book, sourceB64}) {
+        S.imported = book;
+        S.sourceB64 = sourceB64;
+        S.impIdx = 0;
+        S.edits = {};
+        S.styles = {};
+        workView = null;
+    }
+
     async function importFile(file) {
         if (!file) return;
         try {
-            if (!/\.(xlsx|csv|tsv|txt)$/i.test(file.name)) throw new Error("Unsupported format");
-            let sheets;
-            if (/\.(csv|tsv|txt)$/i.test(file.name)) {
-                sheets = parseCsv(await file.text());
-                S.sourceB64 = null;
-                S.imported = { name: file.name, fromScratch: true, sheets };
-            } else {
-                toast("Читаю файл Excel и стили…");
-                const buf = await file.arrayBuffer();
-                sheets = await parseXlsx(buf);
-                if (!sheets.length) throw new Error("empty");
-                S.sourceB64 = arrayBufferToBase64(buf);
-                S.imported = { name: file.name, fromScratch: false, sheets };
-            }
-            if (!sheets.length) throw new Error("empty");
-            S.impIdx = 0;
-            S.edits = {};
-            S.styles = {};
-            workView = null;
+            installWorkbook(await readWorkbook(file));
             S.bossMode = true; S.stealthTabs = true;
             S.sheet = "imp0";
             render();
@@ -1016,7 +1021,7 @@
             toast(t("Открыта книга: ", "Workbook opened: ") + file.name);
         } catch (e) {
             console.error(e);
-            toast("Не удалось прочитать файл. Поддерживаются .xlsx и .csv");
+            toast(t("Не удалось прочитать файл. Поддерживаются .xlsx, .csv, .tsv и .txt", "Could not read the file. Supported: .xlsx, .csv, .tsv and .txt"));
         }
     }
 
@@ -2106,7 +2111,10 @@
         window.addEventListener("dragover", (e) => e.preventDefault());
         window.addEventListener("drop", (e) => {
             e.preventDefault();
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) importFile(e.dataTransfer.files[0]);
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                if ($("excelLobby").open) prepareLobbyWorkbook(e.dataTransfer.files[0]);
+                else importFile(e.dataTransfer.files[0]);
+            }
         });
         $("settingsModal").addEventListener("mousedown", (e) => {
             if (e.target.id === "settingsModal") closeSettings();
@@ -2140,7 +2148,7 @@
         });
 
         document.addEventListener("keydown", (e) => {
-            if (tour?.active) return;
+            if ($("excelLobby").open || tour?.active) return;
             if ($("subscriptionDialog").open) return;
             if (!$("welcome").hidden) return;
             if (e.key === "Escape") {
@@ -2224,6 +2232,8 @@
         }
         document.body.prepend(original);
         document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-label="TabEscape Plus"></dialog>');
+        document.body.insertAdjacentHTML("afterbegin", '<dialog id="excelLobby" aria-labelledby="excelLobbyTitle"></dialog>');
+        $("excelLobby").addEventListener("cancel", event => {event.preventDefault(); closeExcelLobby(false);});
         $("subscriptionDialog").addEventListener("cancel", event => {event.preventDefault(); closeOffer();});
         document.body.insertAdjacentHTML("afterbegin", '<main id="welcome"></main><nav id="workspaceTools" hidden></nav><main id="alternateGame" hidden></main><main id="alternateWork" hidden></main><aside id="guide" hidden aria-label="Обучение / Tutorial"></aside>');
         tour = new WorkspaceTour({
@@ -2291,12 +2301,118 @@
         syncWorkspace();
         if (!tour?.active) $("welcome").scrollTop=0;
     }
-    async function enterMask(id) {
+    let lobbyResolve = null;
+    let lobbyFocus = null;
+    let lobbyDraft = null;
+    let lobbyBusy = false;
+    let lobbyGeneration = 0;
+
+    function syncExcelLobby() {
+        const dialog = $("excelLobby");
+        if (!dialog?.open) return;
+        const fresh = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
+        $("lobbyStart").disabled = lobbyBusy || Boolean(S.loading);
+        $("lobbyStart").textContent = S.loading ? t("Дождитесь завершения хода…", "Finishing your turn…") :
+            fresh ? t("Начать игру", "Start adventure") : t("Продолжить игру", "Continue adventure");
+        $("lobbyReplaceNote").hidden = !fresh || !started;
+    }
+
+    function closeExcelLobby(launched) {
+        const dialog = $("excelLobby");
+        if (!dialog.open) return;
+        dialog.close();
+        lobbyGeneration++;
+        lobbyBusy = false;
+        lobbyDraft = null;
+        const resolve = lobbyResolve;
+        lobbyResolve = null;
+        if (!launched) resolve?.(false);
+        if (!launched && lobbyFocus?.isConnected) lobbyFocus.focus({preventScroll:true});
+        return resolve;
+    }
+
+    async function prepareLobbyWorkbook(file) {
+        if (!file || lobbyBusy) return;
+        const generation = lobbyGeneration;
+        lobbyBusy = true;
+        $("lobbyFileStatus").textContent = t("Читаем книгу…", "Reading workbook…");
+        syncExcelLobby();
+        try {
+            const parsed = await readWorkbook(file);
+            if (generation !== lobbyGeneration) return;
+            lobbyDraft = parsed;
+            $("lobbyFileStatus").textContent = t("Готово: ", "Ready: ") + file.name;
+        } catch {
+            if (generation !== lobbyGeneration) return;
+            $("lobbyFileStatus").textContent = t("Не удалось прочитать файл. Предыдущая книга или готовый отчёт остаются доступны.",
+                "Could not read this file. Your previous workbook or the prepared report is still available.");
+        } finally {
+            if (generation === lobbyGeneration) {lobbyBusy = false; syncExcelLobby();}
+        }
+    }
+
+    function openExcelLobby() {
+        if ($("excelLobby").open) return Promise.resolve(false);
+        lobbyFocus = document.activeElement;
+        lobbyDraft = null;
+        lobbyBusy = false;
+        lobbyGeneration++;
+        const dialog = $("excelLobby");
+        const tutorial = tour.active || store.get("te_tutorial", "") !== "done";
+        dialog.innerHTML = `
+            <header class="lobbyHeader"><div class="lobbyBrand"><img src="${portableImages["excel-icon.png"]}" alt=""><span>TabEscape <small>EXCEL</small></span></div><button class="lobbyClose" aria-label="${t("Закрыть", "Close")}">×</button></header>
+            <div class="lobbyBody"><p class="lobbyEyebrow">${t("ПЕРЕД ПРИКЛЮЧЕНИЕМ", "BEFORE YOUR ADVENTURE")}</p>
+            <h1 id="excelLobbyTitle">${t("Ваш следующий ход", "Your next move")}</h1>
+            <p class="lobbyIntro">${t("Подготовьте игру и рабочее окно. Начнём, когда вы будете готовы.", "Set up your adventure and work view. Start when you’re ready.")}</p>
+            <fieldset class="lobbyActions"><legend>${t("Партия", "Adventure")}</legend>
+                <label><input type="radio" name="lobbyAction" value="new" ${!started ? "checked" : ""}><span><b>${t("Новая игра", "New game")}</b><small>${t("Оукхейвен · начало в 09:00", "Oakhaven · start at 09:00")}</small></span></label>
+                <label><input type="radio" name="lobbyAction" value="continue" ${started ? "checked" : "disabled"}><span><b>${t("Продолжить", "Continue")}</b><small>${started ? clockStr()+" · "+t("Ходов: ", "Turns: ")+S.log.length : t("Пока нет начатой партии", "No adventure started yet")}</small></span></label>
+            </fieldset>
+            <fieldset class="lobbyModes"><legend>${t("Режим игры", "Play mode")}</legend>
+                <label><input type="radio" name="lobbyMode" value="adventure" ${!tutorial ? "checked" : ""}><span><b>${t("Приключение", "Adventure")}</b><small>${t("История и выбор действий в вашем темпе", "Story and choices at your own pace")}</small></span></label>
+                <label><input type="radio" name="lobbyMode" value="tutorial" ${tutorial ? "checked" : ""}><span><b>${t("С проводницей", "With your guide")}</b><small>${t("Мира покажет управление и даст сделать ход", "Mira explains the controls as you play")}</small></span></label>
+            </fieldset>
+            <section class="lobbyWorkbook"><div><h2>${t("Рабочая книга для Esc", "Your work view for Esc")}</h2><p>${t("Загрузите свою книгу или используйте готовый отчёт. Загрузка необязательна.", "Open your workbook or use the prepared report. Uploading is optional.")}</p></div>
+                <button id="lobbyUpload" type="button">${t("Загрузить книгу", "Upload workbook")}</button>
+                <input id="lobbyFile" type="file" accept=".xlsx,.csv,.tsv,.txt" hidden>
+                <p id="lobbyFileStatus" role="status">${esc(S.imported?.name || t("Готовый отчёт Q4_Прогноз.xlsx", "Prepared Q4_Forecast.xlsx report"))}</p>
+                <small>.xlsx · .csv · .tsv · .txt</small>
+            </section>
+            <p class="lobbySessionNote">${t("«Продолжить» работает в этой вкладке. После перезагрузки начинается новая сессия.", "Continue works in this tab. Reloading starts a new session.")}</p>
+            <p id="lobbyReplaceNote" class="lobbyReplaceNote" hidden>${t("Новая игра заменит текущую партию. Рабочая книга сохранится.", "A new game replaces your current adventure. Your workbook stays available.")}</p>
+            </div><footer class="lobbyFooter"><button id="lobbyBack">${t("Назад к интерфейсам", "Back to workspaces")}</button><button id="lobbyStart" class="primary"></button></footer>`;
+        dialog.querySelector(".lobbyClose").onclick = () => closeExcelLobby(false);
+        $("lobbyBack").onclick = () => closeExcelLobby(false);
+        $("lobbyUpload").onclick = () => $("lobbyFile").click();
+        $("lobbyFile").onchange = event => {prepareLobbyWorkbook(event.target.files[0]); event.target.value="";};
+        dialog.querySelectorAll('input[type="radio"]').forEach(input => input.onchange = syncExcelLobby);
+        $("lobbyStart").onclick = async () => {
+            if (lobbyBusy || S.loading) return;
+            const newGame = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
+            const withGuide = dialog.querySelector('input[name="lobbyMode"]:checked').value === "tutorial";
+            const pendingTour = tour.active && withGuide;
+            if (tour.active && !withGuide) tour.close();
+            if (lobbyDraft) installWorkbook(lobbyDraft);
+            const finish = closeExcelLobby(true);
+            try { await enterMask("excel", {confirmed:true, newGame, tutorial:withGuide && !pendingTour}); }
+            finally { finish?.(true); }
+        };
+        const pending = new Promise(resolve => {lobbyResolve = resolve;});
+        dialog.showModal();
+        tour.refresh();
+        syncExcelLobby();
+        $("lobbyStart").focus();
+        return pending;
+    }
+
+    async function enterMask(id, options = {}) {
+        if (id === "excel" && !options.confirmed) return openExcelLobby();
         if (id === "word") panelHidden = true;
         mask=id; store.set("te_mask",mask); $("welcome").hidden=true;
+        const needsStart = !started || options.newGame;
         if (!started) {
             started=true;
-            try {
+            if (!S.imported) try {
                 const response = await fetch("/api/workbook/default");
                 if (!response.ok) throw new Error("Default workbook unavailable");
                 const buffer = await response.arrayBuffer();
@@ -2306,11 +2422,12 @@
                     S.sourceB64 = arrayBufferToBase64(buffer);
                 }
             } catch { /* The built-in Q4 forecast remains available. */ }
-            await restart();
         }
+        if (needsStart) await restart();
         if (!S.bossMode) render();
-        if (!tour.active && store.get("te_tutorial","")!=="done") startTour();
+        if (!tour.active && (options.tutorial === true || (options.tutorial !== false && store.get("te_tutorial","")!=="done"))) startTour();
         else syncWorkspace();
+        return true;
     }
     function startTour() {
         const trigger = document.activeElement;
@@ -2322,6 +2439,7 @@
     }
     function syncWorkspace() {
         if (!$("welcome")) return;
+        syncExcelLobby();
         const home=!$("welcome").hidden;
         document.body.dataset.mask=mask;
         document.body.classList.toggle("work-mode",S.bossMode);
