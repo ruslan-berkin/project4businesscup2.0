@@ -13,8 +13,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "Под серым утренним небом вы входите в Оукхейвен. Смотрительница Ина просит выяснить, почему колокол не предупредил нижний квартал о сбросе воды. На мосту спорят мельники и жители.",
-          "en": "Under a grey morning sky, you enter Oakhaven. Keeper Ina asks why the bell never warned the lower district about a water release. Millers and residents argue on the bridge."
+          "ru": "К утру дождь стих, и над каналом Оукхейвена пахнет мокрым деревом и хлебом. У мостовой будки Ина подвигает вам кружку: «Ручка горячая. Я всё собираюсь её починить». Пока чай остывает, она показывает на окно в нижнем квартале — там её отец сушит книги после вчерашней воды. Сегодня она обещала помочь ему расставить их по полкам.\n\nВы договариваетесь зайти вместе, когда закончится смена. Но привычного удара колокола нет. Ина долго смотрит на неподвижный трос: вчера именно этот звук должен был предупредить жителей о сбросе. На мосту собираются мельники; у одного мокрые сапоги и злое от усталости лицо. Прежде чем решать, кто виноват, хочется понять, почему никто не успел помочь.",
+          "en": "Morning rain has left Oakhaven smelling of wet timber and fresh bread. At the bridge hut, Ina slides you a mug. “Careful with the handle. I keep meaning to mend it.” While the tea cools, she points to a downstairs window. Her father is drying his books after yesterday’s flood. She promised to help him put them back on the shelves.\n\nYou agree to join her after her shift. Then you notice the missing sound: the town bell. Ina stares at its motionless cable. It should have warned the lower district before the water release. Millers gather on the bridge, tired and angry. Before deciding who is to blame, you want to understand why help never came."
         },
         "choices": [
           {
@@ -66,8 +66,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -79,8 +79,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -113,8 +113,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -126,8 +126,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -154,8 +154,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "Под мостом вы находите обрезанный сигнальный трос и пропуск подрядчика. Ина предлагает публичную проверку, Рен просит сначала укрепить затвор.",
-          "en": "Under the bridge you find a cut signal cable and a contractor’s pass. Ina wants a public inspection; Ren wants the gate repaired first."
+          "ru": "Под мостом вы находите обрезанный сигнальный трос и пропуск подрядчика. Ина предлагает публичную проверку, Рен просит сначала укрепить затвор.\n\nИна молчит, когда вы напоминаете о книгах. «Я хочу вернуться домой, не пряча от него глаза», — говорит она. Рен признаётся, что боялся оставить учеников без заработка; это не оправдывает молчание, но объясняет его.",
+          "en": "Under the bridge you find a cut signal cable and a contractor’s pass. Ina wants a public inspection; Ren wants the gate repaired first.\n\nIna falls quiet when you mention the books. “I want to go home without avoiding his eyes.” Ren admits he feared leaving his apprentices without wages. It does not excuse his silence, but it explains it."
         },
         "choices": [
           {
@@ -253,16 +253,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Подлог раскрыт. Жители вместе укрепляют затвор и выбирают нового смотрителя. Колокол звучит без торжества, но теперь ему верят.",
-        "en": "The forgery is exposed. Residents repair the gate and appoint a new keeper. The bell sounds without celebration, but people trust it again."
+        "ru": "Подлог раскрыт. Жители вместе укрепляют затвор и выбирают нового смотрителя. Колокол звучит без торжества, но теперь ему верят.\n\nК вечеру вы вместе с Иной поднимаете книги на верхнюю полку. Треснувшая кружка ждёт на столе: она всё-таки сохранила для вас чай.",
+        "en": "The forgery is exposed. Residents repair the gate and appoint a new keeper. The bell sounds without celebration, but people trust it again.\n\nThat evening, you and Ina lift the books onto a higher shelf. The cracked mug waits on the table. She saved you some tea."
       },
       "mixed": {
         "ru": "Вы добились перемирия на неделю. Мельница работает по очереди с кварталом, а вопрос о виновнике остаётся открытым.",
         "en": "You secure a week-long truce. The mill shares water with the district, but responsibility remains unresolved."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "Вы уходите с моста, не назвав виновного. Ина не останавливает вас, только спрашивает, зайдёте ли вы всё-таки помочь с книгами. Ответить на этот простой вопрос оказывается труднее, чем уйти от спора.",
+        "en": "You leave the bridge without naming a culprit. Ina does not stop you. She only asks whether you will still help with the books. That simple question is harder to answer than the argument you left behind."
       }
     },
     "length": 4
@@ -281,8 +281,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "На вашем столе лежат две версии отчёта. В одной строка 17 пуста, в другой стоит имя сотрудницы Лены, которая сегодня не вышла на работу.",
-          "en": "Two report versions lie on your desk. Row 17 is blank in one and names Lena, absent today, in the other."
+          "ru": "В офисе ещё тихо. Кофемашина гудит за перегородкой, принтер снова жуёт бумагу, а у окна стоит чашка Лены с нарисованным от руки котом. Вчера она помогла вам разобраться с чужими расчётами и впервые за неделю рассмеялась. «Завтра покажу, где тут настоящий кофе», — сказала она, убирая в ящик потрёпанный блокнот.\n\nЕё стул пуст. На вашем столе лежат две версии одного отчёта: в первой строка 17 не заполнена, во второй стоит Ленино имя. Время сохранения отличается на одиннадцать минут. Телефон не отвечает, хотя обычно она пишет первой. Можно сдать привычную проверку и забыть о несходстве — но тогда кто спросит, куда она пропала?",
+          "en": "The office is still quiet. The coffee machine hums behind a partition and the printer is chewing paper again. Lena’s cup sits by the window, with a hand-drawn cat on its side. Yesterday she helped you untangle someone else’s calculations. “Tomorrow I’ll show you where the proper coffee is,” she said, putting away a battered notebook.\n\nHer chair is empty. Two versions of a report lie on your desk. Row 17 is blank in one; the other carries Lena’s name. Their save times are eleven minutes apart. She is not answering her phone. You could finish the routine check and ignore the discrepancy. But then who will ask where she has gone?"
         },
         "choices": [
           {
@@ -334,8 +334,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -347,8 +347,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -381,8 +381,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -394,8 +394,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -422,8 +422,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "Номер накладной ведёт к закрытому подрядчику. Лена звонит: она нашла схему, но боится стать удобной виновницей.",
-          "en": "The invoice number leads to a shuttered contractor. Lena calls: she discovered the scheme and fears being made the scapegoat."
+          "ru": "Номер накладной ведёт к закрытому подрядчику. Лена звонит: она нашла схему, но боится стать удобной виновницей.\n\nВы напоминаете ей про обещанный кофе. Впервые разговор перестаёт звучать как допрос. «Только не решай за меня, ладно?» — просит Лена. Ей нужен союзник, который выслушает, а не ещё один человек с готовым приговором.",
+          "en": "The invoice number leads to a shuttered contractor. Lena calls: she discovered the scheme and fears being made the scapegoat.\n\nYou remind her about the promised coffee. For the first time, this feels less like an interrogation. “Just don’t decide everything for me, okay?” Lena needs someone who will listen, not another verdict."
         },
         "choices": [
           {
@@ -521,16 +521,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Цепочка платежей подтверждена. Лена даёт показания, а аудит останавливает следующий перевод. Строка 17 возвращается в отчёт уже как доказательство.",
-        "en": "The payment trail holds up. Lena testifies and the auditor stops the next transfer. Row 17 returns as evidence."
+        "ru": "Цепочка платежей подтверждена. Лена даёт показания, а аудит останавливает следующий перевод. Строка 17 возвращается в отчёт уже как доказательство.\n\nНа следующий день Лена встречает вас у лифта с двумя стаканчиками. Разговаривать о вчерашнем пока тяжело, поэтому вы сначала обсуждаете смешного кота на её чашке.",
+        "en": "The payment trail holds up. Lena testifies and the auditor stops the next transfer. Row 17 returns as evidence.\n\nThe next morning Lena meets you by the lift with two coffees. Yesterday is still difficult to discuss, so you start with the funny cat on her cup."
       },
       "mixed": {
         "ru": "Платёж заморожен, но виновник не установлен. Вы сохранили Лене работу и получили время на новую проверку.",
         "en": "The payment is frozen, but no culprit is established. Lena keeps her job and the review gains more time."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "Вы передаёте копию отчёта в общий архив и отказываетесь вести проверку дальше. Лена отвечает на сообщение одним «поняла». Её чашка остаётся у окна; вы не знаете, зайдёт ли она за ней завтра.",
+        "en": "You file a copy of the report and step away from the investigation. Lena replies with a single “understood.” Her cup stays by the window. You do not know whether she will collect it tomorrow."
       }
     },
     "length": 4
@@ -549,8 +549,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "Катер оставляет вас у пустого причала. Каждые семь минут маяк передаёт три коротких сигнала. В журнале посетителей уже записано ваше имя.",
-          "en": "A boat leaves you at an empty pier. Every seven minutes the lighthouse flashes three signals. Your name is already in the visitors’ book."
+          "ru": "Катер уходит, оставляя в воздухе запах топлива и мокрой верёвки. У причала вас ждёт Нора, дочь смотрителя. Она неловко принимает тяжёлую сумку, хотя пришла лишь показать дорогу. По пути Нора рассказывает, как отец различал корабли по звуку и никак не мог научить её этому. В кармане у неё две карамели — привычка встречать гостей, от которой она не отказалась после его исчезновения.\n\nВы обещаете выпить чаю перед обратным катером. Внутри маяка тепло, но часы стоят. Каждые семь минут лампа посылает три коротких сигнала. В журнале посетителей уже записано ваше имя, знакомым Норе почерком. Она не просит объяснить невозможное. Пока ей достаточно, чтобы вы остались рядом и посмотрели внимательнее.",
+          "en": "The boat leaves a smell of fuel and wet rope behind. Nora, the keeper’s daughter, waits on the pier and insists on carrying your heavy bag. Walking uphill, she describes how her father could recognise ships by their sound. He never managed to teach her. She offers you a sweet: welcoming visitors is a habit she has kept since he disappeared.\n\nYou promise to share tea before the return boat. The lighthouse is warm, but its clocks have stopped. Every seven minutes the lamp sends three short flashes. Your name is already in the visitors’ book, in handwriting Nora knows. She does not ask you to explain the impossible. For now, she just wants you to stay and look."
         },
         "choices": [
           {
@@ -602,8 +602,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -615,8 +615,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -649,8 +649,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -662,8 +662,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -690,8 +690,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "Под линзой спрятана карта течений. Сигнал указывает безопасный путь судну, которого нет на радарах.",
-          "en": "A current chart is hidden below the lens. The signal guides a ship invisible to radar."
+          "ru": "Под линзой спрятана карта течений. Сигнал указывает безопасный путь судну, которого нет на радарах.\n\nНора узнаёт маршрут, который отец рисовал ей на салфетках. Она просит не обещать, что он вернётся: «Просто помоги мне узнать, кого он ждал».",
+          "en": "A current chart is hidden below the lens. The signal guides a ship invisible to radar.\n\nNora recognises the route her father drew on napkins. She asks you not to promise he will return. “Just help me find out who he was waiting for.”"
         },
         "choices": [
           {
@@ -789,16 +789,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Корабль проходит рифы и растворяется у горизонта. В журнале появляется последняя запись смотрителя: «Все вернулись». Дочь впервые закрывает папку с письмами.",
-        "en": "The ship clears the reef and fades at the horizon. The keeper’s final entry appears: “Everyone returned.” His daughter closes the letters at last."
+        "ru": "Корабль проходит рифы и растворяется у горизонта. В журнале появляется последняя запись смотрителя: «Все вернулись». Дочь впервые закрывает папку с письмами.\n\nНора ставит третью чашку в шкаф и наливает чай в две оставшиеся. Перед катером она спрашивает, сможете ли вы приехать весной, когда на склоне цветёт вереск.",
+        "en": "The ship clears the reef and fades at the horizon. The keeper’s final entry appears: “Everyone returned.” His daughter closes the letters at last.\n\nNora puts the third cup away and pours tea into the other two. Before your boat leaves, she asks whether you could visit in spring, when the hillside blooms."
       },
       "mixed": {
         "ru": "Судно уходит в туман. Вы оставляете свет включённым и договариваетесь вернуться с новым оборудованием. На острове остаётся вопрос, а не ответ.",
         "en": "The ship retreats into fog. You leave the lamp on and promise better equipment. The island keeps its unanswered question."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "Вы успеваете на обратный катер. Нора остаётся на причале с термосом; обещанного чая вы так и не выпили. Когда остров скрывается, три вспышки снова прорезают туман. Вы сохраняете её номер.",
+        "en": "You catch the return boat. Nora stays on the pier with a flask; you never shared that tea. As the island disappears, three flashes cut through the fog. You keep her number."
       }
     },
     "length": 4
@@ -817,8 +817,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "Вы дежурите перед сносом клиники. На пульте загорается «Палата 6», а в коридоре пахнет свежим мылом. Напарник отвечает по рации голосом ребёнка.",
-          "en": "You guard a clinic awaiting demolition. “Ward 6” lights up and the corridor smells of fresh soap. Your partner answers the radio in a child’s voice."
+          "ru": "До последней ночной смены осталось несколько минут. В пустой клинике пахнет пылью и мылом; на стене ещё висит расписание, которое никто не снимет до сноса. Ваш напарник Сэм раскладывает бутерброды на столе охраны и рассказывает, как завтра будет учить дочь кататься на велосипеде. Он смеётся над собой: больше боится отпустить руль, чем она — упасть.\n\nВы обещаете подменить его под утро, чтобы он выспался. Впервые за вечер становится спокойно. Затем на отключённом пульте загорается «Палата 6». Сэм уходит проверить коридор и оставляет половину бутерброда. По рации доносится голос ребёнка: «Ты тоже уйдёшь, не попрощавшись?» На плане шестой палаты нет. Вы смотрите на оставленную еду и зовёте Сэма по имени.",
+          "en": "There are a few minutes before your final night shift. The empty clinic smells of dust and soap. An old timetable still hangs on the wall, waiting for demolition. Your partner Sam lays out sandwiches and talks about teaching his daughter to ride a bicycle tomorrow. He admits that letting go of the handlebars frightens him more than falling frightens her.\n\nYou promise to cover the early hours so he can sleep. Then “Ward Six” lights up on a disconnected console. Sam goes to check, leaving half his sandwich. A child’s voice comes through the radio: “Will you leave without saying goodbye too?” There is no sixth ward on the plan. You look at the food and call Sam’s name."
         },
         "choices": [
           {
@@ -870,8 +870,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -883,8 +883,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -917,8 +917,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -930,8 +930,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -958,8 +958,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "На техническом этаже вы находите детскую бирку и провод к старому громкоговорителю. Звонок звучит уже у вас в кармане.",
-          "en": "On the service floor you find a child’s name tag and a wire to an old speaker. The call bell now rings in your pocket."
+          "ru": "На техническом этаже вы находите детскую бирку и провод к старому громкоговорителю. Звонок звучит уже у вас в кармане.\n\nСэм отвечает уже своим голосом. Он тоже слышал вопрос и теперь просит дождаться его у лестницы. Вы впервые обсуждаете не то, как прогнать голос, а кого здесь забыли.",
+          "en": "On the service floor you find a child’s name tag and a wire to an old speaker. The call bell now rings in your pocket.\n\nSam answers in his own voice and asks you to wait by the stairs. For the first time, you discuss who was forgotten here rather than how to silence them."
         },
         "choices": [
           {
@@ -1057,16 +1057,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Вы называете имя с фотографии и оставляете бирку на подушке. Звонки прекращаются. На выходе напарник замечает: на старом плане появилась шестая палата.",
-        "en": "You speak the name from the photo and leave the tag on the pillow. The ringing stops. Outside, your partner notices Ward Six on the old plan."
+        "ru": "Вы называете имя с фотографии и оставляете бирку на подушке. Звонки прекращаются. На выходе напарник замечает: на старом плане появилась шестая палата.\n\nДнём Сэм присылает фотографию велосипеда: руки уже отпустили руль. «Спасибо, что дождался», — написано под снимком.",
+        "en": "You speak the name from the photo and leave the tag on the pillow. The ringing stops. Outside, your partner notices Ward Six on the old plan.\n\nThat afternoon Sam sends a bicycle photo. His hands have let go of the handlebars. Beneath it: “Thanks for waiting for me.”"
       },
       "mixed": {
         "ru": "Линия отключена, вы оба выбрались. Утром пустой пульт снова мигает. Клиника закрыта до дополнительного обследования.",
         "en": "The line is cut and you both escape. By morning the empty console flashes again. Demolition is postponed."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "Вы выводите Сэма через пожарную лестницу, не возвращая бирку. Он успеет к дочери, и это уже немало. Но перед уходом вы оба слышите звонок и понимаете, кому сегодня так и не ответили.",
+        "en": "You bring Sam out through the fire stairs without returning the tag. He will see his daughter, and that matters. But you both hear the bell as you leave, and know whose call went unanswered."
       }
     },
     "length": 4
@@ -1085,8 +1085,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "Вы просыпаетесь от щелчка аварийного клапана. За окном медленно вращается Земля. Компьютер считает все жилые отсеки пустыми и готовит их разгерметизацию.",
-          "en": "An emergency valve wakes you. Earth turns slowly outside. The computer believes every inhabited module is empty and prepares to vent them."
+          "ru": "Земля медленно поворачивается за стеклом, и рассвет по краю облаков похож на тонкую медную нить. Инженер Мэй приклеивает к стене пакетик с базиликом: её маленький огород опять уплывает от вентилятора. Она предлагает поспорить, переживёт ли растение возвращение домой. Вы обещаете помочь пересадить его, когда закончится утренняя проверка.\n\nМэй уходит в технический отсек, оставив на поручне тёплую кружку. Щёлкает аварийный клапан. Компьютер спокойным голосом сообщает, что жилые отсеки пусты и готовятся к разгерметизации. Вы видите зелёные листья рядом с её фотографией семьи. Эту ошибку нельзя исправить одной галочкой: сначала нужно найти, кто ещё здесь, и сделать так, чтобы система их услышала.",
+          "en": "Earth turns slowly beyond the glass, dawn drawing a copper thread along the clouds. Engineer Mei tapes a pouch of basil to the wall. Her tiny garden keeps drifting into the ventilation current. She bets it will survive the journey home. You promise to help repot it after the morning checks.\n\nMei leaves for the engineering bay, her warm cup clipped to a handrail. An emergency valve clicks. The computer calmly announces that the living compartments are empty and will be depressurised. Green leaves float beside her family photograph. This is more than a box to untick. First you need to find everyone still aboard and make the system hear them."
         },
         "choices": [
           {
@@ -1138,8 +1138,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -1151,8 +1151,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -1185,8 +1185,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -1198,8 +1198,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -1226,8 +1226,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "Вы находите петлю в экспериментальном канале связи: система получает собственные будущие сообщения. В запасе один автономный передатчик.",
-          "en": "The experimental link feeds future messages back into the system. One independent transmitter remains."
+          "ru": "Вы находите петлю в экспериментальном канале связи: система получает собственные будущие сообщения. В запасе один автономный передатчик.\n\nМэй спрашивает, не будете ли вы смеяться, если она заберёт базилик в спасательную капсулу. За вопросом слышится другое: осталось ли у вас общее завтра.",
+          "en": "The experimental link feeds future messages back into the system. One independent transmitter remains.\n\nMei asks whether you would laugh if she took the basil into an escape capsule. Beneath the question is another: do you still have a tomorrow together?"
         },
         "choices": [
           {
@@ -1325,16 +1325,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Сигнал с независимым временем разрывает петлю. Отсеки остаются герметичны, экипаж выходит на связь с Землёй. Приказ из будущего исчезает из журнала.",
-        "en": "An independently timed signal breaks the loop. The station stays pressurized and the crew contacts Earth. Tomorrow’s order vanishes from the log."
+        "ru": "Сигнал с независимым временем разрывает петлю. Отсеки остаются герметичны, экипаж выходит на связь с Землёй. Приказ из будущего исчезает из журнала.\n\nВ сеансе связи Мэй показывает семье зелёные листья. Горшок ещё предстоит найти, но теперь вы действительно можете выполнить обещание.",
+        "en": "An independently timed signal breaks the loop. The station stays pressurized and the crew contacts Earth. Tomorrow’s order vanishes from the log.\n\nOn the next call Mei shows her family the green leaves. You still need a proper pot, but now you can actually keep your promise."
       },
       "mixed": {
         "ru": "Жилой блок спасён, станция потеряна. Экипаж пережидает ночь у аварийного передатчика, пока спасатели ищут подходящую орбиту.",
         "en": "The crew module survives, but the station is lost. You wait beside the emergency transmitter while rescuers find a safe orbit."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "Вы выбираете аварийный отход. Мэй закрепляет базилик у кресла капсулы, но не спрашивает о споре: о тех, кто остался за переборкой, ещё нет новостей. Земля становится ближе, а обещанное возвращение — сложнее.",
+        "en": "You choose the emergency withdrawal. Mei secures the basil by the capsule seat but says nothing about your bet. There is still no news of those beyond the bulkhead. Earth grows closer; the promised homecoming grows harder."
       }
     },
     "length": 4
@@ -1353,8 +1353,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "В базовом лагере остыл чай. Экспедиция не вышла на связь, а верхняя тропа уже скрывается в облаках. На снегу видны два расходящихся следа.",
-          "en": "Tea has gone cold at base camp. The expedition missed its call and clouds cover the upper path. Two tracks split in the snow."
+          "ru": "В базовом лагере потрескивает печка. Лев, младший проводник, чинит порванную лямку вашего рюкзака и стесняется неровного шва. Он недавно провалил экзамен по навигации и всю дорогу старается не выглядеть обузой. Вы договариваетесь вечером ещё раз разобрать карту: без оценок, просто вместе.\n\nЧай на столе успевает остыть. Группа, вышедшая к перевалу, пропускает второй сеанс связи. Верхняя тропа прячется в облаках, а на снегу расходятся два следа. Лев первым замечает, что один ведёт к старой метеостанции, но тут же замолкает. Можно поторопить его и решать самому. А можно дать ему закончить мысль — и понять, что именно он увидел.",
+          "en": "The stove crackles in base camp. Lev, the youngest guide, repairs your torn backpack strap and apologises for the uneven stitches. He recently failed his navigation assessment and has spent the journey trying not to be a burden. You agree to go over the map together this evening, without marks or judgement.\n\nThe tea goes cold. The group on the pass misses a second radio check. Clouds hide the upper path; two sets of tracks divide in the snow. Lev notices one leading towards the old weather station, then falls silent. You could hurry him and take charge. Or you could let him finish his thought and discover what he has seen."
         },
         "choices": [
           {
@@ -1406,8 +1406,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -1419,8 +1419,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -1453,8 +1453,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -1466,8 +1466,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -1494,8 +1494,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "Вы находите людей под каменным навесом. Один не может ходить, а снег начинает заметать обратные следы.",
-          "en": "You find the group beneath a rock shelter. One person cannot walk and snow begins erasing your tracks."
+          "ru": "Вы находите людей под каменным навесом. Один не может ходить, а снег начинает заметать обратные следы.\n\nЛев узнаёт в раненом своего экзаменатора. Руки у него дрожат, но он показывает на карте безопасный обход — тот, который раньше не сумел объяснить. Теперь кто-то должен его выслушать.",
+          "en": "You find the group beneath a rock shelter. One person cannot walk and snow begins erasing your tracks.\n\nLev recognises his examiner among the injured. His hands shake as he points out the safe detour he once failed to explain. This time someone needs to hear him out."
         },
         "choices": [
           {
@@ -1593,16 +1593,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Обход выводит вас к лесу до темноты. Люди несут товарища по очереди. В лагере записывают координаты опасного участка, чтобы никто не повторил этот путь.",
-        "en": "The detour reaches the forest before dark. The group takes turns carrying their companion and marks the danger for future hikers."
+        "ru": "Обход выводит вас к лесу до темноты. Люди несут товарища по очереди. В лагере записывают координаты опасного участка, чтобы никто не повторил этот путь.\n\nЗа вечерним чаем Лев сам разворачивает карту. Вы просите его объяснить маршрут с самого начала и на этот раз не перебиваете.",
+        "en": "The detour reaches the forest before dark. The group takes turns carrying their companion and marks the danger for future hikers.\n\nOver evening tea, Lev unfolds the map himself. You ask him to explain the route from the beginning. This time you do not interrupt."
       },
       "mixed": {
         "ru": "Вы укрепляете укрытие и передаёте координаты. Ночь тяжёлая, но утром приходит спасательная группа. Все живы, хотя гора оставила след.",
         "en": "You reinforce the shelter and radio your position. After a hard night, rescuers arrive. Everyone survives, though the mountain leaves its mark."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "Быстрый спуск выводит вас к нижнему посту, и вы передаёте координаты спасателям. Лев остаётся ждать их с группой. Вечером его стул у карты пуст; вы оставляете чайник на печке и ждёте рацию.",
+        "en": "The fast descent brings you to the lower post, where you give rescuers the coordinates. Lev waits with the group. That evening his chair by the map is empty. You leave the kettle on the stove and listen to the radio."
       }
     },
     "length": 4
@@ -1621,8 +1621,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "Город ждёт утреннего обстрела. Лекарь передаёт вам письмо для коменданта: в госпитале заканчивается вода. Курьерские ворота закрыты.",
-          "en": "The town expects shelling by morning. A physician gives you a letter: the hospital is running out of water. The courier gate is closed."
+          "ru": "В госпитальном дворе сушат простыни; ветер приносит запах угля и тёплого теста из уцелевшей пекарни. Лекарь Марта зашивает вам рукав и ворчит, что нитки кончатся раньше упрямства. Она бережёт маленький пакет семян для своего двора. Вы обещаете прийти помочь, когда землю можно будет копать без страха.\n\nИз колонки вырывается воздух вместо воды. Марта перестаёт шутить и достаёт письмо коменданту. Если до утра не открыть проход, госпиталь останется без подвоза. Курьерские ворота уже закрыты. Она не просит стать героем — только доставить письмо так, чтобы его действительно прочли, а потом вернуться и сказать ей правду.",
+          "en": "Sheets dry in the hospital yard. The wind carries coal smoke and warm dough from a surviving bakery. Doctor Marta mends your sleeve, grumbling that the thread will run out before your stubbornness does. She keeps a little packet of seeds for her garden. You promise to help plant them when digging no longer feels dangerous.\n\nThe pump coughs air instead of water. Marta stops joking and brings out a letter for the commandant. Unless a passage opens before morning, the hospital will receive no supplies. The courier gate is already shut. She does not ask for a hero. She asks you to get the letter read, then return and tell her the truth."
         },
         "choices": [
           {
@@ -1674,8 +1674,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -1687,8 +1687,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -1721,8 +1721,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -1734,8 +1734,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -1762,8 +1762,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "Вы добираетесь до внутреннего поста. Солдат сомневается в печати, но замечает на письме знак своего полкового лекаря.",
-          "en": "At the inner checkpoint, a soldier doubts the seal but recognizes his regimental physician’s mark."
+          "ru": "Вы добираетесь до внутреннего поста. Солдат сомневается в печати, но замечает на письме знак своего полкового лекаря.\n\nСолдат спрашивает, жива ли Марта: она лечила его брата. У вас появляется возможность говорить не только о печатях, но и о человеке, которому вы оба что-то должны.",
+          "en": "At the inner checkpoint, a soldier doubts the seal but recognizes his regimental physician’s mark.\n\nThe soldier asks whether Marta is alive. She treated his brother. You can speak about more than seals now: you both owe something to the same person."
         },
         "choices": [
           {
@@ -1861,16 +1861,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Подписи проверены. Обе стороны открывают коридор для воды и раненых. Это ещё не мир, но утренние орудия молчат.",
-        "en": "The signatures are verified. Both sides open a corridor for water and the wounded. It is not peace, but the morning guns stay silent."
+        "ru": "Подписи проверены. Обе стороны открывают коридор для воды и раненых. Это ещё не мир, но утренние орудия молчат.\n\nВы находите Марту у колонки. Она не благодарит речью, а освобождает место рядом: воду ещё нужно разнести. Семена пока остаются в кармане.",
+        "en": "The signatures are verified. Both sides open a corridor for water and the wounded. It is not peace, but the morning guns stay silent.\n\nYou find Marta at the pump. Instead of a speech, she makes room beside her. The water still needs carrying. The seeds stay in her pocket for now."
       },
       "mixed": {
         "ru": "Для госпиталя выделяют два часа. Вы возвращаетесь с первым обозом, понимая, что завтра переговоры придётся начать заново.",
         "en": "The hospital receives a two-hour corridor. You return with the first convoy, knowing negotiations must begin again tomorrow."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "Письмо принято без свидетелей, но обещания коридора нет. Вы возвращаетесь к Марте с пустыми руками и говорите правду, как она просила. Она подвигает скамью: завтра искать путь придётся снова.",
+        "en": "The letter is accepted without witnesses, but no corridor is promised. You return to Marta empty-handed and tell her the truth, as she asked. She makes room on the bench. Tomorrow another route must be found."
       }
     },
     "length": 4
@@ -1889,8 +1889,8 @@
     "nodes": {
       "start": {
         "text": {
-          "ru": "Проводник забирает билеты и запирает переход между вагонами. На вашем месте лежит телефон с сообщением: «Не выходите на следующей».",
-          "en": "The conductor collects tickets and locks the connecting door. A phone on your seat says: “Do not get off at the next stop.”"
+          "ru": "В вагоне тепло; дождь превращает огни платформы в длинные полосы. Пассажирка напротив, Вера, пытается открыть пакет печенья и наконец просит вас помочь. Она едет к сестре, с которой давно не разговаривала, и репетирует самое простое «привет». Вы обещаете напомнить ей выйти у старого вокзала — она боится задремать и проехать.\n\nПоезд трогается. Проводник собирает билеты и запирает переход, хотя до проверки обычно оставляет его открытым. На сиденье рядом с вами лежит чужой телефон: «Не выходите на следующей». Вера перестаёт вертеть в руках печенье, заметив двух мужчин за стеклом двери. Чтобы решить, кому верить, сначала придётся спросить, о чём она умолчала.",
+          "en": "The carriage is warm, rain stretching the platform lights into bright lines. Across from you, Vera struggles with a packet of biscuits and finally asks for help. She is travelling to a sister she has not spoken to in years, rehearsing a simple hello. You promise to wake her at the old station if she falls asleep.\n\nThe train moves. The conductor collects tickets and locks the carriage connection unusually early. An unfamiliar phone lies beside you: “Do not get off at the next stop.” Vera stops turning a biscuit in her hands when two men appear beyond the glass door. Before deciding whom to trust, you need to ask what she left unsaid."
         },
         "choices": [
           {
@@ -1942,8 +1942,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -1955,8 +1955,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -1989,8 +1989,8 @@
         "choices": [
           {
             "text": {
-              "ru": "Сопоставить находку с рассказом свидетеля",
-              "en": "Cross-check the discovery with the witness"
+              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
+              "en": "Hear the witness out and check what does not add up"
             },
             "next": "discovery",
             "delta": [
@@ -2002,8 +2002,8 @@
           },
           {
             "text": {
-              "ru": "Помочь человеку рядом и восстановить силы",
-              "en": "Help your companion and catch your breath"
+              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
+              "en": "Take a breather, offer help and talk without accusations"
             },
             "next": "discovery",
             "delta": [
@@ -2030,8 +2030,8 @@
       },
       "discovery": {
         "text": {
-          "ru": "На телефоне появляется запись переговоров: поезд направляют в тупик, чтобы забрать архив без свидетелей. Машинист ещё может изменить маршрут.",
-          "en": "The phone receives a recording: the train is being diverted so the archive can be seized without witnesses. The driver can still change route."
+          "ru": "На телефоне появляется запись переговоров: поезд направляют в тупик, чтобы забрать архив без свидетелей. Машинист ещё может изменить маршрут.\n\nВера признаётся, что архив касается и её собственной ошибки. «Если узнаешь всё, ты всё равно поможешь мне выйти?» Теперь обещание у старого вокзала значит больше, чем напоминание об остановке.",
+          "en": "The phone receives a recording: the train is being diverted so the archive can be seized without witnesses. The driver can still change route.\n\nVera admits the archive also exposes a mistake of her own. “If you know all of it, will you still help me get off?” Your promise about the old station means more now."
         },
         "choices": [
           {
@@ -2129,16 +2129,16 @@
     },
     "endings": {
       "good": {
-        "ru": "Диспетчер подтверждает подмену маршрута и переводит поезд к освещённой платформе. Архив попадает к журналистам, а вы выходите вместе с остальными пассажирами.",
-        "en": "Control confirms the diversion and routes the train to a lit platform. The archive reaches reporters, and you leave with the other passengers."
+        "ru": "Диспетчер подтверждает подмену маршрута и переводит поезд к освещённой платформе. Архив попадает к журналистам, а вы выходите вместе с остальными пассажирами.\n\nУ выхода Вера набирает сестру. Вы не слышите ответ, но впервые она произносит своё «привет» без репетиции.",
+        "en": "Control confirms the diversion and routes the train to a lit platform. The archive reaches reporters, and you leave with the other passengers.\n\nAt the exit, Vera calls her sister. You cannot hear the answer, but for the first time her hello is unrehearsed."
       },
       "mixed": {
         "ru": "Пассажирка успевает передать копию по сети. Поезд доходит до тупика, но тайны уже нет. Вы пережидаете проверку в служебном вагоне.",
         "en": "The passenger uploads a copy. The train reaches the siding, but the secret is already public. You wait out the search in a service carriage."
       },
       "leave": {
-        "ru": "Вы выбираете отступить. Записи остаются у вас, но решение теперь придётся принять другим. Эта история заканчивается спасением себя, а не всего вокруг.",
-        "en": "You choose to withdraw. Your notes survive, but others must decide what happens next. This ending saves you, not everyone around you."
+        "ru": "На технической остановке вы сходите с поезда. Вера остаётся в вагоне, сжимая телефон. Позже вы пишете ей вопрос о сестре; сообщение доставлено, но ответа пока нет.",
+        "en": "You get off at the technical stop. Vera stays aboard, gripping her phone. Later you send a message asking about her sister. It is delivered, but no answer comes yet."
       }
     },
     "length": 4

@@ -54,6 +54,7 @@ class GroqContractTests(unittest.TestCase):
         context = json.loads(request['messages'][1]['content'])
         self.assertEqual(context['memory'], 'Lena has the ledger.')
         self.assertEqual(context['action'], 'Follow Lena')
+        self.assertEqual(context['current_scene'], 'Lena opens the tower.')
         self.assertEqual(len(context['history']), 4)
         self.assertIn('Kit', context['inventory'])
         for args in self.call.call_args_list:
@@ -126,6 +127,17 @@ class GroqContractTests(unittest.TestCase):
         with patch.dict(os.environ, {'AI_PROVIDER': 'openai'}):
             self.assertEqual(self.turn(state).status_code, 502)
         self.call.assert_not_called()
+
+    def test_provider_auth_and_limit_errors_have_safe_diagnostics(self):
+        for status, code in ((401, 'ai_auth_error'), (403, 'ai_auth_error'), (429, 'ai_rate_limit')):
+            response = requests.Response()
+            response.status_code = status
+            self.call.side_effect = requests.HTTPError('secret-provider-body', response=response)
+            failed = self.client.post('/api/start', json={'mode': 'premium'})
+            self.assertEqual(failed.status_code, 502)
+            self.assertEqual(failed.get_json()['error_code'], code)
+            self.assertNotIn('secret-provider-body', failed.get_data(as_text=True))
+            self.assertNotIn('test-only-groq', failed.get_data(as_text=True))
 
     def test_legacy_openai_enabled_setting_remains_compatible(self):
         with patch.dict(os.environ, {'AI_PROVIDER': 'openai', 'OPENAI_ENABLED': 'true'}):

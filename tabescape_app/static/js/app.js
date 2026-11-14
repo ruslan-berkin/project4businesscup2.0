@@ -71,7 +71,7 @@
         campaignId: "oakhaven", playMode: "free", genre: "fantasy", campaignTitle: "", engine: "scripted", storyToken: null,
         stats: { ...START_STATS }, options: [], turn: 1, over: false, won: false,
         narrative: "", auditLog: "", sceneId: null, seen: [], inventory: [], log: [],
-        history: [{ ...START_STATS }], loading: null, custom: "",
+        history: [{ ...START_STATS }], loading: null, readUntil: 0, custom: "",
         role: store.get("te_role", t("Начинающий искатель", "Apprentice adventurer")),
         boss: store.get("te_boss", t("Мастер Гильдии Морган", "Guildmaster Morgan")),
         imported: null,
@@ -319,7 +319,7 @@
 
         const money = [1240500, 410200, 88900, 323000, 512400];
         put(2, 1, { raw: "СЦЕНА", cls: "code", locked: true });
-        put(2, 2, { cls: "story", locked: true, html: () => S.loading ? esc(S.loading) : esc(S.narrative), fx: () => (S.loading ? "" : S.auditLog) });
+        put(2, 2, { cls: "story", locked: true, html: () => sceneMarkup(), fx: () => (S.loading ? "" : S.auditLog) });
         put(3, 1, { raw: "СВОЙ ХОД", cls: "code", locked: true });
         put(3, 2, { cls: "prompt", html: () => S.custom ? esc(S.custom) : t("✎ Свой ход: напишите действие в строке формул (B3) и нажмите Enter","✎ Your move: select B3, type in the formula bar and press Enter"), editableAction: true });
         for (let i = 0; i < 3; i++) {
@@ -327,14 +327,13 @@
             put(4 + i, 2, {
                 cls: "optcell", locked: true,
                 html: () => {
-                    if (S.loading) return "";
                     if (S.over && language === "en") return ["▶ Start another adventure", (S.won ? "Victory!" : "Adventure complete") + " · Score " + score() + " · Best " + S.best, "↓ Download diary (.txt)"][i];
                     if (S.over) return ["▶ Начать новое приключение", S.won ? `🏆 Победа! Очки: ${score()} · Рекорд: ${S.best}` : `💫 Приключение окончено! Очки: ${score()} · Рекорд: ${S.best}`, "⤓ Скачать историю похода (.txt)"][i];
                     return `<span class="optkey">${i + 1}</span>${esc(S.options[i] || "…")}`;
                 },
                 fx: () => (S.over ? "" : S.options[i] || ""),
             });
-            rowCls[4 + i] = "opt" + (S.loading ? " disabled" : "");
+            rowCls[4 + i] = "opt" + (turnLocked() ? " disabled" : "");
         }
         rowCls[2] = "story";
         for (let r = 2; r <= 6; r++) put(r, 3, { raw: money[r - 2], fmt: "money", locked: true });
@@ -1503,7 +1502,7 @@
         const val = $("formulaInput").value;
         if (d.editableAction) {
             const t = val.trim();
-            if (t) { S.custom = ""; sendAction(t, -1); }
+            if (t && !turnLocked()) { sendAction(t, -1); }
             return;
         }
         if (isLocked(r, c)) return;
@@ -1534,6 +1533,24 @@
     }
 
     // ------------------------------------------------------------------ игра
+    let readingTimer;
+    const turnLocked = () => Boolean(S.loading) || Date.now() < S.readUntil;
+    const sceneStatus = () => S.loading || (Date.now() < S.readUntil ? t("Новая сцена · немного времени на чтение…", "New scene · take a moment to read…") : "");
+    function sceneMarkup() {
+        return '<span class="sceneProse">' + esc(S.narrative || S.loading || "") + '</span><span class="sceneStatus" role="status">' + esc(S.narrative ? sceneStatus() : "") + '</span>';
+    }
+    function updateTurnControls() {
+        // Do not touch a work document or steal its focus when a timer/request completes.
+        if (S.bossMode || !$("welcome")?.hidden) return;
+        document.querySelectorAll("#altChoices button, #customForm button, #customAction").forEach(el => { el.disabled = turnLocked(); });
+        if (S.sheet === "adv") document.querySelectorAll("#grid tr.opt").forEach(el => el.classList.toggle("disabled", turnLocked()));
+        document.querySelectorAll(".sceneStatus").forEach(el => { el.textContent = S.narrative ? sceneStatus() : ""; });
+    }
+    function pauseForReading() {
+        clearTimeout(readingTimer);
+        S.readUntil = Date.now() + 1400;
+        readingTimer = setTimeout(updateTurnControls, 1420);
+    }
     function logTurn(action) {
         S.log.push({ turn: S.log.length + 1, time: clockStr(), action, roi: S.stats.ROI, kpi: S.stats.KPI, anx: S.stats.Anxiety, formula: S.auditLog });
         S.history.push({ ...S.stats });
@@ -1565,6 +1582,7 @@
         if (S.sceneId) S.seen.push(S.sceneId);
         if (data.inventory_add) S.inventory.push(data.inventory_add);
         S.loading = null;
+        pauseForReading();
         S.custom = "";
         if (action) logTurn(action);
         if (S.over) {
@@ -1579,7 +1597,8 @@
         if (S.inventory.length > prevItems) toast(t("Получен предмет: ", "Item found: ") + itemLabel(S.inventory.at(-1)));
         render();
         const td = cellEls[2] && cellEls[2][2];
-        if (td) td.classList.add("fade");
+        if (td && !S.bossMode) td.classList.add("fade");
+        if (!S.bossMode) $("altScene")?.classList.add("sceneArrival");
         if (offerPending && !offerDismissed && !S.bossMode) offerSubscription();
     }
 
@@ -1621,16 +1640,16 @@
     }
 
     async function sendAction(text, idx) {
-        if (S.loading || S.over || S.bossMode || !S.storyToken) return;
+        if (turnLocked() || S.over || S.bossMode || !S.storyToken) return;
         const prev = { narrative: S.narrative, options: S.options };
         S.loading = t("Выполняется ход: ", "Taking your turn: ") + text + " …";
         render();
         syncing();
         try {
-            const data = await post("/api/action", {
+            const [data] = await Promise.all([post("/api/action", {
                 action: text, story_token: S.storyToken,
                 choice_idx: idx, scene_id: S.sceneId, seen: S.seen.slice(-12), clock: clockStr(), inventory: S.inventory,
-            });
+            }), new Promise(resolve => setTimeout(resolve, 1200))]);
             S.turn += 1;
             workspaceActionPending = S.bossMode;
             applyData(data, text);
@@ -1647,7 +1666,7 @@
     }
 
     function choose(i) {
-        if (S.sheet !== "adv" || S.loading) return;
+        if (S.sheet !== "adv" || turnLocked()) return;
         if (S.over) {
             if (i === 0) restart();
             else if (i === 2) exportReport();
@@ -1657,7 +1676,7 @@
     }
 
     async function useItem(name) {
-        if (S.over || S.loading) { toast("Сейчас предметы использовать нельзя"); return; }
+        if (S.over || turnLocked()) { toast("Сейчас предметы использовать нельзя"); return; }
         const i = S.inventory.indexOf(name);
         if (i < 0) return;
         S.inventory.splice(i, 1);
@@ -1696,7 +1715,8 @@
         if (on === S.bossMode) return;
         const snapshot = {sheet: S.sheet, cur: {...S.cur}, anchor: {...S.anchor},
             x: $("gridScroll").scrollLeft, y: $("gridScroll").scrollTop,
-            focus: document.activeElement, focusId: document.activeElement.id, scroll: window.scrollY};
+            focus: document.activeElement, focusId: document.activeElement.id, scroll: window.scrollY,
+            alternateScroll: $("alternateGame").scrollTop};
         if (on) gameView = snapshot; else workView = snapshot;
         S.bossMode = on;
         S.stealthTabs = on;
@@ -1715,6 +1735,7 @@
             const focus = target.focusId ? $(target.focusId) : target.focus;
             if (focus && focus.isConnected) focus.focus({preventScroll:true});
             window.scrollTo(0, target.scroll);
+            $("alternateGame").scrollTop = target.alternateScroll || 0;
         }
     }
 
@@ -2164,6 +2185,7 @@
                 return;
             }
             if (!$("settingsModal").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.repeat && ["1", "2", "3", "Enter"].includes(e.key)) return;
             if (mask !== "excel" || compactSheet()) {
                 if (!S.bossMode && !e.target.closest("input,textarea,select,[contenteditable],button") && ["1","2","3"].includes(e.key)) choose(+e.key-1);
                 return;
@@ -2254,7 +2276,7 @@
         });
         narrowSheet.addEventListener("change", () => { if (started) syncWorkspace(); });
         showWelcome();
-        if (store.get("te_tutorial", "") !== "done") tour.start(true);
+        // Let first-time visitors read the landing page; the game lobby offers the tutorial.
     }
     function showWelcome() {
         if (S.bossMode) setBoss(false);
@@ -2272,11 +2294,23 @@
             <div class="hero">
               <div class="heroCopy"><div class="campaign"><i></i>${t("8 БЕСПЛАТНЫХ ИСТОРИЙ","8 FREE STORIES")}</div>
                 <h1>${t("Маленький перерыв.","A little break.")}<br><em>${t("Большой квест.","A grand quest.")}</em></h1>
-                <p>${t("Тайны, трудные решения и немного надежды. Выберите историю для короткого перерыва — в привычном рабочем окне.","Mysteries, difficult choices and a little hope. Pick a story for a short break in your everyday workspace.")}</p>
+                <p>${t("Текстовая RPG для перерыва между задачами: читайте сцену, выбирайте поступок и меняйте историю. Без установки и регистрации.","A story-driven RPG for a break between tasks: read a scene, make a choice and shape what happens next. No download or sign-up.")}</p>
                 <button class="playNow"><span aria-hidden="true">▶</span> ${started?t("Продолжить игру","Resume adventure"):t("Начать игру","Play adventure")}</button>
               </div>
               <div class="mapPin"><i aria-hidden="true">✦</i> ${t("Между надеждой и тайной","Between hope and mystery")}</div>
             </div>
+            <section class="benefits" aria-labelledby="benefitsTitle">
+              <div class="benefitsHeading"><p class="eyeline">${t("НЕСКОЛЬКО МИНУТ ДЛЯ СЕБЯ", "A FEW MINUTES FOR YOU")}</p>
+                <h2 id="benefitsTitle">${t("Перерыв, в котором есть история", "A break with a story to tell")}</h2>
+                <p>${t("Задача закончена, до следующей встречи есть время. Проведите его в маленьком приключении — в своём темпе.", "One task is done. Your next meeting is a little way off. Spend the gap in a small adventure, at your own pace.")}</p></div>
+              <div class="benefitCards">
+                <article class="benefitCard lilac"><span class="benefitIndex">01 / ${t("ПАУЗА", "PAUSE")}</span><div class="benefitGlyph" aria-hidden="true">Ⅱ</div><h3>${t("Один перерыв. Один-два хода.", "One break. A move or two.")}</h3><p>${t("Прочитайте сцену и решите, что делать дальше. Здесь нет таймера, который торопит ваш выбор.", "Read a scene and decide what happens next. No countdown is rushing your choice.")}</p></article>
+                <article class="benefitCard peach"><span class="benefitIndex">02 / ${t("ВЫБОР", "CHOICE")}</span><div class="benefitGlyph" aria-hidden="true">↗</div><h3>${t("История слушает вас", "The story listens to you")}</h3><p>${t("Довериться, помочь или пойти своим путём? Выберите действие или напишите своё. Последствия ведут к разным финалам.", "Trust someone, lend a hand or take your own path? Pick an action or write your own. Choices lead to different endings.")}</p></article>
+                <article class="benefitCard rose"><span class="benefitIndex">03 / ${t("ЛЮДИ", "PEOPLE")}</span><div class="benefitGlyph" aria-hidden="true">♡</div><h3>${t("Есть к кому вернуться", "Someone to come back for")}</h3><p>${t("Встретьте людей с маленькими надеждами и непростыми тайнами. Попробуйте понять их — или переиграйте знакомую историю иначе.", "Meet people with small hopes and difficult secrets. Try to understand them, or replay a familiar story differently.")}</p></article>
+                <article class="benefitCard butter"><span class="benefitIndex">04 / ${t("ПЕРЕКЛЮЧЕНИЕ", "SWITCH")}</span><div class="benefitGlyph keyGlyph" aria-hidden="true">Esc</div><h3>${t("Обратно в один момент", "Back in a moment")}</h3><p>${t("Esc открывает подготовленный рабочий экран. Ещё одно нажатие — и вы в той же сцене. Четыре оформления, одна игра.", "Esc opens a prepared work screen. Press again to return to the same scene. Four workspaces, one adventure.")}</p></article>
+              </div>
+              <p class="benefitsFootnote">${t("8 историй бесплатно · без аккаунта · партия сохраняется в открытой вкладке", "8 free stories · no account · your adventure stays in this open tab")}</p>
+            </section>
             <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("8 историй · 4 оформления","8 stories · 4 interfaces")}</span></div><div class="maskCards"></div></div>
             <div class="guideStrip"><div class="miraBust"><img src="${portableImages["mira.webp"]}" alt=""></div><div><b>${t("Привет, я Мира.","Hi, I’m Mira.")}</b><p>${t("Впервые здесь? Давайте выберем вашу историю.","New here? Let’s find your first story.")}</p></div><button data-home-help></button></div>
             <footer class="hubFooter"><span><i></i> ${t("Игра в браузере","Browser session")}</span><span>${t("Перезагрузка начинает новую партию","Reloading starts a new adventure")}</span></footer>
@@ -2564,7 +2598,7 @@
     function renderAlternateGame() {
         const root=$("alternateGame");
         root.className="alternative "+mask;
-        root.innerHTML='<aside class="folders"><b>'+MASKS[mask].file+'</b><p>'+esc(S.campaignTitle)+'</p><p>'+t("Архив приключения","Adventure archive")+'</p></aside><section class="gameDocument"><div id="altScene"><small>'+esc(storyModeLabel())+'</small><h1>'+esc(S.campaignTitle)+'</h1><p>'+esc(S.loading||S.narrative)+'</p></div><div id="altChoices"></div><form id="customForm"><label for="customAction">'+t("Свой ход","Your action")+'</label><input id="customAction" maxlength="500"><button>'+t("Отправить","Send")+'</button></form></section><aside id="altStats"></aside>';
+        root.innerHTML='<aside class="folders"><b>'+MASKS[mask].file+'</b><p>'+esc(S.campaignTitle)+'</p><p>'+t("Архив приключения","Adventure archive")+'</p></aside><section class="gameDocument"><div id="altScene"><small>'+esc(storyModeLabel())+'</small><h1>'+esc(S.campaignTitle)+'</h1><p>'+sceneMarkup()+'</p></div><div id="altChoices"></div><form id="customForm"><label for="customAction">'+t("Свой ход","Your action")+'</label><input id="customAction" maxlength="500"><button>'+t("Отправить","Send")+'</button></form></section><aside id="altStats"></aside>';
         const stats=$("altStats");
         stats.innerHTML='<h2>'+clockStr()+'</h2><p>'+t("Здоровье","Health")+' '+S.stats.ROI+'%</p><p>'+t("Бодрость","Energy")+' '+S.stats.KPI+'%</p><p>'+t("Неприятности","Trouble")+' '+S.stats.Anxiety+'%</p><p>'+t("Рекорд","Best")+' '+S.best+'</p><h3>'+t("Инвентарь","Inventory")+'</h3>';
         const vitals = document.createElement("div");
@@ -2583,12 +2617,13 @@
             button(t("Выбрать другую историю", "Choose another story"), () => openGameLobby(mask), $("altChoices"));
             button(t("Повторить эту историю", "Replay this story"),restart,$("altChoices"));
         }
-        else S.options.forEach((option,i)=>{const b=button((i+1)+". "+option,()=>{S.sheet="adv";choose(i);},$("altChoices"));b.disabled=!!S.loading;});
+        else S.options.forEach((option,i)=>{const b=button((i+1)+". "+option,()=>{S.sheet="adv";choose(i);},$("altChoices"));b.disabled=turnLocked();});
         $("customForm").onsubmit=e=>{e.preventDefault();const value=$("customAction").value.trim();if(value)sendAction(value,-1);};
         $("customForm").hidden=S.over;
         $("customAction").value=S.custom;
         $("customAction").oninput=e=>S.custom=e.target.value;
-        $("customAction").disabled=!!S.loading;
+        $("customAction").disabled=turnLocked();
+        $("customForm").querySelector("button").disabled=turnLocked();
         if(mask==="outlook") {
             const folder=root.querySelector(".folders");
             folder.innerHTML="<b>"+t("Входящие", "Inbox")+"</b><p>"+t("Дела (1)", "Cases (1)")+"</p><p>"+t("Отправленные", "Sent")+"</p><p>"+t("Архив", "Archive")+"</p>";

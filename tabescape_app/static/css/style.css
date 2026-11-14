@@ -1296,3 +1296,29 @@ body.tourDock #welcome {min-height:0}
  #lobbyStoryPreview h2 {font-size:21px}
  .hero:before {background:linear-gradient(90deg,#243a36ee,#34453faa 60%,#797a5230)}
 }
+
+/* A quiet, readable explanation before choosing an office interface. */
+#welcome .benefits {padding:45px 0 26px;max-width:none}
+.benefitsHeading {max-width:690px;margin:0 auto 29px;text-align:center}
+.benefitsHeading h2 {font:600 clamp(29px,3.4vw,43px)/1.12 Georgia,serif;letter-spacing:-1.5px;margin:9px 0 14px;text-wrap:balance}
+.benefitsHeading>p:last-child {max-width:600px;margin:auto;color:#59685b;font-size:15px;line-height:1.6}
+.benefitCards {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;align-items:stretch;padding:5px}
+.benefitCard {position:relative;padding:22px 20px 25px;border:1px solid #25352a20;border-radius:15px;box-shadow:0 5px 0 #2336290c;transform:rotate(var(--tilt));color:#25352d}
+.benefitCard.lilac {background:#e4dcef;--tilt:-2deg}.benefitCard.peach {background:#f4d9c5;--tilt:1.5deg}.benefitCard.rose {background:#efd7df;--tilt:-1.5deg}.benefitCard.butter {background:#f2e7ac;--tilt:2deg}
+.benefitIndex {font:700 10px/1.4 Consolas,monospace;letter-spacing:1.1px}
+.benefitGlyph {height:66px;display:flex;align-items:center;font:500 51px/1 Georgia,serif;margin:13px 0;color:#32493a}
+.keyGlyph {font:650 24px/1 Consolas,monospace;border:2px solid #53613e;border-bottom-width:5px;border-radius:10px;width:76px;height:47px;justify-content:center;margin-top:22px;margin-bottom:23px}
+.benefitCard h3 {font:650 24px/1.12 Georgia,serif;letter-spacing:-.65px;margin:0 0 14px;text-wrap:balance}
+.benefitCard p {font-size:13px;line-height:1.65;margin:0}
+.benefitsFootnote {text-align:center;font-size:12px;color:#59685b;margin:26px 0 0}
+.sceneProse {white-space:pre-line}
+.sceneStatus {display:block;min-height:1.5em;margin-top:12px;font:500 12px/1.5 system-ui,sans-serif;color:#57745f;white-space:normal}
+body[data-mask="autocad"] .sceneStatus {color:#a6d3bf}
+.sceneArrival {animation:scene-arrive .65s ease both}
+.grid td.story.fade {animation:scene-arrive .65s ease both}
+@keyframes scene-arrive {from{opacity:.25;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(max-width:850px){.benefitCards{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.benefitCard h3{font-size:25px}.benefitCard{transform:none}.benefitGlyph{height:50px}.keyGlyph{height:42px;margin-top:17px;margin-bottom:17px}}
+@media(max-width:460px){#welcome .benefits{padding:32px 0 20px}.benefitCards{gap:10px;padding:0}.benefitCard{padding:17px 13px}.benefitCard h3{font-size:22px}.benefitCard p{font-size:12px}.benefitIndex{font-size:9px;letter-spacing:.5px}}
+@media(prefers-reduced-motion:reduce){.sceneArrival,.grid td.story.fade{animation:none!important}}
+
+@media(min-width:1000px){#welcome .hero h1{font-size:60px}.heroCopy{max-width:750px}}
