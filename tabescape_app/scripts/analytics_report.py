@@ -1,6 +1,7 @@
-"""Read a local SQLite export or archived Render logs. Never invent missing cohorts."""
+"""Calculate playtest metrics from PostgreSQL, SQLite or archived Render logs."""
 import argparse
 import json
+import os
 import sqlite3
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -23,6 +24,16 @@ def read_records(path):
             if isinstance(record, dict): yield record
         except (ValueError, TypeError):
             continue
+
+
+def read_postgres(database_url):
+    import psycopg
+
+    with psycopg.connect(database_url, connect_timeout=3) as db:
+        db.execute("SET TRANSACTION READ ONLY")
+        db.execute("SET LOCAL statement_timeout = '15s'")
+        for (payload,) in db.execute("SELECT payload FROM research_events ORDER BY ts, dedupe"):
+            yield json.loads(payload)
 
 
 def summarize(records, as_of):
@@ -71,7 +82,7 @@ def summarize(records, as_of):
         else:
             totals['input_tokens'] += u['input_tokens']; totals['output_tokens'] += u['output_tokens']
     return {'as_of_utc':datetime.fromtimestamp(as_of,timezone.utc).isoformat(),
-            'notes':['Self-selected browser IDs, not verified people. Consent and full log coverage required.',
+            'notes':['Self-selected browser IDs, not verified people. Consent and complete event coverage required.',
                      'Jury/team/demo IDs excluded. D7: 168–192h; D30: 720–744h after first observed successful turn.',
                      'Null retention means no mature cohort. Premium interest is not a purchase.',
                      'Partial logs, cleared storage or lost ephemeral disk undercount activity. Usage excludes unreported provider charges.'],
@@ -95,8 +106,25 @@ def summarize(records, as_of):
 
 if __name__ == '__main__':
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('input', help='Local .sqlite3 database or downloaded JSONL/Render log file')
+    p.add_argument('input', nargs='?', help='Local .sqlite3 database or downloaded JSONL/Render log file')
+    p.add_argument('--postgres', action='store_true', help='Read the database in ANALYTICS_DATABASE_URL')
     p.add_argument('--as-of', help='ISO timestamp, e.g. 2026-12-01T00:00:00+00:00')
     args=p.parse_args()
     now=datetime.fromisoformat(args.as_of).timestamp() if args.as_of else datetime.now(timezone.utc).timestamp()
-    print(json.dumps(summarize(read_records(args.input),now),indent=2,ensure_ascii=False))
+    if args.postgres == bool(args.input):
+        p.error('Provide one input file or --postgres.')
+    if args.postgres:
+        from dotenv import load_dotenv
+        import psycopg
+
+        load_dotenv(Path(__file__).resolve().parents[1] / '.env')
+        database_url = os.getenv('ANALYTICS_DATABASE_URL', '').strip()
+        if not database_url:
+            p.error('Set ANALYTICS_DATABASE_URL in the environment or tabescape_app/.env.')
+        try:
+            report = summarize(read_postgres(database_url), now)
+        except psycopg.Error:
+            p.error('Could not read research PostgreSQL. Check the connection and schema.')
+    else:
+        report = summarize(read_records(args.input), now)
+    print(json.dumps(report, indent=2, ensure_ascii=False))

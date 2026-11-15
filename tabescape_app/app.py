@@ -1361,6 +1361,25 @@ _RESEARCH_EVENTS = {"enrolled", "page_view", "workspace_selected", "adventure_st
 _RESEARCH_SOURCES = {"direct", "story-community", "office-community", "creator", "paid-search", "team", "jury"}
 
 
+def save_research_postgres(database_url, dedupe, event):
+    import psycopg
+
+    with psycopg.connect(database_url, connect_timeout=3) as db:
+        db.execute("SET LOCAL statement_timeout = '2s'")
+        db.execute("DELETE FROM research_events WHERE ts < %s", (event["ts"] - 90 * 86400,))
+        inserted = db.execute(
+            "INSERT INTO research_events (dedupe, ts, payload) VALUES (%s, %s, %s) "
+            "ON CONFLICT (dedupe) DO NOTHING",
+            (dedupe, event["ts"], json.dumps(event)),
+        ).rowcount
+        db.execute("""
+            DELETE FROM research_events WHERE dedupe IN (
+                SELECT dedupe FROM research_events ORDER BY ts DESC, dedupe OFFSET 100000
+            )
+        """)
+    return inserted
+
+
 @app.post("/api/research/event")
 def research_event():
     import sqlite3
@@ -1415,6 +1434,19 @@ def research_event():
         if len(_RESEARCH_WINDOW) >= 300:
             return jsonify(error="Research intake busy; gameplay is unaffected"), 429
         _RESEARCH_WINDOW.append(now)
+
+    database_url = os.getenv("ANALYTICS_DATABASE_URL", "").strip()
+    if database_url:
+        import psycopg
+
+        try:
+            added = save_research_postgres(database_url, dedupe, event)
+        except psycopg.Error:
+            app.logger.warning("Research PostgreSQL write failed")
+            return jsonify(error="Research storage unavailable; gameplay is unaffected"), 503
+        if not added:
+            return jsonify(accepted=True, duplicate=True), 200
+    else:
         db_path = os.getenv("ANALYTICS_DB_PATH", os.path.join(BASE_DIR, ".data", "research.sqlite3"))
         try:
             os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
@@ -1429,7 +1461,7 @@ def research_event():
         except (OSError, sqlite3.Error):
             # Render Free disk is ephemeral; TE_EVENT logs can be archived independently.
             app.logger.warning("Research storage unavailable; using structured logs")
-        print("TE_EVENT " + json.dumps(event, ensure_ascii=True), flush=True)
+    print("TE_EVENT " + json.dumps(event, ensure_ascii=True), flush=True)
     return jsonify(accepted=True), 202
 
 

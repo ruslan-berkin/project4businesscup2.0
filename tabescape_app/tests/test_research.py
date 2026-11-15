@@ -15,7 +15,7 @@ class ResearchTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
         self.db=os.path.join(self.temp.name,'events.sqlite3')
-        self.env=patch.dict(os.environ,{'ANALYTICS_DB_PATH':self.db,'AI_ENABLED':'false'})
+        self.env=patch.dict(os.environ,{'ANALYTICS_DB_PATH':self.db,'ANALYTICS_DATABASE_URL':'','AI_ENABLED':'false'})
         self.env.start(); self.addCleanup(self.env.stop);self.addCleanup(self.temp.cleanup)
         app._RESEARCH_WINDOW.clear()
         self.client=app.app.test_client()
@@ -44,6 +44,18 @@ class ResearchTests(unittest.TestCase):
         with patch('sqlite3.connect',side_effect=sqlite3.OperationalError('unavailable')):
             self.assertEqual(self.send().status_code,202)
         self.assertEqual(self.client.get('/healthz').status_code,200)
+    def test_postgres_failure_does_not_confirm_a_lost_event(self):
+        import psycopg
+
+        with self.assertLogs(app.app.logger, level="WARNING") as logs, \
+                patch.dict(os.environ, {"ANALYTICS_DATABASE_URL": "postgresql://test"}), \
+                patch("psycopg.connect", side_effect=psycopg.OperationalError("private connection details")):
+            response = self.send()
+        self.assertEqual(response.status_code, 503)
+        self.assertNotIn("private connection details", response.get_data(as_text=True))
+        self.assertNotIn("private connection details", str(logs.output))
+        self.assertFalse(os.path.exists(self.db))
+        self.assertEqual(self.client.get("/healthz").status_code, 200)
     def test_intake_rate_limit(self):
         app._RESEARCH_WINDOW[:]=[app.time.time()]*300
         self.assertEqual(self.send().status_code,429)
