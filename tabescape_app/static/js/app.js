@@ -1684,6 +1684,8 @@
         if (S.inventory.length > prevItems) toast(t("Получен предмет: ", "Item found: ") + itemLabel(S.inventory.at(-1)));
         needsResume = false;
         saveAdventure();
+        globalThis.TabEscapeResearch?.event(action ? "turn_completed" : "adventure_started");
+        if (S.over && !wasOver) globalThis.TabEscapeResearch?.event("adventure_completed");
         render();
         const td = cellEls[2] && cellEls[2][2];
         if (td && !S.bossMode) td.classList.add("fade");
@@ -1813,6 +1815,7 @@
             alternateScroll: $("alternateGame").scrollTop};
         if (on) gameView = snapshot; else workView = snapshot;
         S.bossMode = on;
+        if (on) globalThis.TabEscapeResearch?.event("work_view_opened");
         if (!on) tickProse();
         S.stealthTabs = on;
         if (on) {
@@ -2269,6 +2272,7 @@
         });
 
         document.addEventListener("keydown", (e) => {
+            if ($("researchDialog")?.open) return;
             if ($("gameLobby").open || tour?.active) return;
             if ($("subscriptionDialog").open || $("upcomingDialog").open) return;
             if (!$("welcome").hidden) return;
@@ -2372,6 +2376,7 @@
         });
         narrowSheet.addEventListener("change", () => { if (started) syncWorkspace(); });
         loadAdventure();
+        globalThis.TabEscapeResearch?.init({language:()=>language, context:()=>({workspace:mask, adventure_id:adventureId, story_token:S.storyToken})});
         showWelcome();
         loadCatalog().catch(() => {});
         // Let first-time visitors read the landing page; the game lobby offers the tutorial.
@@ -2397,7 +2402,7 @@
               </div>
               <div class="mapPin"><i aria-hidden="true">✦</i> ${t("Между надеждой и тайной","Between hope and mystery")}</div>
             </div>
-            <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("2 доступны · 2 в разработке","2 available · 2 in development")}</span></div><div class="maskCards"></div></div>
+            <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("2 доступны · 2 в разработке","2 available · 2 in development")}</span></div><div class="maskCards"></div><div class="upcomingShelf"><span>${t("Позже","Coming later")}</span><div class="upcomingCards"></div></div></div>
             <section class="benefits" aria-labelledby="benefitsTitle">
               <div class="benefitsHeading"><p class="eyeline">${t("ОБ ИГРЕ", "ABOUT THE GAME")}</p>
                 <h2 id="benefitsTitle">${t("Что вас здесь ждёт", "What you can do here")}</h2>
@@ -2411,8 +2416,10 @@
               <p class="benefitsFootnote">${t("8 историй бесплатно · без аккаунта · прогресс сохраняется в этом браузере", "8 free stories · no account · progress saves in this browser")}</p>
             </section>
             <div class="guideStrip"><div class="miraBust"><img src="${portableImages["mira.webp"]}" alt=""></div><div><b>${t("Привет, я Мира.","Hi, I’m Mira.")}</b><p>${t("Впервые здесь? Давайте выберем вашу историю.","New here? Let’s find your first story.")}</p></div><button data-home-help></button></div>
+            <div class="researchInvite"><span>${t("Какие истории хочется продолжать? Помогите нам разобраться.","Which stories make you want to come back? Help us find out.")}</span><button class="researchLaunch">${t("Отзыв и плейтест","Feedback & playtest")}</button></div>
             <footer class="hubFooter"><span><i></i> ${t("Игра в браузере","Browser session")}</span><span>${t("Вернитесь позже и нажмите «Продолжить»","Come back later and choose Continue")}</span></footer>
           </div>`;
+        home.querySelector(".researchLaunch").onclick = () => globalThis.TabEscapeResearch?.open();
         const launchGuide = () => tour.start(true);
         home.querySelector(".playNow").onclick = () => enterMask(mask);
         home.querySelector(".navPremium").onclick = () => offerSubscription({manual:true});
@@ -2432,10 +2439,10 @@
             showWelcome();
         };
         for (const [id, config] of Object.entries(MASKS)) {
-            const card = button("", () => tour.active ? tour.enter(id) : enterMask(id), home.querySelector(".maskCards"));
-            card.className = "maskCard " + id;
+            const card = button("", () => tour.active ? tour.enter(id) : enterMask(id), home.querySelector(config.upcoming ? ".upcomingCards" : ".maskCards"));
+            card.className = "maskCard " + id + (config.upcoming ? " upcomingCard" : " readyCard");
             card.innerHTML = `<div class="artifact"><img src="${portableImages[id+"-icon.png"]}" alt=""></div>
-              <div class="cardInfo"><h3>${config.name}</h3>${config.upcoming ? `<span class="comingBadge">${t("В разработке", "In development")}</span>` : ""}<p>${config.description[language === "en" ? 1 : 0]}</p></div><span class="cardArrow" aria-hidden="true">↗</span>`;
+              <div class="cardInfo"><h3>${config.name}</h3>${config.upcoming ? `<span class="comingBadge">${t("В разработке", "In development")}</span>` : `<span class="readyBadge">${t("Можно играть", "Ready to play")}</span>`}<p>${config.description[language === "en" ? 1 : 0]}</p></div><span class="cardArrow" aria-hidden="true">↗</span>`;
         }
         syncWorkspace();
         if (!tour?.active) $("welcome").scrollTop=0;
@@ -2624,6 +2631,7 @@
             syncGameLobby();
             try {
                 if (!newGame && needsResume) await resumeAdventure();
+                if (!newGame) globalThis.TabEscapeResearch?.event("adventure_resumed");
                 if (newGame) {
                     const campaign = selectedLobbyCampaign();
                     Object.assign(S, {playMode:dialog.querySelector('input[name="lobbyMode"]:checked').value,
@@ -2703,7 +2711,10 @@
     }
     async function enterMask(id, options = {}) {
         if (MASKS[id]?.upcoming) return showUpcomingMask(id);
-        if (!options.confirmed) return openGameLobby(id);
+        if (!options.confirmed) {
+            globalThis.TabEscapeResearch?.event("workspace_selected", {workspace:id});
+            return openGameLobby(id);
+        }
         if (id === "word") panelHidden = true;
         mask=id; $("welcome").hidden=true;
         const needsStart = !options.prepared && (!started || options.newGame);
@@ -2918,6 +2929,9 @@
             closeOffer();
             openGameLobby(mask, {mode:"free"});
         }, actions);
+        button(t("Оценить предложение за $6.99", "Give feedback on $6.99"), () => {
+            closeOffer(); globalThis.TabEscapeResearch?.open({premium:true});
+        }, actions).className = "researchLaunch";
         if (manual) button(t("Сбросить демо для проверки", "Reset demo for testing"), () => {
             store.set("te_premium_demo", "");
             store.set("te_daily_free_stories_v2", "{}");
@@ -2927,6 +2941,7 @@
         }, actions).className = "demoReset";
         dialog.querySelector(".offerClose").onclick = closeOffer;
         dialog.showModal();
+        globalThis.TabEscapeResearch?.event("premium_viewed");
         actions.querySelector(".primary").focus();
     }
 

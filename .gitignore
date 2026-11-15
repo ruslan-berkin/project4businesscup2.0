@@ -17,3 +17,10 @@ htmlcov/
 
 # Local reports and temporary exports
 *.log
+
+# Opt-in research data (never commit participant records)
+.data/
+*.sqlite3
+research-export*.jsonl
+
+research-data/
