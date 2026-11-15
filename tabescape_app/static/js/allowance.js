@@ -1,6 +1,6 @@
 /* Browser-local offer timing, never a gameplay or paid entitlement gate. */
 window.DailyAllowance = {
-    limit: 2,
+    limit: 1,
     day(date = new Date()) {
         return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
     },
