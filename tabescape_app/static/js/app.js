@@ -1692,10 +1692,10 @@
     }
 
     async function post(url, body) {
-        const response = await fetch(url, {
+        const response = await fetchWithTimeout(url, {
             method: "POST", headers: {"Content-Type": "application/json"},
             body: JSON.stringify({...body, language}),
-        });
+        }, 60000);
         const data = await response.json();
         if (!response.ok) {
             const wait = data.retry_after ? t(` Повторите примерно через ${data.retry_after} сек.`, ` Retry in about ${data.retry_after} seconds.`) : "";
@@ -1704,30 +1704,32 @@
         return data;
     }
 
+    let launchError = "";
     async function restart() {
-        if (S.loading) return;
-        adventureId = globalThis.crypto?.randomUUID?.() || String(Date.now()) + "-" + Math.random().toString(36).slice(2);
-        offerPending = false;
-        offerDismissed = false;
-        Object.assign(S, {
-            stats: { ...START_STATS }, options: [], turn: 1, over: false, won: false,
-            narrative: "", auditLog: "", sceneId: null, seen: [], inventory: [], log: [],
-            history: [{ ...START_STATS }], custom: "", storyToken: null,
-        });
-        S.loading = t("Загрузка нового приключения…","Opening your adventure…");
-        S.bossMode = false;
-        S.stealthTabs = false;
-        S.sheet = "adv";
+        if (S.loading) return false;
+        launchError = "";
+        S.loading = t("Открываем приключение…", "Opening your adventure…");
         render();
-        select(2, 2);
         syncing();
         try {
-            const data = await post("/api/start", { role: S.role, boss: S.boss, campaign_id: S.campaignId, mode: S.playMode, genre: S.genre });
+            const data = await post("/api/start", { role:S.role, boss:S.boss, campaign_id:S.campaignId, mode:S.playMode, genre:S.genre });
+            // Keep the previous party until the server has accepted the new one.
+            adventureId = globalThis.crypto?.randomUUID?.() || String(Date.now()) + "-" + Math.random().toString(36).slice(2);
+            offerPending = false;
+            offerDismissed = false;
+            Object.assign(S, {stats:{...START_STATS}, options:[], turn:1, over:false, won:false,
+                narrative:"", auditLog:"", sceneId:null, seen:[], inventory:[], log:[],
+                history:[{...START_STATS}], custom:"", storyToken:null,
+                bossMode:false, stealthTabs:false, sheet:"adv"});
             applyData(data, null);
+            if (cellEls[2]?.[2]) select(2, 2);
+            return true;
         } catch (error) {
             S.loading = null;
-            S.narrative = error.message + " " + t("Нажмите «Новая игра», чтобы повторить.", "Choose Restart to retry.");
+            launchError = error.message;
             render();
+            if (!$("gameLobby")?.open) toast(launchError);
+            return false;
         }
     }
 
@@ -2371,6 +2373,7 @@
         narrowSheet.addEventListener("change", () => { if (started) syncWorkspace(); });
         loadAdventure();
         showWelcome();
+        loadCatalog().catch(() => {});
         // Let first-time visitors read the landing page; the game lobby offers the tutorial.
     }
     function showWelcome() {
@@ -2448,10 +2451,16 @@
         if (!dialog?.open) return;
         const fresh = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
         $("lobbyStart").disabled = lobbyBusy || Boolean(S.loading) || (fresh && !selectedLobbyCampaign());
-        $("lobbyStart").textContent = S.loading ? t("Дождитесь завершения хода…", "Finishing your turn…") :
+        $("lobbyStart").textContent = lobbyBusy ? t("Открываем…", "Opening…") : S.loading ? t("Дождитесь завершения хода…", "Finishing your turn…") :
             fresh ? t("Начать игру", "Start adventure") : t("Продолжить игру", "Continue adventure");
         $("lobbyReplaceNote").hidden = !fresh || !started;
-        $("lobbySetup").disabled = !fresh;
+        $("lobbySetup").disabled = !fresh || lobbyBusy;
+        dialog.querySelector(".lobbyActions").disabled = lobbyBusy;
+        dialog.querySelector(".lobbyClose").disabled = lobbyBusy;
+        $("lobbyBack").disabled = lobbyBusy;
+        $("lobbyTutorial").disabled = lobbyBusy;
+        if ($("lobbyUpload")) $("lobbyUpload").disabled = lobbyBusy;
+        dialog.setAttribute("aria-busy", String(lobbyBusy));
         const mode = dialog.querySelector('input[name="lobbyMode"]:checked').value;
         $("lobbyStoryLabel").hidden = mode !== "free";
         $("lobbyGenreLabel").hidden = mode === "free";
@@ -2460,6 +2469,7 @@
             const genre = storyCatalog.genres.find(g => g.id === campaign.genre);
             $("lobbyStoryPreview").innerHTML = `<span class="storyTag">${esc(genre.title[language])} · ${mode === "free" ? t(`${campaign.length} ходов до финала`, `${campaign.length} moves to an ending`) : mode === "endless" ? t("До гибели героя", "Until your hero dies") : storyCatalog.premium_ai ? t("25–30 ходов · ИИ", "25–30 moves · AI") : t(`${campaign.length} ходов · демо`, `${campaign.length} moves · demo`)}</span><h2>${esc(campaign.title[language])}</h2><p>${esc(campaign.description[language])}</p>`;
         }
+        if (!fresh) $("lobbyStoryPreview").innerHTML = `<span class="storyTag">${t("СОХРАНЁННОЕ ПРИКЛЮЧЕНИЕ", "SAVED ADVENTURE")} · ${clockStr()}</span><h2>${esc(S.campaignTitle)}</h2><p>${t("Продолжите с того же места. Сцена, показатели и журнал сохранены.", "Pick up where you left off. Your scene, stats and journal are saved.")}</p>`;
         $("lobbyModeNote").textContent = mode === "free" ? t("Все восемь историй открыты. Без ключа ИИ и без оплаты.", "All eight stories are open. No AI key or payment needed.") :
             storyCatalog?.premium_ai ? t("ИИ настроен на сервере. Модель помнит события и развивает сюжет после каждого хода. Демо доступно без подписки.", "AI is configured on the server. The model follows past events and develops the story each turn. This demo needs no subscription.") :
             mode === "endless" ? t("Демо без ИИ: локальные главы повторяются, игра идёт до гибели героя. Новые генерируемые главы появятся после подключения Groq или OpenAI. Оплата не нужна.", "No-AI demo: local chapters repeat until your hero dies. Groq or OpenAI will create new chapters when connected. No payment needed.") :
@@ -2468,7 +2478,7 @@
 
     function closeGameLobby(launched) {
         const dialog = $("gameLobby");
-        if (!dialog.open) return;
+        if (!dialog.open || (lobbyBusy && !launched)) return;
         dialog.close();
         lobbyGeneration++;
         lobbyBusy = false;
@@ -2502,8 +2512,37 @@
 
     let storyCatalog = null;
     let catalogRequest = null;
+    async function fetchWithTimeout(url, options = {}, timeout = 12000) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        try { return await fetch(url, {...options, signal:controller.signal}); }
+        catch (error) {
+            if (error.name === "AbortError") throw new Error(t("Сервер отвечает дольше обычного. Попробуйте ещё раз.", "The server is taking longer than expected. Please try again."));
+            throw error;
+        } finally { clearTimeout(timer); }
+    }
+
+    let defaultWorkbookRequest = null;
+    function prepareDefaultWorkbook() {
+        if (S.imported) return Promise.resolve();
+        if (!defaultWorkbookRequest) defaultWorkbookRequest = (async () => {
+            try {
+                const response = await fetchWithTimeout("/api/workbook/default", {}, 4000);
+                if (!response.ok) throw new Error("Default workbook unavailable");
+                const buffer = await response.arrayBuffer();
+                const sheets = await parseXlsx(buffer);
+                // Never replace a workbook the player uploaded while this was loading.
+                if (sheets.length && !S.imported) {
+                    S.imported = {name:MASKS.excel.file, fromScratch:false, sheets};
+                    S.sourceB64 = arrayBufferToBase64(buffer);
+                }
+            } catch { /* The populated built-in Q4 forecast is immediately available. */ }
+        })();
+        return defaultWorkbookRequest;
+    }
+
     function loadCatalog() {
-        if (!catalogRequest) catalogRequest = fetch('/api/catalog').then(response => {
+        if (!catalogRequest) catalogRequest = fetchWithTimeout('/api/catalog').then(response => {
             if (!response.ok) throw new Error('Catalog unavailable');
             return response.json();
         }).then(data => { storyCatalog = data; return data; }).catch(error => {catalogRequest = null; throw error;});
@@ -2511,12 +2550,13 @@
     }
 
     function openGameLobby(id, options = {}) {
-        const selectedMode = options.mode || S.playMode;
+        const selectedMode = options.mode || (started ? S.playMode : "free");
         const forceNew = Boolean(options.mode);
         if ($("gameLobby").open) return Promise.resolve(false);
         lobbyFocus = document.activeElement;
         lobbyDraft = null;
         lobbyBusy = false;
+        if (id === "excel") prepareDefaultWorkbook();
         const generation = ++lobbyGeneration;
         const dialog = $("gameLobby");
         const tutorial = tour.active || store.get("te_tutorial", "") !== "done";
@@ -2529,9 +2569,12 @@
         dialog.innerHTML = `
             <header class="lobbyHeader"><div class="lobbyBrand"><img src="${portableImages[id+"-icon.png"]}" alt=""><span>TabEscape <small>${MASKS[id].name}</small></span></div><button class="lobbyClose" aria-label="${t("Закрыть", "Close")}">×</button></header>
             <div class="lobbyBody"><p class="lobbyEyebrow">${t("ПЕРЕД ПРИКЛЮЧЕНИЕМ", "BEFORE YOUR ADVENTURE")}</p>
-            <h1 id="gameLobbyTitle">${t("Какую историю проживём?", "Which story will you live?")}</h1>
-            <p class="lobbyIntro">${t("Выберите историю и режим. Игра начнётся только по вашей команде.", "Choose a story and a mode. Your adventure starts when you say so.")}</p>
+            <h1 id="gameLobbyTitle">${t("Ваше следующее приключение", "Your next adventure")}</h1>
+            <p class="lobbyIntro">${t("Всё готово. Начните историю — настройки можно изменить ниже.", "You’re ready to play. Start the story or explore more options below.")}</p>
             ${premiumDemoOpen() ? `<p class="premiumDemoBanner">✓ ${t("Premium для жюри открыт · бесплатно, без карты и срока действия", "Jury Premium demo unlocked · free, no card, no expiry")}</p>` : ""}
+            <div id="lobbyStoryPreview" class="lobbyRecommendation" aria-live="polite">${t("Подбираем историю…", "Getting your story ready…")}</div>
+            <button id="lobbyRetry" type="button" hidden>${t("Повторить загрузку", "Retry loading")}</button>
+            <details id="lobbyAdvanced" ${forceNew ? "open" : ""}><summary>${t("Другие истории и настройки", "More stories & options")}</summary>
             <fieldset class="lobbyActions"><legend>${t("Партия", "Adventure")}</legend>
                 <label><input type="radio" name="lobbyAction" value="new" ${!started || S.over || forceNew ? "checked" : ""}><span><b>${t("Новая игра", "New game")}</b><small>${t("Начать другую историю или ветку", "Try a new story or another path")}</small></span></label>
                 <label><input type="radio" name="lobbyAction" value="continue" ${started ? (S.over || forceNew ? "" : "checked") : "disabled"}><span><b>${t("Продолжить", "Continue")}</b><small>${started ? esc(S.campaignTitle)+" · "+clockStr() : t("Пока нет начатой партии", "No adventure started yet")}</small></span></label>
@@ -2545,7 +2588,6 @@
               <div class="lobbyStoryControls">
                 <label class="lobbySelect" id="lobbyStoryLabel" for="lobbyStory">${t("История", "Story")}<select id="lobbyStory"></select></label>
                 <label class="lobbySelect" id="lobbyGenreLabel" for="lobbyGenre" hidden>${t("Жанр", "Genre")}<select id="lobbyGenre"></select></label>
-                <div id="lobbyStoryPreview" aria-live="polite">${t("Загружаем библиотеку…", "Loading the library…")}</div>
               </div>
             </fieldset>
             <p id="lobbyModeNote" class="lobbyModeNote"></p>
@@ -2555,7 +2597,9 @@
                 <input id="lobbyFile" type="file" accept=".xlsx,.csv,.tsv,.txt" hidden>
                 <p id="lobbyFileStatus" role="status">${esc(S.imported?.name || t("Готовый отчёт Q4_Прогноз.xlsx", "Prepared Q4_Forecast.xlsx report"))}</p><small>.xlsx · .csv · .tsv · .txt</small>` : `<span class="workReady">✓ ${t("Готов", "Ready")}</span>`}
             </section>
-            <p class="lobbySessionNote">${t("Партия сохраняется после каждого хода в этом браузере. После перезагрузки выберите «Продолжить». Рабочие документы — только в текущей вкладке.", "Your adventure saves after each turn in this browser. After reloading, choose Continue. Work documents stay in the current tab only.")}</p>
+            </details>
+            <p id="lobbyLoading" class="lobbyLoading" role="status" hidden></p>
+            <p class="lobbySessionNote">${t("Прогресс сохраняется в этом браузере. Свой файл и аккаунт не нужны.", "Progress saves in this browser. No account or file upload needed.")}</p>
             <p id="lobbyResumeError" role="alert"></p>
             <p id="lobbyReplaceNote" class="lobbyReplaceNote" hidden>${t("Новая игра заменит текущую партию. Рабочие документы сохранятся.", "A new game replaces your current adventure. Your work documents stay available.")}</p>
             </div><footer class="lobbyFooter"><button id="lobbyBack">${t("Назад к интерфейсам", "Back to workspaces")}</button><button id="lobbyStart" class="primary" disabled></button></footer>`;
@@ -2569,49 +2613,64 @@
         $("lobbyStart").onclick = async () => {
             if (lobbyBusy || S.loading) return;
             const newGame = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
-            if (newGame && !storyCatalog) return;
+            if (newGame && !selectedLobbyCampaign()) return;
             const withGuide = $("lobbyTutorial").checked;
-            if (!newGame && needsResume) {
-                lobbyBusy = true;
+            const previous = {playMode:S.playMode, genre:S.genre, campaignId:S.campaignId,
+                campaignTitle:S.campaignTitle, engine:S.engine};
+            lobbyBusy = true;
+            $("lobbyResumeError").textContent = "";
+            $("lobbyLoading").hidden = false;
+            $("lobbyLoading").textContent = t("Открываем историю. Это окно останется здесь, пока всё не будет готово.", "Opening your story. This window will stay here until everything is ready.");
+            syncGameLobby();
+            try {
+                if (!newGame && needsResume) await resumeAdventure();
+                if (newGame) {
+                    const campaign = selectedLobbyCampaign();
+                    Object.assign(S, {playMode:dialog.querySelector('input[name="lobbyMode"]:checked').value,
+                        genre:campaign.genre, campaignId:campaign.id, campaignTitle:campaign.title[language]});
+                }
+                if (id === "excel") await prepareDefaultWorkbook();
+                if (newGame && !await restart()) throw new Error(launchError);
+                const pendingTour = tour.active && withGuide;
+                if (tour.active && !withGuide) tour.close();
+                if (lobbyDraft) installWorkbook(lobbyDraft);
+                // Keep the populated lobby visible through every network wait.
+                const finish = closeGameLobby(true);
+                await enterMask(id, {confirmed:true, newGame:false, prepared:true, tutorial:withGuide && !pendingTour});
+                finish?.(true);
+            } catch (error) {
+                Object.assign(S, previous);
+                $("lobbyResumeError").textContent = error.message;
+                $("lobbyLoading").hidden = true;
+                lobbyBusy = false;
                 syncGameLobby();
-                try { await resumeAdventure(); if (generation !== lobbyGeneration) return; }
-                catch (error) {
-                    $("lobbyResumeError").textContent = error.message;
-                    return;
-                } finally { lobbyBusy = false; syncGameLobby(); }
             }
-            if (newGame) {
-                S.playMode = dialog.querySelector('input[name="lobbyMode"]:checked').value;
-                S.genre = $("lobbyGenre").value;
-                S.campaignId = $("lobbyStory").value;
-                const campaign = selectedLobbyCampaign();
-                S.genre = campaign.genre;
-                S.campaignId = campaign.id;
-                S.campaignTitle = campaign.title[language];
-                S.engine = S.playMode === "free" ? "scripted" : storyCatalog.premium_ai ? storyCatalog.ai_provider : "demo";
-            }
-            const pendingTour = tour.active && withGuide;
-            if (tour.active && !withGuide) tour.close();
-            if (lobbyDraft) installWorkbook(lobbyDraft);
-            const finish = closeGameLobby(true);
-            try { await enterMask(id, {confirmed:true, newGame, tutorial:withGuide && !pendingTour}); }
-            finally { finish?.(true); }
         };
         const pending = new Promise(resolve => {lobbyResolve = resolve;});
         dialog.showModal();
         tour.refresh();
         syncGameLobby();
-        loadCatalog().then(catalog => {
-            if (generation !== lobbyGeneration || !dialog.open) return;
-            $("lobbyStory").innerHTML = catalog.campaigns.map(c => `<option value="${c.id}">${esc(c.title[language])}</option>`).join("");
-            $("lobbyGenre").innerHTML = catalog.genres.map(g => `<option value="${g.id}">${esc(g.title[language])}</option>`).join("");
-            $("lobbyStory").value = S.campaignId;
-            $("lobbyGenre").value = S.genre;
-            syncGameLobby();
-        }).catch(() => {
-            if (generation === lobbyGeneration) $("lobbyStoryPreview").textContent = t("Библиотека недоступна. Закройте это окно и попробуйте снова.", "The library is unavailable. Close this window and try again.");
-        });
-        dialog.querySelector('input[name="lobbyAction"]:checked').focus();
+        async function populateCatalog() {
+            $("lobbyRetry").hidden = true;
+            try {
+                const catalog = await loadCatalog();
+                if (generation !== lobbyGeneration || !dialog.open) return;
+                $("lobbyStory").innerHTML = catalog.campaigns.map(c => `<option value="${c.id}">${esc(c.title[language])}</option>`).join("");
+                $("lobbyGenre").innerHTML = catalog.genres.map(g => `<option value="${g.id}">${esc(g.title[language])}</option>`).join("");
+                $("lobbyStory").value = S.campaignId;
+                $("lobbyGenre").value = S.genre;
+                syncGameLobby();
+                if (document.activeElement === dialog.querySelector(".lobbyClose") && !$("lobbyStart").disabled) $("lobbyStart").focus();
+            } catch {
+                if (generation !== lobbyGeneration || !dialog.open) return;
+                if (!started) $("lobbyStoryPreview").textContent = t("Не удалось загрузить истории. Попробуйте ещё раз.", "Could not load the stories. Please try again.");
+                $("lobbyRetry").hidden = false;
+            }
+        }
+        $("lobbyRetry").onclick = populateCatalog;
+        populateCatalog();
+        // The close control is available immediately; focus Start once the catalog is ready.
+        dialog.querySelector(".lobbyClose").focus();
         return pending;
     }
 
@@ -2647,21 +2706,11 @@
         if (!options.confirmed) return openGameLobby(id);
         if (id === "word") panelHidden = true;
         mask=id; $("welcome").hidden=true;
-        const needsStart = !started || options.newGame;
+        const needsStart = !options.prepared && (!started || options.newGame);
         started = true;
-        if (!S.imported) {
-            try {
-                const response = await fetch("/api/workbook/default");
-                if (!response.ok) throw new Error("Default workbook unavailable");
-                const buffer = await response.arrayBuffer();
-                const sheets = await parseXlsx(buffer);
-                if (sheets.length) {
-                    S.imported = {name:MASKS.excel.file,fromScratch:false,sheets};
-                    S.sourceB64 = arrayBufferToBase64(buffer);
-                }
-            } catch { /* The built-in Q4 forecast remains available. */ }
-        }
-        if (needsStart) await restart();
+        // Paint the workspace before any optional start request.
+        render();
+        if (needsStart && !await restart()) return false;
         if (!S.bossMode) render();
         if (!tour.active && (options.tutorial === true || (options.tutorial !== false && store.get("te_tutorial","")!=="done"))) startTour();
         else syncWorkspace();

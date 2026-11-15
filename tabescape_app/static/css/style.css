@@ -1381,3 +1381,16 @@ body[data-mask="autocad"] .sceneStatus {color:#a6d3bf}
 .premiumPrice strong { font-size: 36px; letter-spacing: -1px; }
 .premiumPrice small { display: block; margin-top: 6px; font-size: 14px; line-height: 1.5; }
 #lobbyResumeError { color: #b42318; }
+
+/* A ready-to-play story comes before optional configuration. */
+#gameLobby {width:min(620px,calc(100% - 24px))}
+.lobbyRecommendation {padding:20px 0 22px;border-bottom:1px solid #dce3d5;margin-bottom:18px}
+.lobbyRecommendation h2 {font:400 28px/1.2 Georgia,serif;margin:10px 0;color:#223a2a}
+.lobbyRecommendation p {margin:0;line-height:1.65;color:#53614e}
+#lobbyAdvanced > summary {font-weight:650;cursor:pointer;padding:10px 0;color:var(--lobby-accent)}
+#lobbyAdvanced[open] > summary {margin-bottom:14px}
+.lobbyLoading {padding:14px 16px;background:#e9f0df;border-left:3px solid #47634b;border-radius:4px;line-height:1.6}
+#lobbyRetry {margin-bottom:14px}
+#gameLobby[aria-busy=true] .lobbyLoading::before {content:"◌";display:inline-block;margin-right:8px;animation:launchSpin 1.2s linear infinite}
+@keyframes launchSpin {to {transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce) {#gameLobby[aria-busy=true] .lobbyLoading::before {animation:none}}
