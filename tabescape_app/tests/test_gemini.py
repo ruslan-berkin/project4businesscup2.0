@@ -58,6 +58,36 @@ class GeminiTests(unittest.TestCase):
                 self.assertEqual(result.get_json()['story_turn'],1)
 
     @patch('app.requests.post')
+    def test_invalid_reserve_after_rate_limit_still_continues_on_gemini(self, call):
+        with patch.dict(os.environ, {'AI_PROVIDER':'groq','GROQ_API_KEYS':'bad-reserve',
+                                     'AI_FALLBACK_PROVIDERS':'gemini'}):
+            opening = dict(narrative='Lena opens the ledger.', options=['Read','Help Lena','Rest'],
+                           delta=[0,0,0], memory='Lena trusts you.', item='Letter', ending=False)
+            call.return_value = Mock(json=lambda: {'choices':[{'finish_reason':'stop',
+                'message':{'content':json.dumps(opening)}}]})
+            before = self.client.post('/api/start', json={'mode':'endless','genre':'detective'}).get_json()
+            previous = app.story_signer().loads(before['story_token'])
+            errors = []
+            for status in (429, 401):
+                response = requests.Response(); response.status_code = status
+                response.headers['Retry-After'] = '60'
+                errors.append(requests.HTTPError('test failure', response=response))
+            call.side_effect = [*errors, self.answer()]
+            result = self.client.post('/api/action', json={'story_token':before['story_token'],'choice_idx':0})
+            self.assertEqual(result.status_code, 200)
+            after = result.get_json()
+            self.assertEqual(after['engine'], 'gemini')
+            self.assertEqual(after['story_turn'], 1)
+            context = json.loads(call.call_args.kwargs['json']['contents'][0]['parts'][0]['text'])
+            self.assertEqual(context['phase'], 'continuation')
+            self.assertEqual(context['current_scene'], previous['narrative'])
+            self.assertEqual(context['memory'], previous['memory'])
+            self.assertEqual(context['inventory'], previous['inventory'])
+            self.assertEqual(context['stats'], previous['stats'])
+            self.assertEqual(context['action'], previous['options'][0])
+            self.assertEqual(context['turn'], 1)
+
+    @patch('app.requests.post')
     def test_invalid_gemini_response_never_applies_a_turn(self, call):
         call.return_value=self.answer()
         state=self.client.post('/api/start',json={'mode':'endless'}).get_json()

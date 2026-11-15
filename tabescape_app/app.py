@@ -1590,7 +1590,7 @@ def generate_ai(state, action):
     try:
         return generate_ai_once(state, action)
     except requests.HTTPError as error:
-        if getattr(error.response, "status_code", None) not in (429, 500, 502, 503, 504):
+        if getattr(error.response, "status_code", None) not in (401, 403, 429, 500, 502, 503, 504):
             raise
         candidates = [ai_provider()] + ai_fallbacks() if ai_fallbacks() else []
         fallback = next((p for p in candidates if p != original and ai_ready(p)), None)
