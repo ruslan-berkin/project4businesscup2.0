@@ -1322,3 +1322,17 @@ body[data-mask="autocad"] .sceneStatus {color:#a6d3bf}
 @media(prefers-reduced-motion:reduce){.sceneArrival,.grid td.story.fade{animation:none!important}}
 
 @media(min-width:1000px){#welcome .hero h1{font-size:60px}.heroCopy{max-width:750px}}
+
+/* Planned workspaces stay discoverable without starting a game. */
+.comingBadge {display:inline-block;margin:5px 0 1px;padding:2px 6px;border:1px solid #d5c8ad;border-radius:4px;background:#f7efd9;color:#705e37;font:600 10px/1.5 "Segoe UI",sans-serif}
+#upcomingDialog {position:fixed;inset:0;width:min(610px,calc(100% - 28px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid #cdd1bd;border-radius:16px;background:#faf8ed;color:#25382c;box-shadow:0 24px 90px #14251b55;overflow:auto;font:15px/1.6 "Segoe UI",system-ui,sans-serif}
+#upcomingDialog[open] {display:grid;grid-template-columns:165px 1fr}
+#upcomingDialog::backdrop {background:#18291d9c;backdrop-filter:blur(4px)}
+.upcomingPortrait {display:flex;align-items:end;justify-content:center;background:linear-gradient(#e6e9cf,#d3dfbb);padding:28px 16px 0;border-right:1px solid #cdd1bd}
+.upcomingPortrait img {display:block;width:132px;max-width:100%;image-rendering:pixelated;filter:drop-shadow(0 6px 0 #263c2820)}
+.upcomingMessage {padding:36px 30px 30px}.upcomingLabel {font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#68774f}
+.upcomingMessage h2 {font:600 30px/1.12 Georgia,serif;margin:12px 0 16px}.upcomingMessage p {color:#566153;margin:0 0 24px}
+.upcomingDone {min-height:44px;padding:10px 17px;background:#315f40;border:1px solid #315f40;border-radius:7px;color:white;font:600 14px/1.4 "Segoe UI",sans-serif;cursor:pointer}
+.upcomingClose {position:absolute;top:8px;right:8px;min-width:36px;min-height:36px;border:0;border-radius:6px;background:transparent;color:#566153;font-size:25px;cursor:pointer}
+#upcomingDialog button:focus-visible {outline:3px solid #8d65b4;outline-offset:3px}
+@media(max-width:520px){#upcomingDialog[open]{grid-template-columns:90px 1fr}.upcomingPortrait{padding:12px 6px 0}.upcomingMessage{padding:44px 18px 24px}.upcomingMessage h2{font-size:25px}.upcomingMessage p{font-size:14px}.upcomingDone{width:100%}}

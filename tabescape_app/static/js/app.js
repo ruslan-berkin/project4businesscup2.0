@@ -2175,7 +2175,7 @@
 
         document.addEventListener("keydown", (e) => {
             if ($("gameLobby").open || tour?.active) return;
-            if ($("subscriptionDialog").open) return;
+            if ($("subscriptionDialog").open || $("upcomingDialog").open) return;
             if (!$("welcome").hidden) return;
             if (e.key === "Escape") {
                 e.preventDefault();
@@ -2235,8 +2235,8 @@
     const MASKS = {
         excel: {name:"Excel", color:"#19734b", icon:"X", get file() { return t("Q4_Прогноз.xlsx", "Q4_Forecast.xlsx"); }, description:["Отчёт, ячейки и формулы","Report, cells and formulas"]},
         word: {name:"Word", color:"#285b9f", icon:"W", file:"Project review.docx", description:["Документ и заметки","Document and notes"]},
-        outlook: {name:"Outlook", color:"#087da8", icon:"O", file:"Inbox", description:["Письма и область чтения","Inbox and reading pane"]},
-        autocad: {name:"AutoCAD", color:"#a33437", icon:"A", file:"Floor plan.dwg", description:["Чертёж и слои","Drawing and layers"]}
+        outlook: {upcoming:true, name:"Outlook", color:"#087da8", icon:"O", file:"Inbox", description:["Письма и область чтения","Inbox and reading pane"]},
+        autocad: {upcoming:true, name:"AutoCAD", color:"#a33437", icon:"A", file:"Floor plan.dwg", description:["Чертёж и слои","Drawing and layers"]}
     };
     // Each visit starts with Excel; switching masks keeps the current session.
     let mask = "excel";
@@ -2260,6 +2260,7 @@
         document.body.prepend(original);
         document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-label="TabEscape Plus"></dialog>');
         document.body.insertAdjacentHTML("afterbegin", '<dialog id="gameLobby" aria-labelledby="gameLobbyTitle"></dialog>');
+        document.body.insertAdjacentHTML("afterbegin", '<dialog id="upcomingDialog" aria-labelledby="upcomingTitle" aria-describedby="upcomingText"></dialog>');
         $("gameLobby").addEventListener("cancel", event => {event.preventDefault(); closeGameLobby(false);});
         $("subscriptionDialog").addEventListener("cancel", event => {event.preventDefault(); closeOffer();});
         document.body.insertAdjacentHTML("afterbegin", '<main id="welcome"></main><nav id="workspaceTools" hidden></nav><main id="alternateGame" hidden></main><main id="alternateWork" hidden></main><aside id="guide" hidden aria-label="Обучение / Tutorial"></aside>');
@@ -2299,7 +2300,7 @@
               </div>
               <div class="mapPin"><i aria-hidden="true">✦</i> ${t("Между надеждой и тайной","Between hope and mystery")}</div>
             </div>
-            <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("8 историй · 4 оформления","8 stories · 4 interfaces")}</span></div><div class="maskCards"></div></div>
+            <div class="workspaceShelf"><div class="shelfHeading"><div><p class="eyeline">${t("ВЫБОР ИНТЕРФЕЙСА","INTERFACE SELECT")}</p><h2>${t("Выберите рабочее окно","Choose your workspace")}</h2></div><span class="shelfMeta">${t("2 доступны · 2 в разработке","2 available · 2 in development")}</span></div><div class="maskCards"></div></div>
             <section class="benefits" aria-labelledby="benefitsTitle">
               <div class="benefitsHeading"><p class="eyeline">${t("ОБ ИГРЕ", "ABOUT THE GAME")}</p>
                 <h2 id="benefitsTitle">${t("Что вас здесь ждёт", "What you can do here")}</h2>
@@ -2308,7 +2309,7 @@
                 <article class="benefitCard lilac"><span class="benefitIndex">01 / ${t("ПАУЗА", "PAUSE")}</span><div class="benefitGlyph" aria-hidden="true">Ⅱ</div><h3>${t("Есть пять минут?", "Got five minutes?")}</h3><p>${t("Начните историю и сделайте пару ходов. Если нужно отвлечься, оставьте вкладку открытой — продолжите, когда будет время.", "Start a story and take a turn or two. Need to step away? Leave the tab open and pick it up when you have time.")}</p></article>
                 <article class="benefitCard peach"><span class="benefitIndex">02 / ${t("ВЫБОР", "CHOICE")}</span><div class="benefitGlyph" aria-hidden="true">↗</div><h3>${t("Как поступить — решать вам", "You decide what to do")}</h3><p>${t("Расспросить свидетеля, помочь ему или уйти? Выбирайте, что вам ближе. Историю можно пройти ещё раз и попробовать другой путь.", "Question a witness, help them out or walk away? Choose what feels right. You can play again to see where another choice leads.")}</p></article>
                 <article class="benefitCard rose"><span class="benefitIndex">03 / ${t("ЛЮДИ", "PEOPLE")}</span><div class="benefitGlyph" aria-hidden="true">♡</div><h3>${t("Познакомьтесь с героями", "Meet the people in the story")}</h3><p>${t("Кто-то попросит помощи, кто-то не сразу расскажет правду. Поговорите с ними, прежде чем решать, кому верить.", "Someone needs your help. Someone else is keeping something back. Talk to them before deciding who to trust.")}</p></article>
-                <article class="benefitCard butter"><span class="benefitIndex">04 / ${t("ПЕРЕКЛЮЧЕНИЕ", "SWITCH")}</span><div class="benefitGlyph keyGlyph" aria-hidden="true">Esc</div><h3>${t("Пора вернуться к делам", "Time to get back to work")}</h3><p>${t("Нажмите Esc — вместо игры появится отчёт, документ, почта или чертёж. Нажмите ещё раз, чтобы вернуться к тому месту, где остановились.", "Press Esc to bring up a sample spreadsheet, document, inbox or drawing. Press it again to return to where you left off.")}</p></article>
+                <article class="benefitCard butter"><span class="benefitIndex">04 / ${t("ПЕРЕКЛЮЧЕНИЕ", "SWITCH")}</span><div class="benefitGlyph keyGlyph" aria-hidden="true">Esc</div><h3>${t("Пора вернуться к делам", "Time to get back to work")}</h3><p>${t("Нажмите Esc — вместо игры появится отчёт Excel или документ Word. Нажмите ещё раз, чтобы вернуться к тому месту, где остановились.", "Press Esc to bring up a sample spreadsheet or Word document. Press it again to return to where you left off.")}</p></article>
               </div>
               <p class="benefitsFootnote">${t("8 историй бесплатно · без аккаунта · партия сохраняется в открытой вкладке", "8 free stories · no account · your adventure stays in this open tab")}</p>
             </section>
@@ -2336,7 +2337,7 @@
             const card = button("", () => tour.active ? tour.enter(id) : enterMask(id), home.querySelector(".maskCards"));
             card.className = "maskCard " + id;
             card.innerHTML = `<div class="artifact"><img src="${portableImages[id+"-icon.png"]}" alt=""></div>
-              <div class="cardInfo"><h3>${config.name}</h3><p>${config.description[language === "en" ? 1 : 0]}</p></div><span class="cardArrow" aria-hidden="true">↗</span>`;
+              <div class="cardInfo"><h3>${config.name}</h3>${config.upcoming ? `<span class="comingBadge">${t("В разработке", "In development")}</span>` : ""}<p>${config.description[language === "en" ? 1 : 0]}</p></div><span class="cardArrow" aria-hidden="true">↗</span>`;
         }
         syncWorkspace();
         if (!tour?.active) $("welcome").scrollTop=0;
@@ -2510,7 +2511,30 @@
         return storyCatalog?.campaigns.find(c => mode === "free" ? c.id === $("lobbyStory").value : c.genre === $("lobbyGenre").value);
     }
 
+    function showUpcomingMask(id) {
+        const dialog = $("upcomingDialog");
+        if (dialog.open) return Promise.resolve(false);
+        const trigger = document.activeElement;
+        dialog.innerHTML = `<button class="upcomingClose" aria-label="${t("Закрыть", "Close")}">×</button>
+            <div class="upcomingPortrait"><img src="${portableImages["mira.webp"]}" alt="${t("Мира — пиксельная проводница", "Mira, your pixel-art guide")}"></div>
+            <section class="upcomingMessage"><span class="upcomingLabel">${MASKS[id].name}</span>
+                <h2 id="upcomingTitle">${t("Ещё немного — и можно играть", "A little more work before you can play")}</h2>
+                <p id="upcomingText">${t("Это оформление пока в разработке. А пока можно отправиться в приключение через Excel или Word — они уже готовы.", "This workspace is still in development. In the meantime, you can play in Excel or Word — both are ready.")}</p>
+                <button class="upcomingDone">${t("Вернуться к выбору", "Back to workspaces")}</button></section>`;
+        return new Promise(resolve => {
+            dialog.onclose = () => {
+                if (trigger?.isConnected) trigger.focus({preventScroll:true});
+                tour?.refresh();
+                resolve(false);
+            };
+            dialog.querySelectorAll("button").forEach(btn => btn.onclick = () => dialog.close());
+            dialog.showModal();
+            tour?.refresh();
+            dialog.querySelector(".upcomingDone").focus();
+        });
+    }
     async function enterMask(id, options = {}) {
+        if (MASKS[id]?.upcoming) return showUpcomingMask(id);
         if (!options.confirmed) return openGameLobby(id);
         if (id === "word") panelHidden = true;
         mask=id; $("welcome").hidden=true;

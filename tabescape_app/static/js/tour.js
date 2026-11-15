@@ -91,10 +91,10 @@ class WorkspaceTour {
         this.afterClose();
     }
     allowed(el) {
-        return document.getElementById("gameLobby")?.open || this.isWork() || this.guide.contains(el) || this.targets?.some(target => target.contains(el));
+        return document.querySelector("#gameLobby[open], #upcomingDialog[open]") || this.isWork() || this.guide.contains(el) || this.targets?.some(target => target.contains(el));
     }
     keydown(event) {
-        if (!this.active || document.getElementById("gameLobby")?.open) return;
+        if (!this.active || document.querySelector("#gameLobby[open], #upcomingDialog[open]")) return;
         if (this.isWork() && event.key !== "Escape") return;
         if (event.key === "Tab") {
             const clickable = (this.targets || []).flatMap(el => el.matches("button:enabled") ? [el] : [...el.querySelectorAll("button:enabled")]);
@@ -131,7 +131,7 @@ class WorkspaceTour {
     }
     refresh() {
         if (!this.active) return;
-        if (this.isWork() || document.getElementById("gameLobby")?.open) {
+        if (this.isWork() || document.querySelector("#gameLobby[open], #upcomingDialog[open]")) {
             this.guide.hidden = this.shade.hidden = true;
             document.body.classList.remove("tourActive", "tourDock");
             document.body.style.removeProperty("--dock-height");
