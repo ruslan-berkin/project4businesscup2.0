@@ -4,7 +4,7 @@
   <p><strong>История на несколько свободных минут</strong></p>
   <p>Браузерная RPG · 8 бесплатных историй · Excel и Word · RU / EN</p>
   <p><a href="https://tabescape.onrender.com/">Играть</a> · <a href="docs/presentation/TabEscape-Pitch-Deck.pdf">10 слайдов PDF</a> · <a href="PITCH.md">Питч</a> · <a href="#плейтест">Плейтест</a></p>
-  <a href="https://github.com/ruslan-berkin/project4zimran/actions/workflows/ci.yml"><img src="https://github.com/ruslan-berkin/project4zimran/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/ruslan-berkin/project4businesscup2.0/actions/workflows/ci.yml"><img src="https://github.com/ruslan-berkin/project4businesscup2.0/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 </div>
 
 ## За 30 секунд
@@ -41,7 +41,7 @@
 
 ## Что подтверждено
 
-Проверен сценарий вход → ход → Esc → возврат → перезагрузка. Прошли 43 серверных теста и проверки JavaScript. На тестовом PostgreSQL проверены запись событий и расчёт D7. [Протокол проверок игры](tabescape_app/VERIFICATION.md) · [GitHub Actions](https://github.com/ruslan-berkin/project4zimran/actions/runs/43741575831).
+Проверен сценарий вход → ход → Esc → возврат → перезагрузка. Прошли 43 серверных теста и проверки JavaScript. На тестовом PostgreSQL проверены запись событий и расчёт D7. [Протокол проверок игры](tabescape_app/VERIFICATION.md) · [GitHub Actions](https://github.com/ruslan-berkin/project4businesscup2.0/actions/runs/43741575831).
 
 **Ещё не подтверждено:** спрос, D7/D30 реальных игроков, готовность платить, CAC и LTV. Интервью и продажи не проводились в рамках этой доработки. Внешние опросы описывают рабочие перерывы и видимость занятости, но не доказывают спрос на нашу RPG: [источники и ограничения выводов](docs/BUSINESS.md#почему-такой-сценарий-имеет-смысл).
 
@@ -96,8 +96,8 @@ flowchart LR
 Нужны Git и Python 3.11 или 3.12. Для macOS/Linux:
 
 ```sh
-git clone https://github.com/ruslan-berkin/project4zimran.git
-cd project4zimran/tabescape_app
+git clone https://github.com/ruslan-berkin/project4businesscup2.0.git
+cd project4businesscup2.0/tabescape_app
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -140,6 +140,6 @@ python scripts/embed_assets.py
 
 ## Материалы для жюри
 
-[Рабочая ссылка](https://tabescape.onrender.com/) · [Публичный GitHub](https://github.com/ruslan-berkin/project4zimran) · [PDF, 10 слайдов](docs/presentation/TabEscape-Pitch-Deck.pdf) · [Пятиминутный питч](PITCH.md)
+[Рабочая ссылка](https://tabescape.onrender.com/) · [Публичный GitHub](https://github.com/ruslan-berkin/project4businesscup2.0) · [PDF, 10 слайдов](docs/presentation/TabEscape-Pitch-Deck.pdf) · [Пятиминутный питч](PITCH.md)
 
 Изменения приложения в `main` публикуются на Render после успешного CI. Заполненную заявку отправляет капитан; наличие материалов в репозитории не означает, что заявка уже отправлена.
