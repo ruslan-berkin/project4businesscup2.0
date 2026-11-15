@@ -5,9 +5,11 @@ services:
     plan: free
     rootDir: tabescape_app
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --timeout 60 --bind 0.0.0.0:$PORT
+    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
     healthCheckPath: /healthz
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.12
       - key: TABESCAPE_SECRET_KEY
         generateValue: true
       - key: AI_PROVIDER
@@ -15,6 +17,12 @@ services:
       - key: GROQ_MODEL
         value: openai/gpt-oss-20b
       - key: AI_ENABLED
-        value: "false"
-      - key: OPENAI_MODEL
-        value: gpt-5-mini
+        value: "true"
+      - key: GROQ_API_KEY
+        sync: false
+      - key: AI_FALLBACK_PROVIDERS
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: GEMINI_API_KEY
+        sync: false
