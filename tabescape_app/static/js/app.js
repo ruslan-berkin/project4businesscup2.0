@@ -2350,7 +2350,7 @@
         original.id="excelShell";
         const modal=$("settingsModal");
         for (const child of Array.from(document.body.children)) {
-            if (child.tagName !== "SCRIPT" && child !== modal) original.append(child);
+            if (child.tagName !== "SCRIPT" && child !== modal && child.id !== "bootScreen") original.append(child);
         }
         document.body.prepend(original);
         document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-labelledby="premiumOfferTitle" aria-describedby="premiumDemoNote"></dialog>');
@@ -3138,9 +3138,16 @@
     };
 
     document.addEventListener("DOMContentLoaded", async () => {
-        document.documentElement.dataset.theme = S.theme;
-        initWorkspace();
-        bind();
-        render();
+        try {
+            document.documentElement.dataset.theme = S.theme;
+            initWorkspace();
+            bind();
+            render();
+            $("bootScreen")?.remove();
+        } catch (error) {
+            const status = $("bootStatus");
+            if (status) status.textContent = "Could not load the game. Please reload. / Не удалось загрузить игру. Обновите страницу.";
+            console.error("TabEscape initialization failed", error);
+        }
     });
 })();
