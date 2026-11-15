@@ -2334,7 +2334,7 @@
             <div class="hero">
               <div class="heroCopy"><div class="campaign"><i></i>${t("8 БЕСПЛАТНЫХ ИСТОРИЙ","8 FREE STORIES")}</div>
                 <h1>${t("Маленький перерыв.","A little break.")}<br><em>${t("Большой квест.","A grand quest.")}</em></h1>
-                <p>${t("Текстовая RPG для перерыва между задачами: читайте сцену, выбирайте поступок и меняйте историю. Без установки и регистрации.","A story-driven RPG for a break between tasks: read a scene, make a choice and shape what happens next. No download or sign-up.")}</p>
+                <p>${t("Играйте между задачами или когда всё уже сделано, а до конца рабочего дня ещё есть время. В этой текстовой RPG вы читаете сцены, выбираете поступки и меняете историю. Без установки и регистрации.","Play between tasks or when your work is done but the workday isn't over yet. In this story-driven RPG, you read scenes, make choices and shape what happens next. No download or sign-up.")}</p>
                 <button class="playNow"><span aria-hidden="true">▶</span> ${started?t("Продолжить игру","Resume adventure"):t("Начать игру","Play adventure")}</button>
               </div>
               <div class="mapPin"><i aria-hidden="true">✦</i> ${t("Между надеждой и тайной","Between hope and mystery")}</div>
