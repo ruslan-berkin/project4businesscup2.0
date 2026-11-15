@@ -1376,3 +1376,8 @@ body[data-mask="autocad"] .sceneStatus {color:#a6d3bf}
 .prosePending { visibility: hidden; }
 .sceneProse { white-space: pre-line; }
 .offerActions .demoReset { font-size: 12px; padding: 8px; background: transparent; border: 0; text-decoration: underline; }
+
+.premiumPrice { margin: 20px 0 12px; color: #253044; }
+.premiumPrice strong { font-size: 36px; letter-spacing: -1px; }
+.premiumPrice small { display: block; margin-top: 6px; font-size: 14px; line-height: 1.5; }
+#lobbyResumeError { color: #b42318; }

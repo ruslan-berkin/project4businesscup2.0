@@ -60,6 +60,7 @@ jobs:
       - run: node tabescape_app/tests/formulas.test.cjs
       - run: node tabescape_app/tests/pacing.test.cjs
       - run: node tabescape_app/tests/animation.test.cjs
+      - run: node tabescape_app/tests/savegame.test.cjs
   dependencies:
     name: Dependency audit
     runs-on: ubuntu-24.04

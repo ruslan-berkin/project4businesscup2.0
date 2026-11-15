@@ -1591,6 +1591,58 @@
         S.history.push({ ...S.stats });
     }
 
+    const SAVE_KEY = "te_adventure_v1";
+    let needsResume = false;
+    let saveWarning = false;
+
+    function saveAdventure() {
+        if (!S.storyToken) return;
+        try {
+            localStorage.setItem(SAVE_KEY, JSON.stringify({version:1, savedAt:Date.now(),
+                token:S.storyToken, title:S.campaignTitle, turn:S.turn,
+                campaign:S.campaignId, mode:S.playMode, genre:S.genre,
+                adventureId, log:S.log, history:S.history}));
+            saveWarning = false;
+        } catch {
+            if (!saveWarning) toast(t("Не удалось сохранить партию в браузере. Не закрывайте вкладку.", "Could not save this adventure in your browser. Keep this tab open."));
+            saveWarning = true;
+        }
+    }
+
+    function loadAdventure() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+            if (!saved) return;
+            if (saved.version !== 1 || typeof saved.token !== "string" || !saved.token ||
+                !Number.isInteger(saved.turn) || saved.turn < 1 || typeof saved.title !== "string" ||
+                !["free", "premium", "endless"].includes(saved.mode) ||
+                typeof saved.campaign !== "string" || typeof saved.genre !== "string" ||
+                !Array.isArray(saved.log) || !saved.log.every(e => e && typeof e.action === "string" && typeof e.time === "string") ||
+                !Array.isArray(saved.history) || !saved.history.every(e => e && [e.ROI,e.KPI,e.Anxiety].every(Number.isFinite))) throw new Error("Invalid save");
+            // Metadata populates Continue. Only the signed server response restores gameplay.
+            Object.assign(S, {storyToken:saved.token, campaignTitle:saved.title, turn:saved.turn,
+                campaignId:saved.campaign, playMode:saved.mode, genre:saved.genre,
+                log:saved.log, history:saved.history});
+            adventureId = typeof saved.adventureId === "string" ? saved.adventureId : saved.token;
+            started = true;
+            needsResume = true;
+        } catch {
+            toast(t("Сохранение не удалось прочитать. Начните новую историю.", "Could not read the saved adventure. Start a new story."));
+        }
+    }
+
+    async function resumeAdventure() {
+        const data = await post("/api/resume", {story_token:S.storyToken});
+        Object.assign(S, {narrative:data.narrative, stats:data.stats, options:data.options,
+            over:data.game_over, won:data.won, storyToken:data.story_token,
+            inventory:data.inventory, turn:data.story_turn + 1, auditLog:data.audit_log,
+            sceneId:data.scene_id, engine:data.engine, playMode:data.mode,
+            campaignId:data.campaign_id, campaignTitle:data.campaign_title,
+            genre:data.genre, role:data.role, boss:data.boss, loading:null, custom:""});
+        needsResume = false;
+        saveAdventure();
+    }
+
     function syncing() {
         const el = $("saveStatus");
         if (!el) return;
@@ -1630,6 +1682,8 @@
             if (before > 0 && remaining === 0 && !premiumDemoOpen()) offerPending = true;
         }
         if (S.inventory.length > prevItems) toast(t("Получен предмет: ", "Item found: ") + itemLabel(S.inventory.at(-1)));
+        needsResume = false;
+        saveAdventure();
         render();
         const td = cellEls[2] && cellEls[2][2];
         if (td && !S.bossMode) td.classList.add("fade");
@@ -2315,6 +2369,7 @@
             }
         });
         narrowSheet.addEventListener("change", () => { if (started) syncWorkspace(); });
+        loadAdventure();
         showWelcome();
         // Let first-time visitors read the landing page; the game lobby offers the tutorial.
     }
@@ -2350,10 +2405,10 @@
                 <article class="benefitCard rose"><span class="benefitIndex">03 / ${t("ВЫБОР", "CHOICE")}</span><div class="benefitGlyph" aria-hidden="true">♡</div><h3>${t("Ваш ход меняет историю", "Your choice matters")}</h3><p>${t("Помочь герою, задать вопрос или пойти другим путём — решать вам.", "Help someone, ask a question or take another path. You decide.")}</p></article>
                 <article class="benefitCard butter"><span class="benefitIndex">04 / ${t("ПЕРЕКЛЮЧЕНИЕ", "SWITCH")}</span><div class="benefitGlyph keyGlyph" aria-hidden="true">Esc</div><h3>${t("Пора к делам", "Back to work")}</h3><p>${t("Esc откроет рабочий экран. Нажмите ещё раз — вернётесь в ту же сцену.", "Press Esc to open the work screen. Press it again to return to the same scene.")}</p></article>
               </div>
-              <p class="benefitsFootnote">${t("8 историй бесплатно · без аккаунта · партия сохраняется в открытой вкладке", "8 free stories · no account · your adventure stays in this open tab")}</p>
+              <p class="benefitsFootnote">${t("8 историй бесплатно · без аккаунта · прогресс сохраняется в этом браузере", "8 free stories · no account · progress saves in this browser")}</p>
             </section>
             <div class="guideStrip"><div class="miraBust"><img src="${portableImages["mira.webp"]}" alt=""></div><div><b>${t("Привет, я Мира.","Hi, I’m Mira.")}</b><p>${t("Впервые здесь? Давайте выберем вашу историю.","New here? Let’s find your first story.")}</p></div><button data-home-help></button></div>
-            <footer class="hubFooter"><span><i></i> ${t("Игра в браузере","Browser session")}</span><span>${t("Перезагрузка начинает новую партию","Reloading starts a new adventure")}</span></footer>
+            <footer class="hubFooter"><span><i></i> ${t("Игра в браузере","Browser session")}</span><span>${t("Вернитесь позже и нажмите «Продолжить»","Come back later and choose Continue")}</span></footer>
           </div>`;
         const launchGuide = () => tour.start(true);
         home.querySelector(".playNow").onclick = () => enterMask(mask);
@@ -2392,7 +2447,7 @@
         const dialog = $("gameLobby");
         if (!dialog?.open) return;
         const fresh = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
-        $("lobbyStart").disabled = lobbyBusy || Boolean(S.loading) || !selectedLobbyCampaign();
+        $("lobbyStart").disabled = lobbyBusy || Boolean(S.loading) || (fresh && !selectedLobbyCampaign());
         $("lobbyStart").textContent = S.loading ? t("Дождитесь завершения хода…", "Finishing your turn…") :
             fresh ? t("Начать игру", "Start adventure") : t("Продолжить игру", "Continue adventure");
         $("lobbyReplaceNote").hidden = !fresh || !started;
@@ -2500,7 +2555,8 @@
                 <input id="lobbyFile" type="file" accept=".xlsx,.csv,.tsv,.txt" hidden>
                 <p id="lobbyFileStatus" role="status">${esc(S.imported?.name || t("Готовый отчёт Q4_Прогноз.xlsx", "Prepared Q4_Forecast.xlsx report"))}</p><small>.xlsx · .csv · .tsv · .txt</small>` : `<span class="workReady">✓ ${t("Готов", "Ready")}</span>`}
             </section>
-            <p class="lobbySessionNote">${t("«Продолжить» работает в этой вкладке. После перезагрузки начинается новая сессия.", "Continue works in this tab. Reloading starts a new session.")}</p>
+            <p class="lobbySessionNote">${t("Партия сохраняется после каждого хода в этом браузере. После перезагрузки выберите «Продолжить». Рабочие документы — только в текущей вкладке.", "Your adventure saves after each turn in this browser. After reloading, choose Continue. Work documents stay in the current tab only.")}</p>
+            <p id="lobbyResumeError" role="alert"></p>
             <p id="lobbyReplaceNote" class="lobbyReplaceNote" hidden>${t("Новая игра заменит текущую партию. Рабочие документы сохранятся.", "A new game replaces your current adventure. Your work documents stay available.")}</p>
             </div><footer class="lobbyFooter"><button id="lobbyBack">${t("Назад к интерфейсам", "Back to workspaces")}</button><button id="lobbyStart" class="primary" disabled></button></footer>`;
         dialog.querySelector(".lobbyClose").onclick = () => closeGameLobby(false);
@@ -2511,9 +2567,19 @@
         }
         dialog.querySelectorAll('input[type="radio"],select').forEach(input => input.onchange = syncGameLobby);
         $("lobbyStart").onclick = async () => {
-            if (lobbyBusy || S.loading || !storyCatalog) return;
+            if (lobbyBusy || S.loading) return;
             const newGame = dialog.querySelector('input[name="lobbyAction"]:checked').value === "new";
+            if (newGame && !storyCatalog) return;
             const withGuide = $("lobbyTutorial").checked;
+            if (!newGame && needsResume) {
+                lobbyBusy = true;
+                syncGameLobby();
+                try { await resumeAdventure(); if (generation !== lobbyGeneration) return; }
+                catch (error) {
+                    $("lobbyResumeError").textContent = error.message;
+                    return;
+                } finally { lobbyBusy = false; syncGameLobby(); }
+            }
             if (newGame) {
                 S.playMode = dialog.querySelector('input[name="lobbyMode"]:checked').value;
                 S.genre = $("lobbyGenre").value;
@@ -2582,9 +2648,9 @@
         if (id === "word") panelHidden = true;
         mask=id; $("welcome").hidden=true;
         const needsStart = !started || options.newGame;
-        if (!started) {
-            started=true;
-            if (!S.imported) try {
+        started = true;
+        if (!S.imported) {
+            try {
                 const response = await fetch("/api/workbook/default");
                 if (!response.ok) throw new Error("Default workbook unavailable");
                 const buffer = await response.arrayBuffer();
@@ -2674,7 +2740,7 @@
         stats.prepend(vitals);
         S.inventory.forEach(name=>button(itemLabel(name),()=>useItem(name),stats));
         const details=document.createElement("details");
-        details.innerHTML='<summary>'+t("Журнал","Journal")+' ('+S.log.length+')</summary>'+S.log.map(e=>'<p>'+e.time+' · '+esc(e.action)+'</p>').join("");
+        details.innerHTML='<summary>'+t("Журнал","Journal")+' ('+S.log.length+')</summary>'+S.log.map(e=>'<p>'+esc(e.time)+' · '+esc(e.action)+'</p>').join("");
         stats.append(details);
         if (S.over) {
             const result = document.createElement("p");
@@ -2788,6 +2854,7 @@
                     <li><span aria-hidden="true">↗</span><div><b>${t("Продолжение зависит от вас", "Your choices shape what comes next")}</b><p>${t("Модель учитывает события, встречи и ваши поступки в следующих сценах.", "The model carries events, encounters and your actions into the next scenes.")}</p></div></li>
                     <li><span aria-hidden="true">∞</span><div><b>${t("Бесконечное приключение", "Endless adventure")}</b><p>${t("Без заранее заданного финала: новые главы, пока ваш герой жив.", "No fixed finale: new chapters for as long as your hero survives.")}</p></div></li>
                 </ul>
+                <p class="premiumPrice"><strong>$6.99</strong> <span>${t("в месяц", "/ month")}</span><small>${t("Планируемая цена подписки. Для жюри сегодня — $0.", "Planned subscription price. Jury demo today: $0.")}</small></p>
                 <p id="premiumDemoNote" class="premiumDemoNote">${t("(Демо для жюри: все возможности Premium бесплатно, без карты и срока действия. Нажатие кнопки не оформляет платную подписку.)", "(Jury demo: all Premium features are free, with no card or expiry. Clicking the button does not create a paid subscription.)")}</p>
                 <div class="offerActions"></div>
                 <p class="offerNote">${t("Бесплатные истории остаются открыты. Premium и бесконечный режим также доступны в меню новой игры.", "Free stories stay available. You can also choose Premium or Endless from the new-game menu.")}</p>
