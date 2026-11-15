@@ -457,4 +457,3 @@ python scripts/embed_assets.py
 - Все три материала доступны. Заявку отправляет капитан команды.
 
 Для дальнейших изменений см. [CONTRIBUTING.md](CONTRIBUTING.md).
-
