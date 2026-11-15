@@ -103,7 +103,7 @@
     };
     const storyModeLabel = () => S.playMode === "free" ? t("Бесплатная история", "Free story") :
         (S.playMode === "endless" ? t("Бесконечный режим", "Endless mode") : "Premium") +
-        (["openai", "groq"].includes(S.engine) ? (S.engine === "groq" ? " · Groq" : " · OpenAI") : t(" · демо без ИИ", " · demo, no AI"));
+        (["openai", "groq", "gemini"].includes(S.engine) ? " · " + ({groq:"Groq",openai:"OpenAI",gemini:"Gemini"}[S.engine]) : t(" · демо без ИИ", " · demo, no AI"));
     const storyGoal = () => S.playMode === "endless" ?
         t("Путешествуйте, пока герой жив. Каждый ход — 30 минут; 18:00 не завершает игру.", "Keep exploring while your hero lives. Each turn takes 30 minutes; 18:00 does not end the game.") :
         t("Следуйте за уликами и выберите, чем закончится история. Каждый ход — 30 минут. Esc закрывает обучение.", "Follow the clues and shape the ending. Each turn takes 30 minutes. Esc skips the tour.");
@@ -1188,7 +1188,7 @@
         for (let r = 1; r <= sh.rows; r++) {
             const rc = sh.rowCls[r] || "";
             const rh = sh.rowH && sh.rowH[r] ? ` style="--rh:${sh.rowH[r]}px"` : "";
-            h += `<tr class="${rc}" ${rc.includes("opt") && !rc.includes("disabled") ? `data-opt="${r - 4}"` : ""}${rh}><th class="rn" data-hr="${r}">${r}</th>`;
+            h += `<tr class="${rc}" ${rc.includes("opt") ? `data-opt="${r - 4}"` : ""}${rh}><th class="rn" data-hr="${r}">${r}</th>`;
             let coverEnd = 0;
             for (let c = 1; c <= NCOLS; c++) {
                 if (skip[key(r, c)]) continue;
@@ -1534,10 +1534,41 @@
 
     // ------------------------------------------------------------------ игра
     let readingTimer;
+    let proseTimer;
+    let proseStarted = 0;
+    let proseDuration = 0;
+    const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    function proseProgress() {
+        return proseDuration ? Math.min(1, Math.max(0, (Date.now() - proseStarted) / proseDuration)) : 1;
+    }
+    function paintProse() {
+        if (S.bossMode || !$("welcome")?.hidden) return;
+        const text = S.narrative || "";
+        const at = Math.ceil(Array.from(text).length * proseProgress());
+        const chars = Array.from(text);
+        document.querySelectorAll(".sceneProse").forEach(el => {
+            const visible = el.querySelector(".proseVisible"), pending = el.querySelector(".prosePending");
+            if (visible && pending) {
+                visible.textContent = chars.slice(0, at).join("");
+                pending.textContent = chars.slice(at).join("");
+            }
+        });
+    }
+    function tickProse() {
+        clearTimeout(proseTimer);
+        paintProse();
+        if (proseProgress() < 1) proseTimer = setTimeout(tickProse, 24);
+        else {
+            updateTurnControls();
+            if (offerPending && !offerDismissed && !S.bossMode) offerSubscription();
+        }
+    }
     const turnLocked = () => Boolean(S.loading) || Date.now() < S.readUntil;
     const sceneStatus = () => S.loading || (Date.now() < S.readUntil ? t("Новая сцена · немного времени на чтение…", "New scene · take a moment to read…") : "");
     function sceneMarkup() {
-        return '<span class="sceneProse">' + esc(S.narrative || S.loading || "") + '</span><span class="sceneStatus" role="status">' + esc(S.narrative ? sceneStatus() : "") + '</span>';
+        const text = S.narrative || S.loading || "";
+        const chars = Array.from(text), at = Math.ceil(chars.length * proseProgress());
+        return '<span class="sceneProse" aria-label="' + esc(text) + '"><span aria-hidden="true" class="proseVisible">' + esc(chars.slice(0, at).join("")) + '</span><span aria-hidden="true" class="prosePending">' + esc(chars.slice(at).join("")) + '</span></span><span class="sceneStatus" role="status">' + esc(S.narrative ? sceneStatus() : "") + '</span>';
     }
     function updateTurnControls() {
         // Do not touch a work document or steal its focus when a timer/request completes.
@@ -1548,8 +1579,12 @@
     }
     function pauseForReading() {
         clearTimeout(readingTimer);
-        S.readUntil = Date.now() + 1400;
-        readingTimer = setTimeout(updateTurnControls, 1420);
+        proseStarted = Date.now();
+        proseDuration = reducedMotion() ? 0 : Math.min(2600, Math.max(700, Array.from(S.narrative || "").length * 3));
+        S.readUntil = Date.now() + Math.max(1400, proseDuration);
+        readingTimer = setTimeout(updateTurnControls, Math.max(1400, proseDuration) + 20);
+        clearTimeout(proseTimer);
+        proseTimer = setTimeout(tickProse, 24);
     }
     function logTurn(action) {
         S.log.push({ turn: S.log.length + 1, time: clockStr(), action, roi: S.stats.ROI, kpi: S.stats.KPI, anx: S.stats.Anxiety, formula: S.auditLog });
@@ -1608,7 +1643,10 @@
             body: JSON.stringify({...body, language}),
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "HTTP " + response.status);
+        if (!response.ok) {
+            const wait = data.retry_after ? t(` Повторите примерно через ${data.retry_after} сек.`, ` Retry in about ${data.retry_after} seconds.`) : "";
+            throw new Error((data.error || "HTTP " + response.status) + wait);
+        }
         return data;
     }
 
@@ -1719,6 +1757,7 @@
             alternateScroll: $("alternateGame").scrollTop};
         if (on) gameView = snapshot; else workView = snapshot;
         S.bossMode = on;
+        if (!on) tickProse();
         S.stealthTabs = on;
         if (on) {
             S.prevSheet = S.sheet;
@@ -2364,7 +2403,7 @@
         const campaign = selectedLobbyCampaign();
         if (campaign) {
             const genre = storyCatalog.genres.find(g => g.id === campaign.genre);
-            $("lobbyStoryPreview").innerHTML = `<span class="storyTag">${esc(genre.title[language])} · ${mode === "free" ? t("4 хода до финала", "4 moves to an ending") : mode === "endless" ? t("До гибели героя", "Until your hero dies") : storyCatalog.premium_ai ? t("8–12 ходов · ИИ", "8–12 moves · AI") : t("4 хода · демо", "4 moves · demo")}</span><h2>${esc(campaign.title[language])}</h2><p>${esc(campaign.description[language])}</p>`;
+            $("lobbyStoryPreview").innerHTML = `<span class="storyTag">${esc(genre.title[language])} · ${mode === "free" ? t(`${campaign.length} ходов до финала`, `${campaign.length} moves to an ending`) : mode === "endless" ? t("До гибели героя", "Until your hero dies") : storyCatalog.premium_ai ? t("25–30 ходов · ИИ", "25–30 moves · AI") : t(`${campaign.length} ходов · демо`, `${campaign.length} moves · demo`)}</span><h2>${esc(campaign.title[language])}</h2><p>${esc(campaign.description[language])}</p>`;
         }
         $("lobbyModeNote").textContent = mode === "free" ? t("Все восемь историй открыты. Без ключа ИИ и без оплаты.", "All eight stories are open. No AI key or payment needed.") :
             storyCatalog?.premium_ai ? t("ИИ настроен на сервере. Модель помнит события и развивает сюжет после каждого хода. Демо доступно без подписки.", "AI is configured on the server. The model follows past events and develops the story each turn. This demo needs no subscription.") :
@@ -2734,7 +2773,7 @@
     function offerSubscription({manual = false} = {}) {
         if (premiumDemoOpen() && !manual) { offerPending = false; return; }
         offerPending = true;
-        if (S.bossMode || tour?.active || (!manual && (offerDismissed || !$("welcome").hidden))) return;
+        if (S.bossMode || (!manual && proseProgress() < 1) || tour?.active || (!manual && (offerDismissed || !$("welcome").hidden))) return;
         const dialog = $("subscriptionDialog");
         if (dialog.open) return;
         offerFocus = document.activeElement;
@@ -2763,6 +2802,13 @@
             closeOffer();
             openGameLobby(mask, {mode:"free"});
         }, actions);
+        if (manual) button(t("Сбросить демо для проверки", "Reset demo for testing"), () => {
+            store.set("te_premium_demo", "");
+            store.set("te_daily_free_stories_v2", "{}");
+            closeOffer();
+            offerDismissed = false;
+            toast(t("Демо сброшено. Предложение появится после одной бесплатной истории.", "Demo reset. Complete one free story to see the offer."));
+        }, actions).className = "demoReset";
         dialog.querySelector(".offerClose").onclick = closeOffer;
         dialog.showModal();
         actions.querySelector(".primary").focus();

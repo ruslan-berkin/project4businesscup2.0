@@ -66,10 +66,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сравнить подпись Ины с утренней записью",
+              "en": "Compare Ina’s signature with the morning entry"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -79,23 +79,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Дать Ине договорить, не предъявляя обвинений",
+              "en": "Let Ina finish before making accusations"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Забрать журнал, оттолкнув сторожа",
+              "en": "Take the ledger by pushing past the keeper"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -113,10 +114,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Спросить Рена, когда он заметил трещину",
+              "en": "Ask Ren when he noticed the crack"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -126,23 +127,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Дать Ине договорить, не предъявляя обвинений",
+              "en": "Let Ina finish before making accusations"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Забрать журнал, оттолкнув сторожа",
+              "en": "Take the ledger by pushing past the keeper"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -163,7 +165,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -180,11 +182,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -193,7 +195,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -205,14 +207,14 @@
       },
       "climax": {
         "text": {
-          "ru": "У плотины собираются жители. Пока затвор держится, можно открыть доказательства, договориться о временном распределении воды или просто уйти.",
-          "en": "Residents gather at the dam. You can present the evidence, negotiate a temporary water agreement, or leave."
+          "ru": "У плотины собираются жители. Пока затвор держится, можно открыть доказательства, договориться о временном распределении воды или просто уйти.\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "Residents gather at the dam. You can present the evidence, negotiate a temporary water agreement, or leave.\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Показать подмену записи при поддержке жителей",
+              "en": "Expose the altered entry with the residents’ support"
             },
             "ending": "resolve",
             "delta": [
@@ -224,8 +226,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Согласовать временный график сброса",
+              "en": "Agree a temporary water-release schedule"
             },
             "ending": "mixed",
             "delta": [
@@ -237,8 +239,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Уйти из квартала с копией журнала",
+              "en": "Leave the quarter with a copy of the ledger"
             },
             "ending": "leave",
             "delta": [
@@ -247,6 +249,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "Ина догоняет вас у затопленного двора. Отец не хочет бросать книги, а вода уже добралась до нижней полки. Журнал в ваших руках намокает; спасти и записи, и библиотеку в одиночку не получится. «Сначала людей», — говорит Ина, но всё равно смотрит на отцовский стол.",
+          "en": "Ina catches up at the flooded yard. Her father refuses to abandon the books; water reaches the lowest shelf. Your ledger is getting wet. You cannot save the records and the library alone. “People first,” Ina says, still watching her father’s desk."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Сверить время сброса, оставив книги Ине",
+              "en": "Check the release time; leave the books to Ina"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Помочь отцу выйти и вынести книги вместе с Иной",
+              "en": "Help her father out and carry the books with Ina"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Перебраться через затвор с журналом: вода сильная",
+              "en": "Cross the sluice with the ledger: the current is strong"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "Рен приносит новый трос, но просит не называть его имя: за скрытую трещину его лишат работы. Ина согласна говорить перед жителями, если вы не превратите её отца в доказательство чужой вины. До следующего сброса нужно решить, что вы готовы пообещать.",
+          "en": "Ren brings a replacement cable but asks you to omit his name: concealing the crack could cost his job. Ina will speak to the residents if you do not turn her father into evidence against someone else. The next release is approaching."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Записать признание Рена; без свидетеля оно слабее",
+              "en": "Record Ren’s confession; without a witness it is weaker"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Вместе с Иной закрепить трос, потратив силы",
+              "en": "Secure the cable with Ina, spending your strength"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Проверить затвор вручную: механизм может сорваться",
+              "en": "Test the sluice by hand: the mechanism may slip"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -263,9 +389,17 @@
       "leave": {
         "ru": "Вы уходите с моста, не назвав виновного. Ина не останавливает вас, только спрашивает, зайдёте ли вы всё-таки помочь с книгами. Ответить на этот простой вопрос оказывается труднее, чем уйти от спора.",
         "en": "You leave the bridge without naming a culprit. Ina does not stop you. She only asks whether you will still help with the books. That simple question is harder to answer than the argument you left behind."
+      },
+      "loss": {
+        "ru": "Ина сама поднимает тревогу. Через неделю в библиотеке снова открывают окна; на вашем месте у стола стоит починенная кружка. Рен приходит чинить полки, хотя ему пока никто не обещал прощения.",
+        "en": "Ina raises the alarm herself. A week later the library windows reopen; a repaired mug waits at your place. Ren comes to mend the shelves, though nobody has promised forgiveness."
+      },
+      "retreat": {
+        "ru": "Ина доводит вас до мостовой будки и сама идёт к жителям. Вы пропускаете собрание, но через несколько дней возвращаетесь помогать в библиотеке. Починенная кружка ждёт на столе; разговор о затворе ещё впереди.",
+        "en": "Ina takes you to the bridge hut and goes to the residents herself. You miss the meeting but return to help in the library days later. The repaired mug waits on the table; the conversation about the sluice is still ahead."
       }
     },
-    "length": 4
+    "length": 6
   },
   {
     "id": "row17",
@@ -334,10 +468,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сравнить время резервной копии и входа в систему",
+              "en": "Compare the backup and login timestamps"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -347,23 +481,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Выслушать, почему свидетель боялся заговорить",
+              "en": "Listen to why the witness was afraid to speak"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Забрать документы силой перед камерой",
+              "en": "Seize the documents in front of the camera"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -381,10 +516,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Проверить подпись на накладной с охранником",
+              "en": "Check the invoice signature with the guard"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -394,23 +529,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Выслушать, почему свидетель боялся заговорить",
+              "en": "Listen to why the witness was afraid to speak"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Забрать документы силой перед камерой",
+              "en": "Seize the documents in front of the camera"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -431,7 +567,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -448,11 +584,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -461,7 +597,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -473,14 +609,14 @@
       },
       "climax": {
         "text": {
-          "ru": "Аудитор ждёт отчёт. Вы можете показать цепочку документов, попросить время на внутреннюю проверку или сдать текущую версию.",
-          "en": "The auditor wants the report. Present the document trail, request an internal review, or submit the current version."
+          "ru": "Аудитор ждёт отчёт. Вы можете показать цепочку документов, попросить время на внутреннюю проверку или сдать текущую версию.\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "The auditor wants the report. Present the document trail, request an internal review, or submit the current version.\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Предъявить аудитору цепочку документов с Леной",
+              "en": "Present the document trail to the auditor with Lena"
             },
             "ending": "resolve",
             "delta": [
@@ -492,8 +628,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Попросить отсрочку и внутреннюю проверку",
+              "en": "Request a delay and an internal review"
             },
             "ending": "mixed",
             "delta": [
@@ -505,8 +641,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Сдать нынешнюю версию без обвинений",
+              "en": "Submit the current version without accusations"
             },
             "ending": "leave",
             "delta": [
@@ -515,6 +651,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "Лена присылает голосовое: в отчёте есть и её настоящая ошибка. Она боится, что вы опубликуете всё, не дав ей объясниться. На экране мигает таймер удаления резервной копии. Ещё можно сохранить файл, но разговор придётся оборвать.",
+          "en": "Lena sends a voice note: the report contains a real mistake of hers too. She fears you will publish everything without hearing her out. A backup deletion timer flashes on your screen. You can save the file, but must cut the conversation short."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Сохранить копию с контрольной суммой",
+              "en": "Save the backup and its checksum"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Дослушать Лену и согласовать, что можно раскрыть",
+              "en": "Hear Lena out and agree what may be disclosed"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Вскрыть чужой кабинет: охрана уже идёт",
+              "en": "Force the office door: security is approaching"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "Аудитор просит оригинал, а охрана — назвать источник. Лена готова прийти сама, если вы дадите ей рассказать и о собственной ошибке. Простая таблица превратилась в выбор: защитить человека или получить безупречно удобную версию событий.",
+          "en": "The auditor wants the original; security wants your source. Lena will come herself if you let her explain her own mistake too. The spreadsheet has become a choice between protecting a person and presenting a conveniently spotless account."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Сопоставить накладную с журналом доступа",
+              "en": "Match the invoice to the access log"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Встретить Лену у входа и выступить вместе",
+              "en": "Meet Lena at the entrance and testify together"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Отправить обвинение всем, пока доступ не закрыли",
+              "en": "Send an accusation to everyone before access is cut"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -531,9 +791,17 @@
       "leave": {
         "ru": "Вы передаёте копию отчёта в общий архив и отказываетесь вести проверку дальше. Лена отвечает на сообщение одним «поняла». Её чашка остаётся у окна; вы не знаете, зайдёт ли она за ней завтра.",
         "en": "You file a copy of the report and step away from the investigation. Lena replies with a single “understood.” Her cup stays by the window. You do not know whether she will collect it tomorrow."
+      },
+      "loss": {
+        "ru": "Лена получает вашу последнюю копию. На проверке она впервые говорит без чужого разрешения и добивается пересмотра строки 17. Через месяц новый сотрудник находит у принтера памятку, которую она написала в вашу память: сначала сохраняйте оригинал, потом делайте выводы.",
+        "en": "Lena receives your last copy. At the review she speaks without waiting for permission and gets row 17 reopened. A month later a new employee finds her note by the printer, written in your memory: preserve the original before drawing conclusions."
+      },
+      "retreat": {
+        "ru": "Лена забирает сохранённую копию и просит перенести проверку. Вы возвращаетесь в офис через неделю: строка 17 ещё выделена жёлтым. На столе стоит кофе и записка «Договорим, когда будешь готов».",
+        "en": "Lena takes the saved copy and requests a postponed review. A week later row 17 is still highlighted yellow. Coffee and a note wait on your desk: “We’ll finish talking when you’re ready.”"
       }
     },
-    "length": 4
+    "length": 6
   },
   {
     "id": "lighthouse",
@@ -602,10 +870,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сверить голос на ленте с журналом смотрителя",
+              "en": "Compare the recorded voice with the keeper’s log"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -615,23 +883,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Послушать воспоминание Норы об отце",
+              "en": "Listen to Nora’s memory of her father"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Сорвать запертую дверь радиорубки",
+              "en": "Force the locked radio-room door"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -649,10 +918,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Расположить письма по описанным приливам",
+              "en": "Order the letters by their tides"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -662,23 +931,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Послушать воспоминание Норы об отце",
+              "en": "Listen to Nora’s memory of her father"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Сорвать запертую дверь радиорубки",
+              "en": "Force the locked radio-room door"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -699,7 +969,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -716,11 +986,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -729,7 +999,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -741,14 +1011,14 @@
       },
       "climax": {
         "text": {
-          "ru": "В тумане возникает борт корабля. Можно восстановить полный сигнал, оставить маяк в нынешнем режиме или погасить его и ждать катер.",
-          "en": "A ship emerges in the fog. Restore the complete signal, keep the present cycle, or extinguish the lamp and await your boat."
+          "ru": "В тумане возникает борт корабля. Можно восстановить полный сигнал, оставить маяк в нынешнем режиме или погасить его и ждать катер.\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "A ship emerges in the fog. Restore the complete signal, keep the present cycle, or extinguish the lamp and await your boat.\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Восстановить полный сигнал вместе с Норой",
+              "en": "Restore the full signal with Nora"
             },
             "ending": "resolve",
             "delta": [
@@ -760,8 +1030,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Сохранить нынешний ритм маяка",
+              "en": "Keep the lighthouse’s current rhythm"
             },
             "ending": "mixed",
             "delta": [
@@ -773,8 +1043,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Погасить лампу и дождаться катера",
+              "en": "Extinguish the lamp and wait for the boat"
             },
             "ending": "leave",
             "delta": [
@@ -783,6 +1053,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "Нора находит на лестнице отцовский плащ, ещё тёплый. Она хочет подняться одна. В радиорубке начинается запись сигнала, которую буря скоро заглушит. Вы обещали остаться рядом; теперь у этого обещания появилась цена.",
+          "en": "Nora finds her father’s coat on the stairs, still warm. She wants to climb alone. A signal begins recording in the radio room; the storm will soon drown it out. Your promise to stay beside her now has a cost."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Записать сигнал, попросив Нору подождать",
+              "en": "Record the signal and ask Nora to wait"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Подняться с Норой, не обещая найти отца",
+              "en": "Climb with Nora without promising to find her father"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Выйти к антенне без страховки: начинается буря",
+              "en": "Reach the aerial without a safety line as the storm begins"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "В письме есть пропуск: отец не звал корабль к берегу, а предупреждал об отмели. Нора держит лампу, и руки у неё устали. Можно ещё раз проверить последовательность вспышек или сменить её у тяжёлого рычага.",
+          "en": "A letter has a missing line: her father was warning the ship away from a shoal, not calling it ashore. Nora holds the lamp mechanism with tired hands. You can verify the flash sequence again or take her place at the heavy lever."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Сопоставить вспышки с картой отмелей",
+              "en": "Match the flashes to the shoal chart"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Сменить Нору у рычага и дать ей передохнуть",
+              "en": "Take Nora’s place at the lever and let her rest"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Развернуть горячую линзу голыми руками",
+              "en": "Turn the hot lens with bare hands"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -799,9 +1193,17 @@
       "leave": {
         "ru": "Вы успеваете на обратный катер. Нора остаётся на причале с термосом; обещанного чая вы так и не выпили. Когда остров скрывается, три вспышки снова прорезают туман. Вы сохраняете её номер.",
         "en": "You catch the return boat. Nora stays on the pier with a flask; you never shared that tea. As the island disappears, three flashes cut through the fog. You keep her number."
+      },
+      "loss": {
+        "ru": "Утром Нора передаёт спасателям записанный сигнал. На маяке меняют лестницу, но оставляют две кружки в радиорубке. Каждый раз, встречая катер, она спрашивает имя прибывшего — и записывает его сама.",
+        "en": "At dawn Nora gives the recorded signal to the rescuers. They replace the lighthouse stairs but leave two mugs in the radio room. Whenever a boat arrives, she asks each visitor’s name and writes it down herself."
+      },
+      "retreat": {
+        "ru": "Нора вызывает катер и помогает вам спуститься. Сигнал так и не расшифрован до конца. Через месяц приходит её письмо с рисунком маяка; внизу приписано, что чай теперь всегда стоит в радиорубке.",
+        "en": "Nora calls the boat and helps you down. The signal remains partly undeciphered. A month later her letter arrives with a drawing of the lighthouse and a note that tea now always waits in the radio room."
       }
     },
-    "length": 4
+    "length": 6
   },
   {
     "id": "room6",
@@ -870,10 +1272,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сверить фотографию с именами пациентов",
+              "en": "Compare the photograph with patient names"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -883,23 +1285,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Поговорить с Сэмом о дочери, пока он успокаивается",
+              "en": "Talk to Sam about his daughter while he calms down"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Взломать дверь, из-за которой идёт стук",
+              "en": "Force the door that the knocking comes from"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -917,10 +1320,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Проверить отражение Сэма на записи камеры",
+              "en": "Check Sam’s reflection in the camera recording"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -930,23 +1333,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Поговорить с Сэмом о дочери, пока он успокаивается",
+              "en": "Talk to Sam about his daughter while he calms down"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Взломать дверь, из-за которой идёт стук",
+              "en": "Force the door that the knocking comes from"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -967,7 +1371,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -984,11 +1388,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -997,7 +1401,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -1009,14 +1413,14 @@
       },
       "climax": {
         "text": {
-          "ru": "Дверь без номера открывается. Внутри ждёт пустая кровать. Можно вернуть бирку и назвать имя, отключить линию вызова или выйти через пожарную лестницу.",
-          "en": "An unnumbered door opens onto an empty bed. Return the tag and speak the name, disconnect the call system, or escape by the fire stairs."
+          "ru": "Дверь без номера открывается. Внутри ждёт пустая кровать. Можно вернуть бирку и назвать имя, отключить линию вызова или выйти через пожарную лестницу.\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "An unnumbered door opens onto an empty bed. Return the tag and speak the name, disconnect the call system, or escape by the fire stairs.\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Вернуть бирку и назвать Асю вместе с Сэмом",
+              "en": "Return the tag and name Asya with Sam"
             },
             "ending": "resolve",
             "delta": [
@@ -1028,8 +1432,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Отключить линию вызова",
+              "en": "Disconnect the call line"
             },
             "ending": "mixed",
             "delta": [
@@ -1041,8 +1445,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Выбраться через пожарную лестницу",
+              "en": "Leave by the fire stairs"
             },
             "ending": "leave",
             "delta": [
@@ -1051,6 +1455,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "Сэм просит открыть дверь охраны. На мониторе он стоит за вашим плечом, а настоящий голос доносится с лестницы. В кармане лежит фотография ребёнка; перевернув её, можно сверить дату. Сэм говорит всё тише и просит не оставлять его одного.",
+          "en": "Sam asks you to open the security door. On the monitor he stands behind you, while his real voice comes from the stairs. The child’s photograph has a date on its back. Sam’s voice is fading; he begs you not to leave him alone."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Сверить дату фотографии с журналом дежурств",
+              "en": "Compare the photograph date with the duty log"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Попросить Сэма рассказать про дочь и идти на голос",
+              "en": "Ask Sam about his daughter and follow his voice"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Разбить монитор: за стеклом кто-то шевелится",
+              "en": "Smash the monitor: something moves behind the glass"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "На бирке проступает имя — Ася. Сэм хочет отключить питание, но звонок слышен даже без проводов. Если вернуть ребёнку имя, придётся задержаться у кровати. Если уйти сейчас, Сэм сможет увидеть дочь, но вопрос останется без ответа.",
+          "en": "A name appears on the tag: Asya. Sam wants to cut the power, but the bell rings without wires. Returning the child’s name means staying by the bed. Leaving now gets Sam home to his daughter, but leaves the question unanswered."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Сверить имя с уцелевшей записью",
+              "en": "Verify the name against the surviving record"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Встать рядом с Сэмом и вместе ответить ребёнку",
+              "en": "Stand beside Sam and answer the child together"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Войти в тёмную палату одному, не проверяя дверь",
+              "en": "Enter the dark ward alone without checking the door"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -1067,9 +1595,17 @@
       "leave": {
         "ru": "Вы выводите Сэма через пожарную лестницу, не возвращая бирку. Он успеет к дочери, и это уже немало. Но перед уходом вы оба слышите звонок и понимаете, кому сегодня так и не ответили.",
         "en": "You bring Sam out through the fire stairs without returning the tag. He will see his daughter, and that matters. But you both hear the bell as you leave, and know whose call went unanswered."
+      },
+      "loss": {
+        "ru": "Сэм выходит из клиники на рассвете. Позже он добивается, чтобы перед сносом прочли имена забытых пациентов. На первой велосипедной прогулке с дочерью он всё-таки отпускает руль. Потом долго сидит на скамье рядом с пустым местом.",
+        "en": "Sam leaves the clinic at dawn. Before demolition, he makes sure the forgotten patients’ names are read aloud. On his daughter’s first bicycle ride he finally lets go of the handlebars. Afterwards he sits beside an empty place on the bench."
+      },
+      "retreat": {
+        "ru": "Сэм выводит вас наружу, не оглядываясь на звонок. На следующий день он присылает фотографию дочери на велосипеде. Вы сохраняете её рядом с найденной биркой: к вопросу клиники придётся вернуться, когда хватит сил.",
+        "en": "Sam leads you outside without looking back at the bell. The next day he sends a photo of his daughter on her bicycle. You keep it beside the tag: the clinic’s question must wait until you have the strength."
       }
     },
-    "length": 4
+    "length": 6
   },
   {
     "id": "orbit",
@@ -1138,10 +1674,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сверить подпись командира с независимыми часами",
+              "en": "Check the commander’s signature against an independent clock"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -1151,23 +1687,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Сменить Мэй у клапана на несколько минут",
+              "en": "Relieve Mei at the valve for a few minutes"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Открыть техническую панель под напряжением",
+              "en": "Force open the live service panel"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -1185,10 +1722,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Проверить запись давления у шлюза",
+              "en": "Check the airlock pressure log"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -1198,23 +1735,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Сменить Мэй у клапана на несколько минут",
+              "en": "Relieve Mei at the valve for a few minutes"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Открыть техническую панель под напряжением",
+              "en": "Force open the live service panel"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -1235,7 +1773,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -1252,11 +1790,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -1265,7 +1803,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -1277,14 +1815,14 @@
       },
       "climax": {
         "text": {
-          "ru": "До сброса воздуха минуты. Можно разорвать петлю с подтверждённым кодом, изолировать жилые отсеки или уходить в спасательной капсуле.",
-          "en": "Venting is minutes away. Break the loop using a verified code, isolate the inhabited modules, or take the escape capsule."
+          "ru": "До сброса воздуха минуты. Можно разорвать петлю с подтверждённым кодом, изолировать жилые отсеки или уходить в спасательной капсуле.\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "Venting is minutes away. Break the loop using a verified code, isolate the inhabited modules, or take the escape capsule.\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Разорвать петлю проверенным кодом вместе с Мэй",
+              "en": "Break the loop with the verified code and Mei"
             },
             "ending": "resolve",
             "delta": [
@@ -1296,8 +1834,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Изолировать жилой блок от станции",
+              "en": "Isolate the crew module from the station"
             },
             "ending": "mixed",
             "delta": [
@@ -1309,8 +1847,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Уйти в спасательной капсуле",
+              "en": "Leave in the escape capsule"
             },
             "ending": "leave",
             "delta": [
@@ -1319,6 +1857,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "Мэй держит клапан обеими руками. В соседнем отсеке терминал хранит исходное время приказа, но питание скоро отключится. Она просит сначала пристегнуть её к поручню: если начнётся разгерметизация, сил не хватит. До терминала всего десять метров.",
+          "en": "Mei holds the valve with both hands. A nearby terminal holds the command’s original timestamp, but power is failing. She asks you to tether her to the rail first: she cannot hold on through decompression. The terminal is only ten metres away."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Скопировать исходный таймкод приказа",
+              "en": "Copy the command’s original timestamp"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Пристегнуть Мэй и помочь удержать клапан",
+              "en": "Tether Mei and help her hold the valve"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Проскочить закрывающийся шлюз без проверки",
+              "en": "Rush through the closing airlock without checking"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "Код готов, но ручной разрыв требует человека у панели. Мэй предлагает остаться, пряча дрожащую руку. Если проверить схему ещё раз, станет понятнее риск. Если подменить её, придётся доверить запуск человеку, которому вы только что помогли.",
+          "en": "The code is ready, but someone must stay at the panel. Mei volunteers, hiding a trembling hand. Checking the wiring would clarify the risk. Taking her place means trusting the person you just helped to trigger the sequence."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Проверить независимый контур питания",
+              "en": "Check the independent power circuit"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Подменить Мэй у панели и доверить ей запуск",
+              "en": "Take Mei’s place and trust her with the trigger"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Разомкнуть контур под напряжением",
+              "en": "Break the circuit while it is live"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -1335,9 +1997,17 @@
       "leave": {
         "ru": "Вы выбираете аварийный отход. Мэй закрепляет базилик у кресла капсулы, но не спрашивает о споре: о тех, кто остался за переборкой, ещё нет новостей. Земля становится ближе, а обещанное возвращение — сложнее.",
         "en": "You choose the emergency withdrawal. Mei secures the basil by the capsule seat but says nothing about your bet. There is still no news of those beyond the bulkhead. Earth grows closer; the promised homecoming grows harder."
+      },
+      "loss": {
+        "ru": "Мэй дописывает ваше имя в журнал, который больше не меняет прошлое. Спасатели находят контейнер с базиликом и вашими записями. Первый урожай она делит с экипажем; никто не шутит про маленький горшок.",
+        "en": "Mei adds your name to a log that no longer rewrites the past. Rescuers find the basil container and your notes. She shares the first harvest with the crew. Nobody jokes about the small pot."
+      },
+      "retreat": {
+        "ru": "Мэй передаёт вас спасателям и остаётся у панели. В лазарете вы получаете короткое сообщение: «Базилик жив». Станцию ещё обследуют, но теперь у вас есть причина дождаться следующего сеанса связи.",
+        "en": "Mei hands you over to rescuers and stays at the panel. In the infirmary a brief message arrives: “The basil is alive.” The station is still being surveyed, but you have a reason to wait for the next call."
       }
     },
-    "length": 4
+    "length": 6
   },
   {
     "id": "pass",
@@ -1406,10 +2076,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сверить отметку лавины с прогнозом",
+              "en": "Compare the avalanche marker with the forecast"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -1419,23 +2089,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Разделить чай и дать Льву закончить объяснение",
+              "en": "Share tea and let Lev finish explaining"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Полезть за находкой по обледенелой стене",
+              "en": "Climb the icy wall to retrieve the find"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -1453,10 +2124,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Уточнить по рации, кто видел гребень",
+              "en": "Ask on the radio who has seen the ridge"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -1466,23 +2137,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Разделить чай и дать Льву закончить объяснение",
+              "en": "Share tea and let Lev finish explaining"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Полезть за находкой по обледенелой стене",
+              "en": "Climb the icy wall to retrieve the find"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -1503,7 +2175,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -1520,11 +2192,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -1533,7 +2205,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -1545,14 +2217,14 @@
       },
       "climax": {
         "text": {
-          "ru": "Нужно выбрать путь домой: отмеченный обход, укрытие до спасателей или быстрый спуск по гребню.",
-          "en": "Choose a way home: the mapped detour, shelter until rescuers arrive, or a quick descent along the ridge."
+          "ru": "Нужно выбрать путь домой: отмеченный обход, укрытие до спасателей или быстрый спуск по гребню.\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "Choose a way home: the mapped detour, shelter until rescuers arrive, or a quick descent along the ridge.\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Провести группу проверенным обходом со Львом",
+              "en": "Lead the group along the verified detour with Lev"
             },
             "ending": "resolve",
             "delta": [
@@ -1564,8 +2236,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Укрепить укрытие и вызвать спасателей",
+              "en": "Reinforce the shelter and call rescuers"
             },
             "ending": "mixed",
             "delta": [
@@ -1577,8 +2249,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Спуститься к нижнему посту за помощью",
+              "en": "Descend to the lower post for help"
             },
             "ending": "leave",
             "delta": [
@@ -1587,6 +2259,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "Лев садится на камень и прячет обмороженные пальцы. Он заметил безопасную отметку, но просит минуту передохнуть. Ветер заметает её прямо сейчас. Вы можете сохранить маршрут или согреть ему руки; делать оба дела придётся уже в темноте.",
+          "en": "Lev sits on a rock, hiding frostbitten fingers. He has spotted a safe marker but asks for a minute’s rest. Wind is burying it now. You can preserve the route or warm his hands; doing both will take you into darkness."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Записать координаты отметки до снегопада",
+              "en": "Record the marker coordinates before the snowfall"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Поделиться варежками и выслушать Льва",
+              "en": "Share your mittens and listen to Lev"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Проверить карниз без верёвки: снег оседает",
+              "en": "Test the cornice without a rope as the snow settles"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "Раненого нужно нести вдвоём. Лев помнит обход, но боится снова ошибиться перед экзаменатором. Ваши ноги дрожат от усталости. Проверка карты даст уверенность, а место у носилок — возможность показать, что вы ему доверяете.",
+          "en": "The injured hiker needs two people to carry him. Lev remembers the detour but fears failing again before his examiner. Your legs shake with fatigue. Checking the map offers certainty; taking the stretcher shows him your trust."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Проверить склон по карте и компасу",
+              "en": "Check the slope with map and compass"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Взяться за носилки и попросить Льва вести",
+              "en": "Take the stretcher and ask Lev to lead"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Срезать путь по гребню несмотря на предупреждение",
+              "en": "Take the ridge shortcut despite the warning"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -1603,9 +2399,17 @@
       "leave": {
         "ru": "Быстрый спуск выводит вас к нижнему посту, и вы передаёте координаты спасателям. Лев остаётся ждать их с группой. Вечером его стул у карты пуст; вы оставляете чайник на печке и ждёте рацию.",
         "en": "The fast descent brings you to the lower post, where you give rescuers the coordinates. Lev waits with the group. That evening his chair by the map is empty. You leave the kettle on the stove and listen to the radio."
+      },
+      "loss": {
+        "ru": "Лев выводит оставшихся к лесу по вашему следу. На следующем экзамене он просит сначала обсудить разворот назад, а потом скорость подъёма. В лагере ваш рюкзак чинят до конца; на внутреннем кармане остаётся его первый неровный шов.",
+        "en": "Lev guides the others to the forest along your tracks. At his next exam he asks to discuss turning back before climbing speed. Your pack is repaired at camp; his first uneven seam remains inside the pocket."
+      },
+      "retreat": {
+        "ru": "Лев вызывает спасателей и остаётся с вами до их прихода. Вы просыпаетесь в лагере рядом с развёрнутой картой. Его маршрут обведён карандашом; в следующий раз вы сначала обсудите, где стоит повернуть назад.",
+        "en": "Lev calls rescuers and stays until they arrive. You wake at camp beside an unfolded map. His route is circled in pencil; next time you will first discuss where to turn back."
       }
     },
-    "length": 4
+    "length": 6
   },
   {
     "id": "archive",
@@ -1674,10 +2478,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сравнить печать с настоящим пропуском",
+              "en": "Compare the seal with a genuine pass"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -1687,23 +2491,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Помочь перевязать раненого и поговорить",
+              "en": "Help bandage the wounded man and talk"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Оттолкнуть патрульного и забрать пропуск",
+              "en": "Push past a patrolman and seize the pass"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -1721,10 +2526,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Проверить у лодочницы время смены патруля",
+              "en": "Check the patrol change with the boatwoman"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -1734,23 +2539,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Помочь перевязать раненого и поговорить",
+              "en": "Help bandage the wounded man and talk"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Оттолкнуть патрульного и забрать пропуск",
+              "en": "Push past a patrolman and seize the pass"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -1771,7 +2577,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -1788,11 +2594,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -1801,7 +2607,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -1813,14 +2619,14 @@
       },
       "climax": {
         "text": {
-          "ru": "Комендант готов слушать. Можно предъявить подтверждения, просить ограниченный коридор для госпиталя или передать письмо без свидетелей.",
-          "en": "The commander will listen. Present corroboration, negotiate a hospital corridor, or deliver the letter without witnesses."
+          "ru": "Комендант готов слушать. Можно предъявить подтверждения, просить ограниченный коридор для госпиталя или передать письмо без свидетелей.\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "The commander will listen. Present corroboration, negotiate a hospital corridor, or deliver the letter without witnesses.\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Показать подписи и попросить общий коридор",
+              "en": "Present the signatures and request a shared corridor"
             },
             "ending": "resolve",
             "delta": [
@@ -1832,8 +2638,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Просить два часа только для госпиталя",
+              "en": "Request two hours for the hospital alone"
             },
             "ending": "mixed",
             "delta": [
@@ -1845,8 +2651,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Передать письмо без свидетелей",
+              "en": "Hand over the letter without witnesses"
             },
             "ending": "leave",
             "delta": [
@@ -1855,6 +2661,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "У пристани раненый просит воды. Письмо нельзя мочить, а фляга лежит под мокрым плащом. Марта просила вернуться с ответом, но не говорила проходить мимо. Наборщик предлагает спрятать конверт, пока вы помогаете; вы ещё не знаете, можно ли ему доверять.",
+          "en": "A wounded man asks for water by the quay. The letter must stay dry; your flask is beneath a soaked coat. Marta asked for an answer, not for you to walk past people. The printer offers to protect the envelope while you help, but you barely know him."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Проверить печать и сохранить письмо сухим",
+              "en": "Check the seal and keep the letter dry"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Дать раненому воды и попросить помочь с письмом",
+              "en": "Give the wounded man water and ask for help with the letter"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Бежать через простреливаемую площадь",
+              "en": "Run across the exposed square"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "Солдат готов впустить вас, если вы подпишете, что помощь нужна только госпиталю. За воротами ждут семьи с пустыми вёдрами. Марта такого условия не ставила. Можно проверить приказ или попросить солдата самому увидеть очередь.",
+          "en": "The soldier will admit you if you sign that only the hospital needs aid. Families wait outside with empty buckets. Marta set no such condition. You can verify the order or ask the soldier to see the queue himself."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Сверить приказ с пропуском и именами свидетелей",
+              "en": "Check the order against the pass and witness names"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Разделить воду с очередью и позвать солдата",
+              "en": "Share water with the queue and call the soldier over"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Угрожать солдату перед вооружённым караулом",
+              "en": "Threaten the soldier in front of the armed guard"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -1871,9 +2801,17 @@
       "leave": {
         "ru": "Письмо принято без свидетелей, но обещания коридора нет. Вы возвращаетесь к Марте с пустыми руками и говорите правду, как она просила. Она подвигает скамью: завтра искать путь придётся снова.",
         "en": "The letter is accepted without witnesses, but no corridor is promised. You return to Marta empty-handed and tell her the truth, as she asked. She makes room on the bench. Tomorrow another route must be found."
+      },
+      "loss": {
+        "ru": "Марта получает письмо обратно с пометками на полях. Она использует их на следующих переговорах; первый обоз привозит воду, а не обещания. Весной во дворе всходят семена. Одну грядку она оставляет без таблички — для тех, кто не вернулся.",
+        "en": "Marta gets the letter back with notes in the margins. She uses them in the next negotiations; the first convoy brings water instead of promises. In spring the seeds sprout. She leaves one bed unlabelled for those who did not return."
+      },
+      "retreat": {
+        "ru": "Марта встречает вас у госпиталя и молча разрезает испачканный рукав. Письмо передают другому курьеру вместе с вашими пометками. Пока вы поправляетесь, она просит помочь перебрать семена — это тоже дело, которое нельзя бросить.",
+        "en": "Marta meets you at the hospital and silently cuts away the stained sleeve. Another courier takes the letter and your notes. While you recover, she asks you to sort the seeds: that task matters too."
       }
     },
-    "length": 4
+    "length": 6
   },
   {
     "id": "lasttrain",
@@ -1942,10 +2880,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Сверить исправление расписания с картой пути",
+              "en": "Compare the changed timetable with the track map"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -1955,23 +2893,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Помочь Вере успокоиться, не требуя признания",
+              "en": "Help Vera calm down without demanding a confession"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Попытаться отнять ключ у проводника",
+              "en": "Try to take the conductor’s key by force"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -1989,10 +2928,10 @@
         "choices": [
           {
             "text": {
-              "ru": "Выслушать свидетеля и проверить, что в его рассказе не сходится",
-              "en": "Hear the witness out and check what does not add up"
+              "ru": "Уточнить у Веры происхождение архива",
+              "en": "Ask Vera where the archive came from"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               0,
               -10,
@@ -2002,23 +2941,24 @@
           },
           {
             "text": {
-              "ru": "Сделать паузу, предложить помощь и поговорить без обвинений",
-              "en": "Take a breather, offer help and talk without accusations"
+              "ru": "Помочь Вере успокоиться, не требуя признания",
+              "en": "Help Vera calm down without demanding a confession"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
-              10,
-              15,
+              5,
+              8,
               -5
             ],
-            "evidence": 0
+            "evidence": 0,
+            "trust": 1
           },
           {
             "text": {
-              "ru": "Забрать находку силой и идти напролом",
-              "en": "Seize the evidence and force a way through"
+              "ru": "Попытаться отнять ключ у проводника",
+              "en": "Try to take the conductor’s key by force"
             },
-            "next": "discovery",
+            "next": "promise",
             "delta": [
               -30,
               -15,
@@ -2039,7 +2979,7 @@
               "ru": "Сохранить доказательство и проверить детали",
               "en": "Keep the evidence and verify the details"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               0,
               -10,
@@ -2056,11 +2996,11 @@
               "ru": "Довериться союзнику и подготовить безопасный выход",
               "en": "Trust your ally and prepare a safe exit"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               5,
-              10,
-              -10
+              8,
+              -8
             ],
             "evidence": 0
           },
@@ -2069,7 +3009,7 @@
               "ru": "Поспешить к развязке, не проверяя путь",
               "en": "Rush toward the confrontation without checking the way"
             },
-            "next": "climax",
+            "next": "cost",
             "delta": [
               -25,
               -15,
@@ -2081,14 +3021,14 @@
       },
       "climax": {
         "text": {
-          "ru": "До стрелки остаётся минута. Передать запись диспетчеру, спрятать пассажирку и архив или сойти на технической остановке?",
-          "en": "The junction is a minute away. Send the recording to control, hide the passenger and archive, or leave at the maintenance stop?"
+          "ru": "До стрелки остаётся минута. Передать запись диспетчеру, спрятать пассажирку и архив или сойти на технической остановке?\n\nДля полного решения нужны проверенные сведения и человек, готовый поддержать вас. Если вы собирали только улики и никому не помогли, рассчитывайте на компромисс.",
+          "en": "The junction is a minute away. Send the recording to control, hide the passenger and archive, or leave at the maintenance stop?\n\nA full resolution needs verified evidence and someone willing to stand beside you. If you collected only clues and helped nobody, expect a compromise."
         },
         "choices": [
           {
             "text": {
-              "ru": "Действовать открыто, опираясь на собранные сведения",
-              "en": "Act openly using the evidence you gathered"
+              "ru": "Передать проверенную запись диспетчеру с Верой",
+              "en": "Send the verified recording to control with Vera"
             },
             "ending": "resolve",
             "delta": [
@@ -2100,8 +3040,8 @@
           },
           {
             "text": {
-              "ru": "Выбрать осторожный компромисс",
-              "en": "Choose the cautious compromise"
+              "ru": "Спрятать Веру, отправив копию архива",
+              "en": "Hide Vera and send a copy of the archive"
             },
             "ending": "mixed",
             "delta": [
@@ -2113,8 +3053,8 @@
           },
           {
             "text": {
-              "ru": "Уйти, сохранив жизнь и найденные записи",
-              "en": "Leave alive, taking your notes with you"
+              "ru": "Сойти на технической остановке",
+              "en": "Get off at the technical stop"
             },
             "ending": "leave",
             "delta": [
@@ -2123,6 +3063,130 @@
               0
             ],
             "evidence": 0
+          }
+        ]
+      },
+      "promise": {
+        "text": {
+          "ru": "Вера показывает сообщение сестры: «Я встречу». Она хочет ответить, но телефон с архивом может выдать ваше место. В купе напротив слышны шаги. Можно отключить сеть и проверить запись или дать ей полминуты, чтобы наконец сказать правду близкому человеку.",
+          "en": "Vera shows her sister’s message: “I’ll meet you.” Replying from the archive phone could reveal your location. Footsteps sound in the next compartment. You can cut the connection and verify the recording, or give her half a minute to tell her sister the truth."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Проверить запись в авиарежиме",
+              "en": "Verify the recording in airplane mode"
+            },
+            "next": "discovery",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Дать Вере позвонить и остаться у двери",
+              "en": "Let Vera call while you watch the door"
+            },
+            "next": "discovery",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Пойти к преследователям одному без записи",
+              "en": "Confront the pursuers alone without the recording"
+            },
+            "next": "discovery",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
+          }
+        ]
+      },
+      "cost": {
+        "text": {
+          "ru": "Диспетчер отвечает, но требует подтверждение из кабины. Вера предлагает отвлечь преследователей. Её голос спокоен только первые два слова. Вы можете добыть подтверждение или пойти вместе, отказавшись от самого быстрого плана.",
+          "en": "Control answers but needs confirmation from the cab. Vera offers to distract the pursuers. Her voice stays steady for only two words. You can obtain the confirmation or go together, giving up the quickest plan."
+        },
+        "choices": [
+          {
+            "text": {
+              "ru": "Запросить номер состава и сверить маршрут",
+              "en": "Request the train number and verify its route"
+            },
+            "next": "climax",
+            "delta": [
+              0,
+              -12,
+              4
+            ],
+            "evidence": 1,
+            "trust": 0,
+            "result": {
+              "ru": "Проверка дала ещё одну зацепку, но потребовала времени и сил.",
+              "en": "The check yields another clue, at a cost in time and strength."
+            }
+          },
+          {
+            "text": {
+              "ru": "Пойти с Верой и прикрыть переход",
+              "en": "Go with Vera and guard the passage"
+            },
+            "next": "climax",
+            "delta": [
+              -5,
+              -8,
+              -6
+            ],
+            "evidence": 0,
+            "trust": 1,
+            "result": {
+              "ru": "Помощь принята. Теперь вы действуете не в одиночку.",
+              "en": "Your help is accepted. You are no longer acting alone."
+            }
+          },
+          {
+            "text": {
+              "ru": "Перейти между вагонами снаружи на ходу",
+              "en": "Climb between the carriages while the train moves"
+            },
+            "next": "climax",
+            "delta": [
+              -28,
+              -18,
+              22
+            ],
+            "evidence": 0,
+            "trust": 0,
+            "result": {
+              "ru": "Риск оказался настоящим: вы ранены, и осторожный путь уже закрыт.",
+              "en": "The risk was real: you are hurt, and the cautious route is now closed."
+            }
           }
         ]
       }
@@ -2139,8 +3203,16 @@
       "leave": {
         "ru": "На технической остановке вы сходите с поезда. Вера остаётся в вагоне, сжимая телефон. Позже вы пишете ей вопрос о сестре; сообщение доставлено, но ответа пока нет.",
         "en": "You get off at the technical stop. Vera stays aboard, gripping her phone. Later you send a message asking about her sister. It is delivered, but no answer comes yet."
+      },
+      "loss": {
+        "ru": "Вера передаёт копию архива на освещённой платформе. Сестра ждёт её у турникета и не задаёт первый вопрос. Позже в свидетельских показаниях появляется ваше имя. Вера сохраняет последнее сообщение: обещание встретиться, которое теперь придётся помнить за двоих.",
+        "en": "Vera hands over the archive copy at a lit platform. Her sister waits by the gate without asking the first question. Your name appears in the witness statements. Vera keeps the final message: a promised meeting she must now remember for both of you."
+      },
+      "retreat": {
+        "ru": "Вера помогает вам сойти на освещённой платформе и передаёт записи дежурному. Сестра находит её в медпункте рядом с вами. Разговор получается совсем не тем, который она репетировала, но он наконец начинается.",
+        "en": "Vera helps you off at a lit platform and gives the recording to the attendant. Her sister finds her beside you in the first-aid room. Their conversation is nothing like the rehearsal, but at last it begins."
       }
     },
-    "length": 4
+    "length": 6
   }
 ]

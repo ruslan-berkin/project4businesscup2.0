@@ -10,10 +10,11 @@ import app
 
 class GroqContractTests(unittest.TestCase):
     def setUp(self):
+        app._AI_COOLDOWNS.clear()
         self.client = app.app.test_client()
         env = patch.dict(os.environ, {
-            'AI_PROVIDER': 'groq', 'AI_ENABLED': 'true',
-            'GROQ_API_KEY': 'test-only-groq', 'GROQ_MODEL': 'openai/gpt-oss-20b',
+            'AI_PROVIDER': 'groq', 'AI_ENABLED': 'true', 'AI_FALLBACK_PROVIDERS': '',
+            'GROQ_API_KEYS': '', 'OPENAI_API_KEYS': '', 'GROQ_API_KEY': 'test-only-groq', 'GROQ_MODEL': 'openai/gpt-oss-20b',
             'OPENAI_API_KEY': 'test-only-openai',
         })
         env.start()
@@ -71,11 +72,11 @@ class GroqContractTests(unittest.TestCase):
         self.assertEqual(self.call.call_count, calls)
 
     def test_finite_story_has_finale(self):
-        self.call.return_value = self.answer(ending=True)
+        self.call.return_value = self.answer(ending=True, delta=[10,22,-15])
         state = self.start('premium')
-        for i in range(4):
+        for i in range(25):
             state = self.turn(state).get_json()
-            self.assertEqual(state['game_over'], i == 3)
+            self.assertEqual(state['game_over'], i == 24)
         self.assertTrue(state['won'])
         self.assertEqual(state['options'], [])
 
@@ -134,6 +135,7 @@ class GroqContractTests(unittest.TestCase):
 
     def test_provider_auth_and_limit_errors_have_safe_diagnostics(self):
         for status, code in ((401, 'ai_auth_error'), (403, 'ai_auth_error'), (429, 'ai_rate_limit')):
+            app._AI_COOLDOWNS.clear()
             response = requests.Response()
             response.status_code = status
             self.call.side_effect = requests.HTTPError('secret-provider-body', response=response)

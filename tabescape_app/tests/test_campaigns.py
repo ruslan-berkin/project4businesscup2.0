@@ -33,10 +33,10 @@ class CampaignTests(unittest.TestCase):
                     with self.subTest(campaign=campaign['id'], language=language, ending=final_choice):
                         state = self.start(campaign_id=campaign['id'], language=language)
                         starts.add(state['narrative'])
-                        for choice in (0, 0, 0, final_choice):
+                        for choice in (0, 0, 1, 0, 0, final_choice):
                             state = self.turn(state, choice)
                         self.assertTrue(state['game_over'])
-                        self.assertEqual(state['story_turn'], 4)
+                        self.assertEqual(state['story_turn'], 6)
                         self.assertEqual(state['won'], final_choice == 0)
                         self.assertEqual(state['options'], [])
                         endings.append(state['narrative'])
@@ -45,7 +45,7 @@ class CampaignTests(unittest.TestCase):
 
     def test_evidence_affects_ending_and_risky_actions_can_kill(self):
         state = self.start()
-        for choice in (2, 1, 1, 0):
+        for choice in (2, 0, 0, 1, 0, 0):
             state = self.turn(state, choice)
         self.assertTrue(state['game_over'])
         self.assertFalse(state['won'])
@@ -59,8 +59,8 @@ class CampaignTests(unittest.TestCase):
 
     def test_inventory_and_typed_action(self):
         state = self.start()
-        for _ in range(3):
-            state = self.turn(state)
+        for choice in (0, 0, 1, 0):
+            state = self.turn(state, choice)
         item = state['inventory_add']
         self.assertTrue(item)
         restored = self.turn(state, -1, action='Use item: ' + item)
@@ -77,7 +77,7 @@ class CampaignTests(unittest.TestCase):
         self.assertEqual(state['engine'], 'demo')
         self.assertEqual(state['campaign_id'], 'room6')
         for i in range(22):
-            state = self.turn(state, 0 if i % 4 in (0, 3) else 1)
+            state = self.turn(state, 0 if i % 6 in (0, 5) else 1)
             self.assertFalse(state['game_over'], i)
         self.assertGreater(state['story_turn'], 18)
         for _ in range(20):
@@ -108,7 +108,7 @@ class CampaignTests(unittest.TestCase):
 class OpenAIContractTests(unittest.TestCase):
     def setUp(self):
         self.client = app.app.test_client()
-        self.env = patch.dict(os.environ, {'AI_PROVIDER':'openai', 'AI_ENABLED':'true', 'OPENAI_ENABLED':'true', 'OPENAI_API_KEY':'test-only', 'OPENAI_MODEL':'gpt-5-mini'})
+        self.env = patch.dict(os.environ, {'AI_PROVIDER':'openai', 'AI_ENABLED':'true', 'AI_FALLBACK_PROVIDERS':'', 'OPENAI_API_KEYS':'', 'OPENAI_ENABLED':'true', 'OPENAI_API_KEY':'test-only', 'OPENAI_MODEL':'gpt-5-mini'})
         self.env.start()
         self.addCleanup(self.env.stop)
 
@@ -148,8 +148,8 @@ class OpenAIContractTests(unittest.TestCase):
         failed = self.client.post('/api/action', json={'story_token':state['story_token'], 'choice_idx':0})
         self.assertEqual(failed.status_code, 502)
         call.side_effect = None
-        call.return_value = self.answer(ending=True)
-        for i in range(4):
+        call.return_value = self.answer(ending=True, delta=[10,22,-15])
+        for i in range(25):
             state = self.client.post('/api/action', json={'story_token':state['story_token'], 'choice_idx':0}).get_json()
             self.assertEqual(state['story_turn'], i+1)
         self.assertTrue(state['game_over'])

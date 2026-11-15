@@ -9,6 +9,7 @@ let timers = [];
 const state = {narrative:'The old scene',options:['Listen','Help','Leave'],readUntil:0,loading:null,
     over:false,bossMode:false,storyToken:'signed',seen:[],inventory:[],turn:1,sheet:'adv'};
 const context = vm.createContext({S:state, Boolean, Date:{now:()=>now}, Promise,
+    window:{matchMedia:()=>({matches:false})}, offerPending:false, offerDismissed:false,
     $:()=>null, document:{querySelectorAll:()=>[]},
     t:ru=>ru, esc:s=>s, clockStr:()=> '09:00', syncing:()=>{}, toast:()=>{},
     render:()=>{renders++;}, workspaceActionPending:false,

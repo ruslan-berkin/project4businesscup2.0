@@ -1371,3 +1371,8 @@ body[data-mask="autocad"] .sceneStatus {color:#a6d3bf}
 @media(max-width:520px){.hubNav nav{gap:5px}.hubNav .navPremium{padding:7px 9px;gap:4px;font-size:12px}.hubNav .navPremium svg{width:16px;height:16px}}
 .hubNav .langSwitch {white-space:nowrap;flex-shrink:0}
 @media(max-width:420px){.hubNav nav [data-home-help]{display:none}.hubNav .wordmark{font-size:21px}}
+
+/* Keep a stable paragraph height while the story types in. */
+.prosePending { visibility: hidden; }
+.sceneProse { white-space: pre-line; }
+.offerActions .demoReset { font-size: 12px; padding: 8px; background: transparent; border: 0; text-decoration: underline; }
