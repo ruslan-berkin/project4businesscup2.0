@@ -1,13 +1,13 @@
-/* Browser-local demo allowance. Paid entitlements will be verified by the server. */
+/* Browser-local offer timing, never a gameplay or paid entitlement gate. */
 window.DailyAllowance = {
-    limit: 3,
+    limit: 2,
     day(date = new Date()) {
         return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
     },
     read(storage, date = new Date()) {
         const day = this.day(date);
         try {
-            const value = JSON.parse(storage.get("te_daily_stories", "{}"));
+            const value = JSON.parse(storage.get("te_daily_free_stories_v2", "{}"));
             if (value.day === day && Array.isArray(value.completed)) {
                 return {day, completed: [...new Set(value.completed.filter(id => typeof id === "string"))]};
             }
@@ -20,7 +20,7 @@ window.DailyAllowance = {
     complete(storage, id, date = new Date()) {
         const record = this.read(storage, date);
         if (!record.completed.includes(id)) record.completed.push(id);
-        storage.set("te_daily_stories", JSON.stringify(record));
+        storage.set("te_daily_free_stories_v2", JSON.stringify(record));
         return this.remaining(storage, date);
     }
 };

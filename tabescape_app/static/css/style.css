@@ -1336,3 +1336,38 @@ body[data-mask="autocad"] .sceneStatus {color:#a6d3bf}
 .upcomingClose {position:absolute;top:8px;right:8px;min-width:36px;min-height:36px;border:0;border-radius:6px;background:transparent;color:#566153;font-size:25px;cursor:pointer}
 #upcomingDialog button:focus-visible {outline:3px solid #8d65b4;outline-offset:3px}
 @media(max-width:520px){#upcomingDialog[open]{grid-template-columns:90px 1fr}.upcomingPortrait{padding:12px 6px 0}.upcomingMessage{padding:44px 18px 24px}.upcomingMessage h2{font-size:25px}.upcomingMessage p{font-size:14px}.upcomingDone{width:100%}}
+
+/* An honest, optional Premium invitation for the jury demo. */
+#subscriptionDialog {position:fixed;inset:0;background:#faf8ed;max-height:calc(100dvh - 24px);overflow:auto}
+#subscriptionDialog .offerLayout {grid-template-columns:142px minmax(0,1fr)}
+#subscriptionDialog .offerPortrait {background:linear-gradient(#e6e9cf,#d3dfbb);padding:24px 12px 0;align-items:end;border-right:1px solid #d1d7bf}
+#subscriptionDialog .offerPortrait img {width:118px;max-height:none;image-rendering:pixelated;object-fit:contain}
+#subscriptionDialog .offerLayout section {padding:30px}
+#subscriptionDialog .offerLayout h2 {font:600 34px/1.12 Georgia,serif;letter-spacing:-.8px;margin:10px 0 14px}
+.offerClose {position:absolute;right:8px;top:8px;width:36px;height:36px;border:0;border-radius:6px;background:transparent;color:#52654c;font-size:25px;cursor:pointer}
+.offerIntro {font-size:14px;line-height:1.55;color:#52614e;margin:0}
+.premiumBenefits {list-style:none;padding:0;margin:20px 0;display:grid;gap:14px}
+.premiumBenefits li {display:flex;gap:12px;align-items:start}
+.premiumBenefits li>span {display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:7px;background:#e7ecd7;color:#43612e;font-size:20px}
+.premiumBenefits b {display:block;font-size:14px;line-height:1.4}.premiumBenefits p {font-size:12px;line-height:1.45;margin:3px 0 0;color:#5d6757}
+.premiumDemoNote,.premiumDemoBanner {padding:11px 13px;border:1px solid #c9d9b9;border-radius:8px;background:#edf3e4;color:#38542b;font-size:12px;line-height:1.5;margin:16px 0}
+#subscriptionDialog .offerActions {display:grid;gap:8px}
+#subscriptionDialog .offerActions button {min-height:44px;font-size:14px;background:transparent}
+#subscriptionDialog .offerActions .primary {background:#315f40;color:white;border-color:#315f40}
+#subscriptionDialog .offerNote {font-size:11px;line-height:1.5;margin:12px 0 0}
+#subscriptionDialog button:focus-visible {outline:3px solid #9872ba;outline-offset:3px}
+@media(max-width:600px){
+ #subscriptionDialog .offerLayout {display:block}
+ #subscriptionDialog .offerPortrait {display:none}
+ #subscriptionDialog .offerLayout section {padding:32px 20px 20px}
+ #subscriptionDialog .offerLayout h2 {font-size:29px}
+ .premiumBenefits {gap:12px;margin:16px 0}
+}
+
+.hubNav .navPremium {display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #d5ac50;background:linear-gradient(145deg,#fff3c9,#edcf80);color:#735012;box-shadow:inset 0 1px 0 #fff9e8,0 2px 0 #c7a25233;font-weight:750}
+.hubNav .navPremium svg {flex-shrink:0;color:#b27a15;filter:drop-shadow(0 1px 0 #fff7d8)}
+.hubNav .navPremium:hover {background:linear-gradient(145deg,#ffeeb3,#e8c362);border-color:#af7d24;color:#503608}
+.hubNav .navPremium:focus-visible {outline:3px solid #8b6420;outline-offset:3px}
+@media(max-width:520px){.hubNav nav{gap:5px}.hubNav .navPremium{padding:7px 9px;gap:4px;font-size:12px}.hubNav .navPremium svg{width:16px;height:16px}}
+.hubNav .langSwitch {white-space:nowrap;flex-shrink:0}
+@media(max-width:420px){.hubNav nav [data-home-help]{display:none}.hubNav .wordmark{font-size:21px}}

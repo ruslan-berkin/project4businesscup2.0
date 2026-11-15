@@ -1589,10 +1589,10 @@
             const sc = S.won ? score() : Math.round(score() / 2);
             if (S.turn > 1 && sc > S.best) { S.best = sc; store.set("te_best", String(sc)); }
         }
-        if (S.over && !wasOver && adventureId) {
+        if (S.over && !wasOver && adventureId && S.playMode === "free") {
             const before = DailyAllowance.remaining(store);
             const remaining = DailyAllowance.complete(store, adventureId);
-            if (before > 0 && remaining === 0) offerPending = true;
+            if (before > 0 && remaining === 0 && !premiumDemoOpen()) offerPending = true;
         }
         if (S.inventory.length > prevItems) toast(t("Получен предмет: ", "Item found: ") + itemLabel(S.inventory.at(-1)));
         render();
@@ -2258,7 +2258,7 @@
             if (child.tagName !== "SCRIPT" && child !== modal) original.append(child);
         }
         document.body.prepend(original);
-        document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-label="TabEscape Plus"></dialog>');
+        document.body.insertAdjacentHTML("afterbegin", '<div id="compactTools" hidden></div><dialog id="subscriptionDialog" aria-labelledby="premiumOfferTitle" aria-describedby="premiumDemoNote"></dialog>');
         document.body.insertAdjacentHTML("afterbegin", '<dialog id="gameLobby" aria-labelledby="gameLobbyTitle"></dialog>');
         document.body.insertAdjacentHTML("afterbegin", '<dialog id="upcomingDialog" aria-labelledby="upcomingTitle" aria-describedby="upcomingText"></dialog>');
         $("gameLobby").addEventListener("cancel", event => {event.preventDefault(); closeGameLobby(false);});
@@ -2289,7 +2289,7 @@
           <div class="hub">
             <div class="hubNav">
               <div class="wordmark"><img src="${portableImages["portal-icon.png"]}" alt="">Tab<span>Escape</span></div>
-              <nav aria-label="TabEscape"><button class="navWork"></button><button data-home-help></button></nav>
+              <nav aria-label="TabEscape"><button class="navWork"></button><button class="navPremium"><svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19"><path d="m3 7 5 4 4-7 4 7 5-4-2 11H5Z" fill="currentColor"/><path d="M6 21h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Premium</span></button><button data-home-help></button></nav>
               <button class="langSwitch"></button>
             </div>
             <div class="hero">
@@ -2318,6 +2318,7 @@
           </div>`;
         const launchGuide = () => tour.start(true);
         home.querySelector(".playNow").onclick = () => enterMask(mask);
+        home.querySelector(".navPremium").onclick = () => offerSubscription({manual:true});
         const navWork = home.querySelector(".navWork");
         navWork.textContent = t("Интерфейсы", "Workspaces");
         navWork.onclick = () => home.querySelector(".maskCard").focus();
@@ -2415,7 +2416,9 @@
         return catalogRequest;
     }
 
-    function openGameLobby(id) {
+    function openGameLobby(id, options = {}) {
+        const selectedMode = options.mode || S.playMode;
+        const forceNew = Boolean(options.mode);
         if ($("gameLobby").open) return Promise.resolve(false);
         lobbyFocus = document.activeElement;
         lobbyDraft = null;
@@ -2434,15 +2437,16 @@
             <div class="lobbyBody"><p class="lobbyEyebrow">${t("ПЕРЕД ПРИКЛЮЧЕНИЕМ", "BEFORE YOUR ADVENTURE")}</p>
             <h1 id="gameLobbyTitle">${t("Какую историю проживём?", "Which story will you live?")}</h1>
             <p class="lobbyIntro">${t("Выберите историю и режим. Игра начнётся только по вашей команде.", "Choose a story and a mode. Your adventure starts when you say so.")}</p>
+            ${premiumDemoOpen() ? `<p class="premiumDemoBanner">✓ ${t("Premium для жюри открыт · бесплатно, без карты и срока действия", "Jury Premium demo unlocked · free, no card, no expiry")}</p>` : ""}
             <fieldset class="lobbyActions"><legend>${t("Партия", "Adventure")}</legend>
-                <label><input type="radio" name="lobbyAction" value="new" ${!started || S.over ? "checked" : ""}><span><b>${t("Новая игра", "New game")}</b><small>${t("Начать другую историю или ветку", "Try a new story or another path")}</small></span></label>
-                <label><input type="radio" name="lobbyAction" value="continue" ${started ? (S.over ? "" : "checked") : "disabled"}><span><b>${t("Продолжить", "Continue")}</b><small>${started ? esc(S.campaignTitle)+" · "+clockStr() : t("Пока нет начатой партии", "No adventure started yet")}</small></span></label>
+                <label><input type="radio" name="lobbyAction" value="new" ${!started || S.over || forceNew ? "checked" : ""}><span><b>${t("Новая игра", "New game")}</b><small>${t("Начать другую историю или ветку", "Try a new story or another path")}</small></span></label>
+                <label><input type="radio" name="lobbyAction" value="continue" ${started ? (S.over || forceNew ? "" : "checked") : "disabled"}><span><b>${t("Продолжить", "Continue")}</b><small>${started ? esc(S.campaignTitle)+" · "+clockStr() : t("Пока нет начатой партии", "No adventure started yet")}</small></span></label>
             </fieldset>
             <fieldset id="lobbySetup"><legend>${t("Режим игры", "Play mode")}</legend>
               <div class="lobbyModeCards">
-                <label><input type="radio" name="lobbyMode" value="free" ${S.playMode === "free" ? "checked" : ""}><span><b>${t("Бесплатно", "Free stories")}</b><small>${t("8 историй · разные финалы", "8 stories · branching endings")}</small></span></label>
-                <label><input type="radio" name="lobbyMode" value="premium" ${S.playMode === "premium" ? "checked" : ""}><span><b>Premium</b><small>${t("ИИ-сюжет в выбранном жанре", "An AI story in your genre")}</small></span></label>
-                <label><input type="radio" name="lobbyMode" value="endless" ${S.playMode === "endless" ? "checked" : ""}><span><b>${t("Бесконечный", "Endless")}</b><small>${t("Новые главы, пока герой жив", "New chapters while you survive")}</small></span></label>
+                <label><input type="radio" name="lobbyMode" value="free" ${selectedMode === "free" ? "checked" : ""}><span><b>${t("Бесплатно", "Free stories")}</b><small>${t("8 историй · разные финалы", "8 stories · branching endings")}</small></span></label>
+                <label><input type="radio" name="lobbyMode" value="premium" ${selectedMode === "premium" ? "checked" : ""}><span><b>Premium</b><small>${t("ИИ-сюжет в выбранном жанре", "An AI story in your genre")}</small></span></label>
+                <label><input type="radio" name="lobbyMode" value="endless" ${selectedMode === "endless" ? "checked" : ""}><span><b>${t("Бесконечный", "Endless")}</b><small>${t("Новые главы, пока герой жив", "New chapters while you survive")}</small></span></label>
               </div>
               <div class="lobbyStoryControls">
                 <label class="lobbySelect" id="lobbyStoryLabel" for="lobbyStory">${t("История", "Story")}<select id="lobbyStory"></select></label>
@@ -2723,46 +2727,52 @@
         button(t("Переключить · Esc", "Switch · Esc"), toggleBoss, $("compactTools")).className = "compactSwitch";
     }
 
-    function offerSubscription() {
+    function premiumDemoOpen() {
+        return store.get("te_premium_demo", "") === "open";
+    }
+
+    function offerSubscription({manual = false} = {}) {
+        if (premiumDemoOpen() && !manual) { offerPending = false; return; }
         offerPending = true;
-        offerDismissed = false;
-        if (S.bossMode || tour?.active) return;
+        if (S.bossMode || tour?.active || (!manual && (offerDismissed || !$("welcome").hidden))) return;
         const dialog = $("subscriptionDialog");
         if (dialog.open) return;
         offerFocus = document.activeElement;
-        dialog.innerHTML = '<div class="offerLayout"><div class="offerPortrait"><img src="' + portableImages["mira.webp"] + '" alt=""></div><section><span class="offerEyebrow">TABESCAPE PLUS</span><h2>' +
-            t("На сегодня — целое приключение", "You’ve had quite an adventure") + '</h2><p>' +
-            t("Ты завершил три истории! В демо можно продолжать играть бесплатно и без ограничений.",
-              "You’ve finished three stories! Keep playing this demo for free, with no limits.") +
-            '</p><div class="plusFeatures"><h3>' + t("Больше миров с Plus", "More worlds with Plus") +
-            '</h3><ul><li>' + t("Новые сюжеты с ИИ", "New AI-generated stories") + '</li><li>' +
-            t("Выбор жанров и атмосферы", "Choose genres and atmosphere") + '</li><li>' +
-            t("Бесконечный режим", "Endless mode") + '</li></ul><p>' +
-            t("Подписка готовится к запуску. Цена и оплата появятся позже.",
-              "Subscription coming soon. Pricing and checkout will be available at launch.") +
-            '</p></div><div class="offerActions"></div><p class="offerNote" role="status"></p></section></div>';
+        dialog.innerHTML = `<button class="offerClose" aria-label="${t("Закрыть", "Close")}">×</button>
+            <div class="offerLayout"><div class="offerPortrait"><img src="${portableImages["mira.webp"]}" alt="${t("Мира", "Mira")}"></div>
+            <section><span class="offerEyebrow">TABESCAPE PREMIUM</span>
+                <h2 id="premiumOfferTitle">${t("Продолжим в новом мире?", "Ready for another world?")}</h2>
+                <p class="offerIntro">${manual ? t("Выберите жанр — ИИ придумает новое приключение и будет развивать его по вашим решениям.", "Choose a genre. AI will create a new adventure and develop it with your decisions.") : t("Две бесплатные истории позади. В Premium вы выбираете жанр, а ИИ придумывает новое приключение и развивает его по вашим решениям.", "Two free stories down. With Premium, you choose the genre and AI creates a new adventure that develops with your decisions.")}</p>
+                <ul class="premiumBenefits">
+                    <li><span aria-hidden="true">✦</span><div><b>${t("Новые истории с ИИ", "New AI-created stories")}</b><p>${t("Начните заново — с другими героями, загадками и поворотами сюжета.", "Start again with different characters, mysteries and plot twists.")}</p></div></li>
+                    <li><span aria-hidden="true">◈</span><div><b>${t("Жанр под настроение", "Pick your kind of story")}</b><p>${t("Детектив, хоррор, фэнтези, фантастика и другие жанры — выбирайте перед стартом.", "Mystery, horror, fantasy, sci-fi and more — choose before you start.")}</p></div></li>
+                    <li><span aria-hidden="true">↗</span><div><b>${t("Продолжение зависит от вас", "Your choices shape what comes next")}</b><p>${t("Модель учитывает события, встречи и ваши поступки в следующих сценах.", "The model carries events, encounters and your actions into the next scenes.")}</p></div></li>
+                    <li><span aria-hidden="true">∞</span><div><b>${t("Бесконечное приключение", "Endless adventure")}</b><p>${t("Без заранее заданного финала: новые главы, пока ваш герой жив.", "No fixed finale: new chapters for as long as your hero survives.")}</p></div></li>
+                </ul>
+                <p id="premiumDemoNote" class="premiumDemoNote">${t("(Демо для жюри: все возможности Premium бесплатно, без карты и срока действия. Нажатие кнопки не оформляет платную подписку.)", "(Jury demo: all Premium features are free, with no card or expiry. Clicking the button does not create a paid subscription.)")}</p>
+                <div class="offerActions"></div>
+                <p class="offerNote">${t("Бесплатные истории остаются открыты. Premium и бесконечный режим также доступны в меню новой игры.", "Free stories stay available. You can also choose Premium or Endless from the new-game menu.")}</p>
+            </section></div>`;
         const actions = dialog.querySelector(".offerActions");
-        button(t("Продолжить бесплатно", "Continue for free"), () => {
+        button(premiumDemoOpen() ? t("Выбрать приключение", "Choose an adventure") : t("Открыть Premium бесплатно", "Unlock Premium for free"), () => {
+            store.set("te_premium_demo", "open");
             closeOffer();
-            if (S.over) restart();
+            openGameLobby(mask, {mode:"premium"});
         }, actions).className = "primary";
-        button(t("Купить подписку · скоро", "Get Plus · coming soon"), () => {
-            dialog.querySelector(".offerNote").textContent = t(
-                "Оплата ещё не подключена. Жанры и режимы уже доступны в окне новой игры; генерацию Groq / OpenAI включает команда на сервере.",
-                "Checkout is not connected yet. Genres and modes are available in the new-game menu; the team enables Groq / OpenAI on the server.");
-        }, actions);
-        button(t("Прийти завтра", "Come back tomorrow"), () => {
+        button(t("Пока бесплатные истории", "Keep playing free stories"), () => {
             closeOffer();
-            showWelcome();
+            openGameLobby(mask, {mode:"free"});
         }, actions);
-        button(started ? t("Посмотреть финал", "Review ending") : t("Закрыть", "Close"), closeOffer, actions);
+        dialog.querySelector(".offerClose").onclick = closeOffer;
         dialog.showModal();
+        actions.querySelector(".primary").focus();
     }
 
     function closeOffer() {
         $("subscriptionDialog").close();
+        offerPending = false;
         offerDismissed = true;
-        if (offerFocus?.isConnected) offerFocus.focus();
+        if (offerFocus?.isConnected) offerFocus.focus({preventScroll:true});
     }
 
     function wordChrome(root, editing) {
