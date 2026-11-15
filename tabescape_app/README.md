@@ -23,7 +23,7 @@ python app.py
 gunicorn app:app --timeout 60 --bind 0.0.0.0:8000
 ```
 
-Корневой `render.yaml` задаёт `rootDir`, зависимости, Gunicorn и постоянный секрет подписи. После создания Blueprint из репозитория Render выдаст публичную ссылку. Сам GitHub Flask не запускает.
+Корневой `render.yaml` задаёт `rootDir`, зависимости, Gunicorn и постоянный секрет подписи. Действующая публичная версия: [tabescape.onrender.com](https://tabescape.onrender.com/). Сам GitHub Flask не запускает.
 
 ## Начало партии
 
